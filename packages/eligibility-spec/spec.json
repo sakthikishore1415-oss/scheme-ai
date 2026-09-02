@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "name": "Arivom Thittam Eligibility Rules Specification",
+  "disqualifiers": [
+    {
+      "key": "age",
+      "condition": "profile.age < scheme.minAge || profile.age > scheme.maxAge"
+    },
+    {
+      "key": "income",
+      "condition": "scheme.maxAnnualIncome && profile.annualIncome > scheme.maxAnnualIncome"
+    },
+    {
+      "key": "location",
+      "condition": "scheme.stateId !== 'ALL' && profile.state !== scheme.stateId"
+    },
+    {
+      "key": "gender",
+      "condition": "scheme.genders && !scheme.genders.includes(profile.gender)"
+    }
+  ],
+  "weights": {
+    "occupation": 35,
+    "income": 25,
+    "age": 20,
+    "location": 20
+  },
+  "thresholds": {
+    "strong": 80,
+    "potential": 50,
+    "more_info": 1
+  }
+}
+
