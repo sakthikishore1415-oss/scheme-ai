@@ -1,5 +1,6 @@
 package com.arivomthittam.ui.screens.language
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -36,12 +38,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arivomthittam.ui.components.ArivomTopAppBar
-import com.arivomthittam.ui.theme.Emerald600
-import com.arivomthittam.ui.theme.Emerald700
-import com.arivomthittam.ui.theme.Emerald800
-import com.arivomthittam.ui.theme.Slate100
-import com.arivomthittam.ui.theme.Slate500
-import com.arivomthittam.ui.theme.Slate900
+import com.arivomthittam.ui.theme.OnPrimary
+import com.arivomthittam.ui.theme.OnSurface
+import com.arivomthittam.ui.theme.OnSurfaceVariant
+import com.arivomthittam.ui.theme.OutlineVariant
+import com.arivomthittam.ui.theme.PrimaryFixed
+import com.arivomthittam.ui.theme.PrimaryIndigo
+import com.arivomthittam.ui.theme.Surface
+import com.arivomthittam.ui.theme.SurfaceContainerLowest
 
 data class LanguageOption(
     val id: String,
@@ -73,7 +77,7 @@ fun LanguageSelectionScreen(
     Scaffold(
         topBar = {
             ArivomTopAppBar(
-                title = "Choose Language",
+                title = "Arivom Thittam",
                 tamilTitle = "மொழி தேர்வு"
             )
         }
@@ -81,15 +85,24 @@ fun LanguageSelectionScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Surface)
                 .padding(padding)
                 .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
                 Text(
-                    text = "Select your regional language for voice discovery & explanations",
+                    text = "Choose Your Language / மொழியைத் தேர்ந்தெடுக்கவும்",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PrimaryIndigo,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+
+                Text(
+                    text = "Select your regional language for voice discovery & explanations.",
                     fontSize = 13.sp,
-                    color = Slate500,
+                    color = OnSurfaceVariant,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
@@ -103,11 +116,15 @@ fun LanguageSelectionScreen(
                                     selectedLang = lang.id
                                     selectedState = lang.stateCode
                                 },
-                            shape = RoundedCornerShape(16.dp),
+                            shape = RoundedCornerShape(14.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = if (isSelected) Emerald600 else Color.White
+                                containerColor = if (isSelected) PrimaryFixed else SurfaceContainerLowest
                             ),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                            border = BorderStroke(
+                                if (isSelected) 2.dp else 1.dp,
+                                if (isSelected) PrimaryIndigo else OutlineVariant
+                            ),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                         ) {
                             Row(
                                 modifier = Modifier
@@ -121,21 +138,30 @@ fun LanguageSelectionScreen(
                                         text = lang.name,
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 16.sp,
-                                        color = if (isSelected) Color.White else Slate900
+                                        color = if (isSelected) PrimaryIndigo else OnSurface
                                     )
                                     Text(
                                         text = lang.nativeName,
                                         fontSize = 13.sp,
-                                        color = if (isSelected) Slate100 else Emerald700
+                                        color = if (isSelected) PrimaryIndigo else OnSurfaceVariant
                                     )
                                 }
 
                                 if (isSelected) {
-                                    Icon(
-                                        imageVector = Icons.Default.Check,
-                                        contentDescription = null,
-                                        tint = Color.White
-                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .clip(CircleShape)
+                                            .background(PrimaryIndigo),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = null,
+                                            tint = OnPrimary,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -151,16 +177,16 @@ fun LanguageSelectionScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(54.dp),
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Emerald800)
+                shape = RoundedCornerShape(27.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
             ) {
                 Text(
                     text = "CONTINUE / தொடர்க",
                     fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = OnPrimary
                 )
             }
         }
     }
 }
-

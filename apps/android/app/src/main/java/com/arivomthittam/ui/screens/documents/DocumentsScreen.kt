@@ -1,11 +1,16 @@
 package com.arivomthittam.ui.screens.documents
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,20 +19,24 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arivomthittam.ui.components.ArivomTopAppBar
-import com.arivomthittam.ui.theme.Emerald600
-import com.arivomthittam.ui.theme.Slate500
-import com.arivomthittam.ui.theme.Slate700
-import com.arivomthittam.ui.theme.Slate900
+import com.arivomthittam.ui.theme.OnSurface
+import com.arivomthittam.ui.theme.OnSurfaceVariant
+import com.arivomthittam.ui.theme.OutlineVariant
+import com.arivomthittam.ui.theme.PrimaryIndigo
+import com.arivomthittam.ui.theme.Surface
+import com.arivomthittam.ui.theme.SurfaceContainerHigh
+import com.arivomthittam.ui.theme.SurfaceContainerLowest
+import com.arivomthittam.ui.theme.TertiaryContainer
 
 data class StandardDocument(
     val id: String,
@@ -52,10 +61,14 @@ fun DocumentsScreen(
     onToggleDocument: (String) -> Unit,
     onNavigateBack: () -> Unit
 ) {
+    val readyCount = checkedDocuments.size
+    val totalCount = STANDARD_DOCUMENTS.size
+    val progress = if (totalCount > 0) readyCount.toFloat() / totalCount else 0f
+
     Scaffold(
         topBar = {
             ArivomTopAppBar(
-                title = "Required Documents",
+                title = "Arivom Thittam",
                 tamilTitle = "ஆவண சரிபார்ப்பு",
                 canNavigateBack = true,
                 onNavigateBack = onNavigateBack
@@ -65,21 +78,59 @@ fun DocumentsScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Surface)
                 .padding(padding)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+            // Readiness Summary Card
+            item {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = SurfaceContainerLowest),
+                    border = BorderStroke(1.dp, OutlineVariant)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Document Readiness",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                                color = PrimaryIndigo
+                            )
+                            Text(
+                                text = "$readyCount of $totalCount ready",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp,
+                                color = TertiaryContainer
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        LinearProgressIndicator(
+                            progress = { progress },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(8.dp),
+                            color = TertiaryContainer,
+                            trackColor = SurfaceContainerHigh
+                        )
+                    }
+                }
+            }
+
             item {
                 Text(
-                    text = "Citizen Document Readiness",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Black,
-                    color = Slate900
-                )
-                Text(
-                    text = "Check off documents you possess to verify application readiness.",
-                    fontSize = 12.sp,
-                    color = Slate500
+                    text = "Citizen Document Checklist",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PrimaryIndigo
                 )
             }
 
@@ -89,8 +140,9 @@ fun DocumentsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { onToggleDocument(doc.id) },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(14.dp),
+                    colors = CardDefaults.cardColors(containerColor = SurfaceContainerLowest),
+                    border = BorderStroke(1.dp, OutlineVariant),
                     elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
                     Row(
@@ -102,7 +154,7 @@ fun DocumentsScreen(
                         Checkbox(
                             checked = isChecked,
                             onCheckedChange = { onToggleDocument(doc.id) },
-                            colors = CheckboxDefaults.colors(checkedColor = Emerald600)
+                            colors = CheckboxDefaults.colors(checkedColor = PrimaryIndigo)
                         )
 
                         Column(modifier = Modifier.padding(start = 8.dp)) {
@@ -110,18 +162,21 @@ fun DocumentsScreen(
                                 text = "${doc.name} (${doc.tamilName})",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp,
-                                color = Slate900
+                                color = OnSurface
                             )
                             Text(
                                 text = doc.description,
                                 fontSize = 12.sp,
-                                color = Slate700
+                                color = OnSurfaceVariant
                             )
                         }
                     }
                 }
             }
+
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
     }
 }
-

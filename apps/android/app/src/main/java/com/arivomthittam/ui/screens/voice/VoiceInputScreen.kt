@@ -5,19 +5,23 @@ import android.content.Intent
 import android.speech.RecognizerIntent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -25,6 +29,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,11 +48,17 @@ import androidx.compose.ui.unit.sp
 import com.arivomthittam.data.model.CitizenProfile
 import com.arivomthittam.ui.components.ArivomTopAppBar
 import com.arivomthittam.ui.navigation.Screen
-import com.arivomthittam.ui.theme.Emerald600
-import com.arivomthittam.ui.theme.Emerald800
-import com.arivomthittam.ui.theme.Slate100
-import com.arivomthittam.ui.theme.Slate500
-import com.arivomthittam.ui.theme.Slate900
+import com.arivomthittam.ui.theme.OnPrimary
+import com.arivomthittam.ui.theme.OnSurface
+import com.arivomthittam.ui.theme.OnSurfaceVariant
+import com.arivomthittam.ui.theme.OutlineVariant
+import com.arivomthittam.ui.theme.PrimaryContainer
+import com.arivomthittam.ui.theme.PrimaryFixed
+import com.arivomthittam.ui.theme.PrimaryIndigo
+import com.arivomthittam.ui.theme.SecondaryContainer
+import com.arivomthittam.ui.theme.Surface
+import com.arivomthittam.ui.theme.SurfaceContainerLow
+import com.arivomthittam.ui.theme.SurfaceContainerLowest
 
 @Composable
 fun VoiceInputScreen(
@@ -75,7 +86,7 @@ fun VoiceInputScreen(
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, if (currentLanguage == "ta") "ta-IN" else "en-IN")
-            putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak your details (e.g. 45 years old farmer)...")
+            putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak now. You can speak in Tamil or English...")
         }
         isListening = true
         try {
@@ -88,7 +99,7 @@ fun VoiceInputScreen(
     Scaffold(
         topBar = {
             ArivomTopAppBar(
-                title = "Voice Assistant",
+                title = "Arivom Thittam",
                 tamilTitle = "குரல் உதவி",
                 canNavigateBack = true,
                 onNavigateBack = { onNavigate(Screen.Home.route) }
@@ -98,110 +109,140 @@ fun VoiceInputScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Surface)
                 .padding(padding)
-                .padding(20.dp),
+                .padding(horizontal = 20.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text(
-                    text = "Speak Your Demographic Details",
-                    fontWeight = FontWeight.Black,
-                    fontSize = 20.sp,
-                    color = Slate900
+                    text = "Arivom Voice Assistant",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 22.sp,
+                    color = PrimaryIndigo,
+                    textAlign = TextAlign.Center
                 )
                 Text(
-                    text = "Mention your age, occupation, and needed welfare support.",
+                    text = "குரல் உதவியாளரிடம் பேசுங்கள்",
                     fontSize = 13.sp,
-                    color = Slate500,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 4.dp, bottom = 24.dp)
+                    color = OnSurfaceVariant,
+                    modifier = Modifier.padding(top = 2.dp, bottom = 28.dp)
                 )
 
-                // Large Central Mic Touch Target
+                // Large Central Touch Target with pulsing concentric circles
                 Box(
                     modifier = Modifier
-                        .size(120.dp)
+                        .size(160.dp)
                         .clip(CircleShape)
-                        .background(if (isListening) Color.Red else Emerald600),
+                        .background(if (isListening) PrimaryContainer.copy(alpha = 0.3f) else PrimaryFixed.copy(alpha = 0.5f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    IconButton(
-                        onClick = { launchSpeechRecognition() },
-                        modifier = Modifier.size(120.dp)
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape)
+                            .background(if (isListening) SecondaryContainer else PrimaryIndigo),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Mic,
-                            contentDescription = "Tap to Speak",
-                            tint = Color.White,
-                            modifier = Modifier.size(48.dp)
-                        )
+                        IconButton(
+                            onClick = { launchSpeechRecognition() },
+                            modifier = Modifier.size(120.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Mic,
+                                contentDescription = "Tap to Speak",
+                                tint = OnPrimary,
+                                modifier = Modifier.size(48.dp)
+                            )
+                        }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = if (isListening) "LISTENING..." else "TAP TO SPEAK",
-                    fontWeight = FontWeight.Black,
-                    fontSize = 12.sp,
-                    color = if (isListening) Color.Red else Emerald800
+                    text = if (isListening) "LISTENING... / கேட்கிறது..." else "TAP TO SPEAK / பேசத் தொடங்குங்கள்",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp,
+                    color = if (isListening) SecondaryContainer else PrimaryIndigo,
+                    letterSpacing = 1.sp
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // Spoken Transcript Card
                 if (recognizedText.isNotBlank()) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = Slate100)
+                        colors = CardDefaults.cardColors(containerColor = SurfaceContainerLowest),
+                        border = BorderStroke(1.dp, OutlineVariant),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = "CAPTURED SPOKEN INPUT",
+                                text = "YOU SAID / நீங்கள் கூறியது:",
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Emerald800
+                                color = OnSurfaceVariant,
+                                letterSpacing = 1.sp
                             )
+
                             Text(
                                 text = "\"$recognizedText\"",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Slate900,
-                                modifier = Modifier.padding(top = 4.dp)
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PrimaryIndigo,
+                                modifier = Modifier.padding(vertical = 8.dp)
                             )
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                OutlinedButton(
+                                    onClick = { recognizedText = "" },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(20.dp),
+                                    border = BorderStroke(1.dp, PrimaryIndigo)
+                                ) {
+                                    Text("Edit / மாற்று", color = PrimaryIndigo, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                }
+
+                                Button(
+                                    onClick = {
+                                        val profile = CitizenProfile(
+                                            age = 45,
+                                            occupation = recognizedText,
+                                            state = currentState,
+                                            voiceLanguage = currentLanguage
+                                        )
+                                        onProfileExtracted(profile)
+                                        onNavigate(Screen.Matches.route)
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
+                                ) {
+                                    Text("Yes, continue", color = OnPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                }
+                            }
                         }
                     }
                 }
             }
 
-            if (recognizedText.isNotBlank()) {
-                Button(
-                    onClick = {
-                        // Create structured profile from voice
-                        val profile = CitizenProfile(
-                            age = 35,
-                            occupation = recognizedText,
-                            state = currentState,
-                            voiceLanguage = currentLanguage
-                        )
-                        onProfileExtracted(profile)
-                        onNavigate(Screen.Matches.route)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(54.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Emerald800)
-                ) {
-                    Text(
-                        text = "CONFIRM & MATCH SCHEMES",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
+            Text(
+                text = "Speak now. You can speak in Tamil or English.",
+                fontSize = 12.sp,
+                color = OnSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
         }
     }
 }
-

@@ -9,3 +9,5 @@ coverage/
 .turbo/
 bun.lock*
 bun.lockb
+design_system/
+*.zip
