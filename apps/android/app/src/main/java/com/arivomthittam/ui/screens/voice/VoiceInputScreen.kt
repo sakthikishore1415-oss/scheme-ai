@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Sparkles
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arivomthittam.data.model.CitizenProfile
+import com.arivomthittam.domain.language.LanguageDetectionHelper
 import com.arivomthittam.ui.components.ArivomTopAppBar
 import com.arivomthittam.ui.navigation.Screen
 import com.arivomthittam.ui.theme.OnPrimary
@@ -59,6 +61,8 @@ import com.arivomthittam.ui.theme.SecondaryContainer
 import com.arivomthittam.ui.theme.Surface
 import com.arivomthittam.ui.theme.SurfaceContainerLow
 import com.arivomthittam.ui.theme.SurfaceContainerLowest
+import com.arivomthittam.ui.theme.TertiaryContainer
+import com.arivomthittam.ui.theme.TertiaryFixed
 
 @Composable
 fun VoiceInputScreen(
@@ -68,6 +72,7 @@ fun VoiceInputScreen(
     onNavigate: (String) -> Unit
 ) {
     var recognizedText by remember { mutableStateOf("") }
+    var detectedLanguage by remember { mutableStateOf<String?>(null) }
     var isListening by remember { mutableStateOf(false) }
 
     val speechRecognizerLauncher = rememberLauncherForActivityResult(
@@ -77,16 +82,29 @@ fun VoiceInputScreen(
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
             val spokenMatches = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
             if (!spokenMatches.isNullOrEmpty()) {
-                recognizedText = spokenMatches[0]
+                val text = spokenMatches[0]
+                recognizedText = text
+                val detected = LanguageDetectionHelper.detectLanguageFromText(text)
+                detectedLanguage = detected ?: currentLanguage
             }
         }
     }
 
     val launchSpeechRecognition = {
+        val bcp47 = when (currentLanguage) {
+            "ta" -> "ta-IN"
+            "te" -> "te-IN"
+            "kn" -> "kn-IN"
+            "ml" -> "ml-IN"
+            "hi" -> "hi-IN"
+            "bn" -> "bn-IN"
+            "mr" -> "mr-IN"
+            else -> "en-IN"
+        }
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, if (currentLanguage == "ta") "ta-IN" else "en-IN")
-            putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak now. You can speak in Tamil or English...")
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, bcp47)
+            putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak now in your regional language or English...")
         }
         isListening = true
         try {
@@ -102,7 +120,9 @@ fun VoiceInputScreen(
                 title = "Arivom Thittam",
                 tamilTitle = "குரல் உதவி",
                 canNavigateBack = true,
-                onNavigateBack = { onNavigate(Screen.Home.route) }
+                onNavigateBack = { onNavigate(Screen.Home.route) },
+                currentLanguageName = if (currentLanguage == "ta") "தமிழ்" else "English",
+                onLanguageClick = { onNavigate(Screen.Language.route) }
             )
         }
     ) { padding ->
@@ -172,9 +192,9 @@ fun VoiceInputScreen(
                     letterSpacing = 1.sp
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                // Spoken Transcript Card
+                // Spoken Transcript Card with Auto-Detected Language Indicator
                 if (recognizedText.isNotBlank()) {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -184,13 +204,35 @@ fun VoiceInputScreen(
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = "YOU SAID / நீங்கள் கூறியது:",
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = OnSurfaceVariant,
-                                letterSpacing = 1.sp
-                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "YOU SAID / நீங்கள் கூறியது:",
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = OnSurfaceVariant,
+                                    letterSpacing = 1.sp
+                                )
+
+                                if (detectedLanguage != null) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(TertiaryFixed.copy(alpha = 0.6f))
+                                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                                    ) {
+                                        Text(
+                                            text = "Auto-detected: ${if (detectedLanguage == "ta") "Tamil" else detectedLanguage?.uppercase()}",
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = TertiaryContainer
+                                        )
+                                    }
+                                }
+                            }
 
                             Text(
                                 text = "\"$recognizedText\"",
@@ -205,7 +247,10 @@ fun VoiceInputScreen(
                                 horizontalArrangement = Arrangement.spacedBy(10.dp)
                             ) {
                                 OutlinedButton(
-                                    onClick = { recognizedText = "" },
+                                    onClick = {
+                                        recognizedText = ""
+                                        detectedLanguage = null
+                                    },
                                     modifier = Modifier.weight(1f),
                                     shape = RoundedCornerShape(20.dp),
                                     border = BorderStroke(1.dp, PrimaryIndigo)
@@ -219,7 +264,7 @@ fun VoiceInputScreen(
                                             age = 45,
                                             occupation = recognizedText,
                                             state = currentState,
-                                            voiceLanguage = currentLanguage
+                                            voiceLanguage = detectedLanguage ?: currentLanguage
                                         )
                                         onProfileExtracted(profile)
                                         onNavigate(Screen.Matches.route)
@@ -237,7 +282,7 @@ fun VoiceInputScreen(
             }
 
             Text(
-                text = "Speak now. You can speak in Tamil or English.",
+                text = "Speak now. You can speak in Tamil, Telugu, Hindi, Malayalam or English.",
                 fontSize = 12.sp,
                 color = OnSurfaceVariant,
                 textAlign = TextAlign.Center,

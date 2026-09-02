@@ -8,6 +8,7 @@ import com.arivomthittam.data.model.Scheme
 import com.arivomthittam.data.repository.LocalSchemeRepository
 import com.arivomthittam.data.repository.RepositoryResult
 import com.arivomthittam.domain.eligibility.DeterministicEligibilityEngine
+import com.arivomthittam.domain.language.LanguageDetectionHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,7 @@ import kotlinx.coroutines.withContext
 
 data class UiState(
     val userProfile: CitizenProfile? = null,
-    val selectedLanguage: String = "ta",
+    val selectedLanguage: String = LanguageDetectionHelper.detectDeviceLanguage(),
     val selectedState: String = "TN",
     val schemes: List<Scheme> = emptyList(),
     val matches: List<EligibilityResult> = emptyList(),

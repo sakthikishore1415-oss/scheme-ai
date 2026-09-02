@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import {
   Mic,
   MapPin,
@@ -104,19 +105,19 @@ export const Header: React.FC = () => {
             </div>
           </button>
 
-          {/* Active State / Language Switcher Button */}
+          {/* Active State Button */}
           <button
-            id="state-lang-selector-btn"
+            id="state-selector-btn"
             onClick={() => setShowSetupModal(true)}
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-800 hover:text-emerald-900 text-xs font-semibold border border-slate-200 hover:border-emerald-300 transition-all cursor-pointer"
-            title="Click to Change State or Language"
+            title="Click to Change State"
           >
             <MapPin className="w-3.5 h-3.5 text-emerald-700" />
             <span className="font-bold">{currentStateConfig.name}</span>
-            <span className="text-slate-400 font-normal">|</span>
-            <Volume2 className="w-3.5 h-3.5 text-teal-600" />
-            <span>{currentLanguageConfig.name}</span>
           </button>
+
+          {/* Quick Language Switcher Dropdown */}
+          <LanguageSwitcher />
         </div>
 
         {/* Global Action Tools */}

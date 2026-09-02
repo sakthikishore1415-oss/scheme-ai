@@ -3,6 +3,8 @@ import { useApp } from '../context/AppContext';
 import { getVoicePack } from '../data/locales';
 import { speechService } from '../utils/speech';
 import { extractProfileFromSpokenText, ExtractedProfileData } from '../utils/nlpExtractor';
+import { detectLanguageFromText } from '../utils/languageDetector';
+import { SUPPORTED_LANGUAGES } from '../data/languages';
 import {
   Mic,
   MicOff,
@@ -29,6 +31,7 @@ export const VoiceAssistantModal: React.FC = () => {
     showVoiceModal,
     setShowVoiceModal,
     selectedVoiceLanguageId,
+    setSelectedVoiceLanguageId,
     currentStateConfig,
     currentLanguageConfig,
     userProfile,
@@ -134,9 +137,25 @@ export const VoiceAssistantModal: React.FC = () => {
     setErrorMessage('Browser SpeechRecognition not supported on this browser. Please use the text input below.');
   };
 
+  const [detectedLangFeedback, setDetectedLangFeedback] = useState<string | null>(null);
+
   const processSpokenText = (text: string) => {
     setVoiceState('UNDERSTANDING');
-    const extracted = extractProfileFromSpokenText(text, selectedVoiceLanguageId);
+
+    // Auto-detect language from spoken or transcribed script
+    const detectedLang = detectLanguageFromText(text);
+    let activeLang = selectedVoiceLanguageId;
+    if (detectedLang && detectedLang !== selectedVoiceLanguageId && SUPPORTED_LANGUAGES[detectedLang]) {
+      activeLang = detectedLang;
+      setSelectedVoiceLanguageId(detectedLang);
+      setDetectedLangFeedback(
+        `Auto-detected language: ${SUPPORTED_LANGUAGES[detectedLang].nativeName} (${SUPPORTED_LANGUAGES[detectedLang].name})`
+      );
+    } else {
+      setDetectedLangFeedback(null);
+    }
+
+    const extracted = extractProfileFromSpokenText(text, activeLang);
     setExtractedData(extracted);
     setVoiceState('BUILDING_PROFILE');
 
@@ -295,9 +314,17 @@ export const VoiceAssistantModal: React.FC = () => {
           {(voiceState === 'UNDERSTANDING' || voiceState === 'BUILDING_PROFILE') && (
             <div className="space-y-4 max-w-md w-full text-left">
               <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 space-y-2">
-                <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider block">
-                  Captured Spoken Input
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider block">
+                    Captured Spoken Input
+                  </span>
+                  {detectedLangFeedback && (
+                    <span className="flex items-center gap-1 text-[10px] font-bold text-teal-300 bg-teal-950/80 border border-teal-700/60 px-2 py-0.5 rounded-full">
+                      <Sparkles className="w-2.5 h-2.5 text-teal-400" />
+                      {detectedLangFeedback}
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm font-semibold text-white italic">
                   "{spokenTranscript || customTextInput}"
                 </p>
