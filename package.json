@@ -8,9 +8,9 @@
     "clean": "turbo run clean",
     "fetch-schemes": "python3 scripts/fetch_all_india_schemes.py"
   },
-  "packageManager": "pnpm@11.25.0",
+  "packageManager": "pnpm@9.15.4",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=20.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",
