@@ -7,6 +7,7 @@ interface VoiceOrbVisualizerProps {
   soundLevel?: number; // 0.0 to 1.0
   onClick?: () => void;
   size?: number;
+  langInitial?: string;
 }
 
 export const VoiceOrbVisualizer: React.FC<VoiceOrbVisualizerProps> = ({
@@ -14,6 +15,7 @@ export const VoiceOrbVisualizer: React.FC<VoiceOrbVisualizerProps> = ({
   soundLevel = 0,
   onClick,
   size = 200,
+  langInitial = 'அ',
 }) => {
   // State specific colors & animations
   const getOrbColors = () => {
@@ -171,7 +173,7 @@ export const VoiceOrbVisualizer: React.FC<VoiceOrbVisualizerProps> = ({
 
             {state === 'READY' && (
               <div className="text-white/80 font-bold text-lg tracking-wider flex items-center gap-1">
-                <span>அ</span>
+                <span>{langInitial}</span>
               </div>
             )}
 

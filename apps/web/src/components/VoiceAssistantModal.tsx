@@ -4,7 +4,7 @@ import { getVoicePack } from '../data/locales';
 import { speechService } from '../utils/speech';
 import { extractProfileFromSpokenText, translateToEnglish, ExtractedProfileData } from '../utils/nlpExtractor';
 import { detectLanguageFromText } from '../utils/languageDetector';
-import { SUPPORTED_LANGUAGES } from '../data/languages';
+import { SUPPORTED_LANGUAGES, getLanguageInitial } from '../data/languages';
 import { VoiceOrbVisualizer, VoiceOrbState } from './voice/VoiceOrbVisualizer';
 import {
   ConversationPhase,
@@ -472,7 +472,7 @@ export const VoiceAssistantModal: React.FC = () => {
         <div className="p-4 sm:p-5 flex items-center justify-between border-b border-white/10 bg-[#001944]">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-[#FEA619] text-[#092554] flex items-center justify-center font-black text-base shadow-sm">
-              அ
+              {getLanguageInitial(selectedVoiceLanguageId)}
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -609,6 +609,7 @@ export const VoiceAssistantModal: React.FC = () => {
               soundLevel={audioLevel}
               onClick={handleToggleListening}
               size={180}
+              langInitial={getLanguageInitial(selectedVoiceLanguageId)}
             />
 
             {/* Live Subtitles with Karaoke Sentence Highlighting */}
@@ -707,7 +708,7 @@ export const VoiceAssistantModal: React.FC = () => {
                   >
                     {isAsst && (
                       <div className="w-7 h-7 rounded-full bg-[#FEA619] text-[#092554] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                        அ
+                        {getLanguageInitial(selectedVoiceLanguageId)}
                       </div>
                     )}
 

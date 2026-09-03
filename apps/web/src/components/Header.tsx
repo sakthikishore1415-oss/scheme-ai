@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { getLanguageInitial } from '../data/languages';
 import {
   Mic,
   MapPin,
@@ -17,6 +18,8 @@ export const Header: React.FC = () => {
   const {
     currentStateConfig,
     currentLanguageConfig,
+    selectedVoiceLanguageId,
+    uiStrings,
     setShowSetupModal,
     setShowVoiceModal,
     easyMode,
@@ -41,9 +44,9 @@ export const Header: React.FC = () => {
             ARIVOM THITTAM
           </div>
           <span className="text-[#90a6dd]/60">|</span>
-          <span className="text-[#d9e2ff] font-medium text-[11px]">அறிவோம் திட்டம்</span>
+          <span className="text-[#d9e2ff] font-medium text-[11px]">{uiStrings.appTitle}</span>
           <span className="hidden md:inline text-[#90a6dd] text-[11px] italic">
-            “Know Your Schemes. Claim Your Benefits.”
+            “{uiStrings.appTagline}”
           </span>
         </div>
 
@@ -58,7 +61,7 @@ export const Header: React.FC = () => {
               onClick={() => setActiveTab('profile')}
               className="text-[11px] text-[#94f6c4] hover:text-white font-semibold underline cursor-pointer"
             >
-              Create Profile
+              {uiStrings.profileHeading}
             </button>
           )}
 
@@ -93,11 +96,11 @@ export const Header: React.FC = () => {
             className="flex items-center gap-2.5 text-left group cursor-pointer"
           >
             <div className="w-10 h-10 rounded-xl bg-[#092554] text-white flex items-center justify-center font-bold text-xl shadow-md group-hover:bg-[#243b6b] transition-colors">
-              அ
+              {getLanguageInitial(selectedVoiceLanguageId)}
             </div>
             <div>
               <div className="font-extrabold text-base text-[#092554] leading-none tracking-tight group-hover:text-[#243b6b] transition-colors">
-                Arivom Thittam
+                {uiStrings.appTitle}
               </div>
               <div className="text-[10px] text-[#44464f] font-semibold tracking-wider uppercase mt-0.5">
                 CIVIC SCHEME DISCOVERY

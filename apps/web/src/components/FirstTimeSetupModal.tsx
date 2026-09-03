@@ -26,6 +26,7 @@ export const FirstTimeSetupModal: React.FC = () => {
     setSelectedStateId,
     selectedVoiceLanguageId,
     setSelectedVoiceLanguageId,
+    uiStrings,
     userProfile,
     updateUserProfile,
   } = useApp();
@@ -78,7 +79,7 @@ export const FirstTimeSetupModal: React.FC = () => {
               <span className="bg-[#94f6c4]/30 text-[#94f6c4] text-xs px-2.5 py-0.5 rounded-full font-bold border border-[#57b98c]/40">
                 PERSONALIZATION
               </span>
-              <span className="text-xs text-[#d9e2ff]">அறிவோம் திட்டம்</span>
+              <span className="text-xs text-[#d9e2ff]">{uiStrings.appTitle}</span>
             </div>
             <h2 className="text-xl font-bold tracking-tight">Let's Personalize Your Experience</h2>
             <p className="text-xs text-[#d9e2ff] mt-1">

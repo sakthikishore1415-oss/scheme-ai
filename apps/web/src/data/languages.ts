@@ -98,8 +98,8 @@ export const SUPPORTED_LANGUAGES: Record<string, LanguageConfig> = {
     bcp47Code: 'pa-IN',
     voiceSupport: true,
     ttsSupport: true,
-    samplePhrase: 'ਮੈਂ ਕਿਸਾਨ ਹਾਂ, ਮੈਨੂੰ ਖੇਤੀਬਾੜੀ ਸਬਸਿਡੀ ਅਤੇ ਟਿਊਬਵੈੱਲ ਯੋਜਨਾ ਦੀ ਜਾਣਕਾਰੀ ਚਾਹੀਦੀ ਹੈ।',
-    sampleTranscription: 'I am a farmer seeking information on agricultural subsidies and power schemes.',
+    samplePhrase: 'ਮੈਨੂੰ ਛੋਟੇ ਕਾਰੋਬਾਰ ਲਈ ਸਰਕਾਰੀ ਕਰਜ਼ਾ ਅਤੇ ਸਬਸਿਡੀ ਦੀ ਲੋੜ ਹੈ।',
+    sampleTranscription: 'I need government micro-loan and subsidy assistance for small business.',
   },
   as: {
     id: 'as',
@@ -108,8 +108,8 @@ export const SUPPORTED_LANGUAGES: Record<string, LanguageConfig> = {
     bcp47Code: 'as-IN',
     voiceSupport: true,
     ttsSupport: true,
-    samplePhrase: 'মোক হস্ততাঁত উদ্যোগ আৰু ক্ষুদ্ৰ ব্যৱসায়ৰ বাবে ঋণ লাগে।',
-    sampleTranscription: 'I need financial support and artisan credit for handloom and small enterprise.',
+    samplePhrase: 'মই এগৰাকী মহিলা উদ্যমী, আত্মসহায়ক গোটৰ ঋণ আৰু সাহায্য লাগে।',
+    sampleTranscription: 'I am a woman entrepreneur looking for self-help group loans and livelihood aid.',
   },
   en: {
     id: 'en',
@@ -118,9 +118,38 @@ export const SUPPORTED_LANGUAGES: Record<string, LanguageConfig> = {
     bcp47Code: 'en-IN',
     voiceSupport: true,
     ttsSupport: true,
-    samplePhrase: 'I am a small farmer seeking agricultural fertilizer and tractor subsidy.',
-    sampleTranscription: 'I am a small farmer seeking agricultural fertilizer and tractor subsidy.',
+    samplePhrase: 'I am looking for government agricultural subsidies and crop insurance support.',
+    sampleTranscription: 'I am looking for government agricultural subsidies and crop insurance support.',
   },
 };
 
 export const LANGUAGE_LIST = Object.values(SUPPORTED_LANGUAGES);
+
+export function getLanguageInitial(langId: string): string {
+  switch (langId) {
+    case 'ta':
+      return 'அ';
+    case 'ml':
+      return 'അ';
+    case 'hi':
+      return 'अ';
+    case 'te':
+      return 'అ';
+    case 'kn':
+      return 'ಅ';
+    case 'bn':
+      return 'অ';
+    case 'mr':
+      return 'अ';
+    case 'gu':
+      return 'અ';
+    case 'or':
+      return 'ଅ';
+    case 'pa':
+      return 'ਅ';
+    case 'as':
+      return 'অ';
+    default:
+      return 'A';
+  }
+}
