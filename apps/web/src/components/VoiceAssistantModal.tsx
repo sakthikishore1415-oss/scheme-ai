@@ -1,28 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import {
-  realtimeVoiceService,
-  RealtimeVoiceState,
-  RealtimeMessage,
-} from '../services/realtimeVoiceService';
+  geminiLiveVoiceService,
+  GeminiLiveVoiceState,
+  GeminiLiveMessage,
+} from '../services/geminiLiveVoiceService';
+import { verificationService, ComparisonReport } from '../services/verificationService';
 import { getLanguageInitial, SUPPORTED_LANGUAGES } from '../data/languages';
 import { VoiceOrbVisualizer } from './voice/VoiceOrbVisualizer';
 import {
   Mic,
   MicOff,
-  Volume2,
-  VolumeX,
   PhoneOff,
   Sparkles,
   ArrowRight,
   Shield,
-  Keyboard,
   Globe,
   Send,
   User,
   MessageSquare,
   CheckCircle2,
-  RefreshCw,
+  AlertTriangle,
+  ExternalLink,
+  Bookmark,
 } from 'lucide-react';
 
 export const VoiceAssistantModal: React.FC = () => {
@@ -37,19 +37,22 @@ export const VoiceAssistantModal: React.FC = () => {
     updateUserProfile,
     activeMatches,
     schemes,
+    savedSchemeIds,
+    toggleSaveScheme,
     setActiveTab,
     t,
   } = useApp();
 
-  // Session & UI States
-  const [voiceState, setVoiceState] = useState<RealtimeVoiceState>('CONNECTING');
+  // Voice State & Telemetry
+  const [voiceState, setVoiceState] = useState<GeminiLiveVoiceState>('CONNECTING');
   const [audioLevel, setAudioLevel] = useState<number>(0);
-  const [messages, setMessages] = useState<RealtimeMessage[]>([]);
+  const [messages, setMessages] = useState<GeminiLiveMessage[]>([]);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [activeMode, setActiveMode] = useState<'VOICE' | 'TEXT'>('VOICE');
   const [typedInput, setTypedInput] = useState<string>('');
   const [showLangPicker, setShowLangPicker] = useState<boolean>(false);
   const [lastError, setLastError] = useState<string | null>(null);
+  const [activeComparison, setActiveComparison] = useState<ComparisonReport | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -58,14 +61,15 @@ export const VoiceAssistantModal: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Connect to Realtime Voice Session on Mount
+  // Connect to Gemini 2.5 Flash Live Session
   useEffect(() => {
     if (!showVoiceModal) return;
 
     setLastError(null);
     setMessages([]);
+    setActiveComparison(null);
 
-    realtimeVoiceService.startSession(
+    geminiLiveVoiceService.startSession(
       selectedVoiceLanguageId,
       currentStateConfig.name,
       {
@@ -91,31 +95,131 @@ export const VoiceAssistantModal: React.FC = () => {
           updateUserProfile(data);
         },
         onToolCall: async (name, args) => {
-          if (name === 'update_citizen_profile') {
+          // 1. User Profile Management
+          if (name === 'getUserProfile') {
+            return userProfile;
+          }
+          if (name === 'updateUserProfile') {
             updateUserProfile(args);
             return { status: 'success', updatedProfile: args };
           }
-          if (name === 'get_matching_schemes') {
+
+          // 2. Search & Deterministic Matching
+          if (name === 'searchSchemes') {
+            const query = (args.query || '').toLowerCase();
+            const results = schemes
+              .filter((s) => s.name.toLowerCase().includes(query) || s.category?.toLowerCase().includes(query))
+              .slice(0, 4)
+              .map((s) => ({ id: s.id, name: s.name, department: s.department }));
+            return { count: results.length, schemes: results };
+          }
+
+          if (name === 'findEligibleSchemes') {
             return {
               count: activeMatches.length,
-              schemes: activeMatches.slice(0, 3).map((m) => ({
+              schemes: activeMatches.slice(0, 4).map((m) => ({
                 id: m.scheme.id,
                 name: m.scheme.name,
-                benefit: m.scheme.benefits?.amount || m.scheme.benefits?.shortSummary,
+                matchScore: m.score,
+                matchedCriteria: m.matchedPoints || [],
                 department: m.scheme.department || m.scheme.authority,
+                benefits: m.scheme.benefits?.amount || m.scheme.benefits?.shortSummary,
               })),
             };
           }
-          if (name === 'get_scheme_details') {
-            const target = schemes.find((s) => s.id === args.schemeId) || schemes[0];
+
+          if (name === 'checkSchemeEligibility') {
+            const match = activeMatches.find((m) => m.scheme.id === args.schemeId);
+            if (match) {
+              return {
+                eligible: true,
+                schemeId: match.scheme.id,
+                name: match.scheme.name,
+                matchedCriteria: match.matchedPoints || [],
+                missingInformation: [],
+                verified: true,
+              };
+            }
+            const target = schemes.find((s) => s.id === args.schemeId);
             return {
-              name: target.name,
-              benefits: target.benefits,
-              documents: target.documents,
-              howToApply: target.applicationUrl || target.officialSource,
-              whereToApply: target.offlineApplicationCenter,
+              eligible: false,
+              schemeId: args.schemeId,
+              name: target?.name || 'Scheme',
+              reason: 'Profile does not meet specific age, income, or occupational criteria.',
+              verified: true,
             };
           }
+
+          // 3. Scheme Details & Documents
+          if (name === 'getSchemeDetails') {
+            const target = schemes.find((s) => s.id === args.schemeId) || schemes[0];
+            return {
+              id: target.id,
+              name: target.name,
+              department: target.department,
+              benefits: target.benefits,
+              documents: target.documents,
+              officialSource: target.officialSource || target.applicationUrl,
+            };
+          }
+
+          if (name === 'getSchemeDocuments') {
+            const target = schemes.find((s) => s.id === args.schemeId) || schemes[0];
+            return {
+              schemeId: target.id,
+              name: target.name,
+              requiredDocuments: target.documents || ['Aadhaar Card', 'Ration Card', 'Income Certificate'],
+            };
+          }
+
+          if (name === 'getSchemeBenefits') {
+            const target = schemes.find((s) => s.id === args.schemeId) || schemes[0];
+            return {
+              schemeId: target.id,
+              name: target.name,
+              benefits: target.benefits,
+            };
+          }
+
+          if (name === 'getSchemeApplicationProcess') {
+            const target = schemes.find((s) => s.id === args.schemeId) || schemes[0];
+            return {
+              schemeId: target.id,
+              name: target.name,
+              applicationSteps: target.applicationUrl || 'Apply online via e-Sevai / State Civic Portal',
+              offlineCenter: target.offlineApplicationCenter || 'District Collectorate / Taluk Office',
+            };
+          }
+
+          // 4. Online Verification & Comparison
+          if (name === 'verifySchemeOnline') {
+            const target = schemes.find((s) => s.id === args.schemeId) || schemes[0];
+            const ver = await verificationService.verifySchemeOnline(target);
+            return ver;
+          }
+
+          if (name === 'compareRepositoryWithOfficialSource') {
+            const target = schemes.find((s) => s.id === args.schemeId) || schemes[0];
+            const report = await verificationService.compareRepositoryWithOfficialSource(target);
+            setActiveComparison(report);
+            return report;
+          }
+
+          if (name === 'searchOfficialGovernmentSources') {
+            return await verificationService.searchOfficialGovernmentSources(args.query || '', schemes);
+          }
+
+          // 5. Bookmarks / Saved
+          if (name === 'saveScheme') {
+            toggleSaveScheme(args.schemeId);
+            return { status: 'success', saved: true };
+          }
+
+          if (name === 'getSavedSchemes') {
+            const saved = schemes.filter((s) => savedSchemeIds.includes(s.id));
+            return { count: saved.length, schemes: saved.map((s) => ({ id: s.id, name: s.name })) };
+          }
+
           return { status: 'success' };
         },
         onError: (err) => {
@@ -125,19 +229,19 @@ export const VoiceAssistantModal: React.FC = () => {
     );
 
     return () => {
-      realtimeVoiceService.endSession();
+      geminiLiveVoiceService.endSession();
     };
   }, [showVoiceModal, selectedVoiceLanguageId, currentStateConfig.name]);
 
   if (!showVoiceModal) return null;
 
   const handleEndCall = () => {
-    realtimeVoiceService.endSession();
+    geminiLiveVoiceService.endSession();
     setShowVoiceModal(false);
   };
 
   const handleToggleMute = () => {
-    const muted = realtimeVoiceService.toggleMute();
+    const muted = geminiLiveVoiceService.toggleMute();
     setIsMuted(muted);
   };
 
@@ -146,7 +250,7 @@ export const VoiceAssistantModal: React.FC = () => {
     if (!typedInput.trim()) return;
     const txt = typedInput;
     setTypedInput('');
-    realtimeVoiceService.sendTextMessage(txt);
+    geminiLiveVoiceService.sendTextMessage(txt);
   };
 
   const getStatusBadge = () => {
@@ -154,15 +258,17 @@ export const VoiceAssistantModal: React.FC = () => {
       case 'CONNECTING':
         return { label: 'CONNECTING...', color: 'bg-amber-400/20 text-amber-300 border-amber-400/30' };
       case 'LISTENING':
-        return { label: 'LISTENING (SPEAK NOW)', color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' };
+        return { label: 'LISTENING', color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' };
       case 'USER_SPEAKING':
         return { label: 'USER SPEAKING...', color: 'bg-emerald-400/30 text-[#94f6c4] border-emerald-400/50' };
       case 'THINKING':
         return { label: 'EVALUATING SCHEMES...', color: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
       case 'SPEAKING':
         return { label: 'ARIVOM SPEAKING...', color: 'bg-[#fea619]/20 text-[#fea619] border-[#fea619]/40' };
+      case 'INTERRUPTED':
+        return { label: 'INTERRUPTED (LISTENING)', color: 'bg-indigo-400/20 text-indigo-200 border-indigo-400/40' };
       case 'ERROR':
-        return { label: 'CONNECTION ERROR', color: 'bg-rose-500/20 text-rose-300 border-rose-500/40' };
+        return { label: 'OFFLINE / LOCAL DUPLEX', color: 'bg-blue-500/20 text-blue-200 border-blue-500/30' };
       default:
         return { label: 'READY', color: 'bg-white/10 text-white/80 border-white/20' };
     }
@@ -174,7 +280,7 @@ export const VoiceAssistantModal: React.FC = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in">
       <div className="bg-[#092554] text-white w-full h-full sm:h-[92vh] sm:max-w-4xl sm:rounded-3xl flex flex-col shadow-2xl border border-white/10 overflow-hidden relative">
         {/* ========================================================= */}
-        {/* TOP BAR: Brand, Live Call Status, Mode Switcher */}
+        {/* TOP BAR: Brand, Realtime Call Status, Controls */}
         {/* ========================================================= */}
         <div className="p-4 sm:p-5 flex items-center justify-between border-b border-white/10 bg-[#001944]">
           <div className="flex items-center gap-3">
@@ -185,14 +291,14 @@ export const VoiceAssistantModal: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-[#94f6c4] tracking-wider uppercase flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-[#fea619]" />
-                  Arivom Real-time Voice
+                  Arivom Gemini Live Voice
                 </span>
                 <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold border ${status.color}`}>
                   {status.label}
                 </span>
               </div>
               <p className="text-[11px] text-[#d9e2ff]/80">
-                📍 {currentStateConfig.name} • 🎙️ {currentLanguageConfig.nativeName} ({currentLanguageConfig.bcp47Code})
+                📍 {currentStateConfig.name} • 🎙️ {currentLanguageConfig.nativeName}
               </p>
             </div>
           </div>
@@ -279,6 +385,27 @@ export const VoiceAssistantModal: React.FC = () => {
           </div>
         )}
 
+        {/* Optional Discrepancy Notice Banner */}
+        {activeComparison && (
+          <div className="p-2.5 px-4 bg-amber-500/20 border-b border-amber-500/30 flex items-center justify-between text-xs text-amber-200 animate-fade-in">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>
+                <strong>Official Portal Gazette:</strong> Cross-checked {activeComparison.schemeName} with official records.
+              </span>
+            </div>
+            <a
+              href={activeComparison.officialSourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-300 hover:underline flex items-center gap-1 font-bold text-[11px]"
+            >
+              <span>View Source</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+        )}
+
         {/* ========================================================= */}
         {/* MAIN BODY: Split Voice Orb & Live Transcript Stream */}
         {/* ========================================================= */}
@@ -298,7 +425,7 @@ export const VoiceAssistantModal: React.FC = () => {
               soundLevel={audioLevel}
               onClick={() => {
                 if (voiceState === 'SPEAKING') {
-                  realtimeVoiceService.interruptPlayback();
+                  geminiLiveVoiceService.interruptPlayback();
                 }
               }}
               size={180}
@@ -314,14 +441,13 @@ export const VoiceAssistantModal: React.FC = () => {
                   : 'Arivom AI Voice'}
               </span>
               <p className="text-xs text-[#d9e2ff]/80 max-w-xs">
-                Speak naturally like a phone call. Arivom will listen, understand, and answer.
+                Speak naturally like a phone call. Arivom retrieves verified schemes from gazettes.
               </p>
             </div>
 
-            {/* Quick Interrupt Notice */}
             {voiceState === 'SPEAKING' && (
               <button
-                onClick={() => realtimeVoiceService.interruptPlayback()}
+                onClick={() => geminiLiveVoiceService.interruptPlayback()}
                 className="px-4 py-1.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[11px] font-bold animate-pulse cursor-pointer"
               >
                 Tap or speak to interrupt
@@ -347,7 +473,7 @@ export const VoiceAssistantModal: React.FC = () => {
                 <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-2 text-[#d9e2ff]/60">
                   <Mic className="w-8 h-8 text-[#fea619] animate-pulse" />
                   <p className="text-xs font-medium">
-                    Say something like: "I am a farmer from Thanjavur, looking for crop assistance."
+                    Say something like: "I am a 35-year-old farmer from Erode with ₹1.2L income."
                   </p>
                 </div>
               ) : (
@@ -409,7 +535,7 @@ export const VoiceAssistantModal: React.FC = () => {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Text Mode Input Field (Available in both Voice and Text modes) */}
+            {/* Text Mode Input Field */}
             <form
               onSubmit={handleSendText}
               className="p-3 bg-[#000e26] border-t border-white/10 flex items-center gap-2"
@@ -440,7 +566,7 @@ export const VoiceAssistantModal: React.FC = () => {
           <div className="flex items-center gap-2 text-[#d9e2ff]/80 text-[11px]">
             <Shield className="w-4 h-4 text-[#94f6c4] shrink-0" />
             <span>
-              <strong>Civic Privacy:</strong> Real-time audio is processed securely to evaluate verified government gazettes.
+              <strong>Civic Privacy:</strong> Voice processed securely against verified gazette rules.
             </span>
           </div>
 
@@ -448,7 +574,7 @@ export const VoiceAssistantModal: React.FC = () => {
             {activeMatches.length > 0 && (
               <button
                 onClick={() => {
-                  realtimeVoiceService.endSession();
+                  geminiLiveVoiceService.endSession();
                   setShowVoiceModal(false);
                   setActiveTab('matches');
                 }}
