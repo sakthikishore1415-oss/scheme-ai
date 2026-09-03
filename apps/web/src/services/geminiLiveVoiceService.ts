@@ -258,20 +258,17 @@ export class GeminiLiveVoiceService {
       };
 
       this.recognition.onend = () => {
-        // Keep continuous speech listener alive during live voice conversation if listening is still active
-        if (this.state !== 'DISCONNECTED' && this.state !== 'IDLE' && this.isListeningActive) {
+        // Keep speech listener alive during live voice conversation if listening is still active
+        if (this.state !== 'DISCONNECTED' && this.state !== 'IDLE' && this.isListeningActive && this.state !== 'SPEAKING' && this.state !== 'THINKING') {
           try {
             this.recognition.start();
           } catch (_) {}
         }
       };
 
-      this.recognition.start();
-      this.isListeningActive = true;
-
-      // Welcome voice greeting directly spoken in citizen's chosen language
+      // Welcome voice greeting displayed in transcript
       const greetings: Record<string, string> = {
-        ta: 'வணக்கம்! நான் அறிவோம். உங்களுடன் பேச தயாராக இருக்கிறேன். சொல்லுங்கள்!',
+        ta: 'வணக்கம்! நான் அறிவோம். உங்களுடன் பேச தயாராக இருக்கிறேன். உங்கள் கேள்வியைக் கூறுங்கள்!',
         hi: 'नमस्ते! मैं अरिवोम हूं। मैं आपकी कैसे मदद कर सकता हूं? बताइए!',
         te: 'నమస్కారం! నేను అరివోమ్. మాట్లాడటానికి సిద్ధంగా ఉన్నాను, చెప్పండి!',
         kn: 'ನಮಸ್ಕಾರ! ನಾನು ಅರಿವೋಮ್. ಮಾತನಾಡಲು ಸಿದ್ಧನಾಗಿದ್ದೇನೆ, ತಿಳಿಸಿ!',
@@ -282,14 +279,23 @@ export class GeminiLiveVoiceService {
         or: 'ନମସ୍କାର! ମୁଁ ଅରିଭୋମ୍। ଆପଣଙ୍କୁ କିପରି ସାହାଯ୍ୟ କରିପାରିବି?',
         pa: 'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਅਰਿਵੋਮ ਹਾਂ। ਮੈਂ ਤੁਹਾਡੀ ਕਿਵੇਂ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?',
         as: 'নমস্কাৰ! মই অৰিবোম। মই আপোনাক কিদৰে সহায় কৰিব পাৰোঁ?',
-        en: "Hello! I'm Arivom. I'm ready to talk with you. How can I help today?",
+        en: "Hello! I'm Arivom. I'm listening. Ask me any government scheme question!",
       };
       const welcome = greetings[this.currentLanguageId] || greetings.en;
-      this.speak(welcome);
+      this.callbacks?.onMessage?.({
+        id: `asst-welcome-${Date.now()}`,
+        role: 'assistant',
+        text: welcome,
+        timestamp: Date.now(),
+        audioVoice: 'Arivom Scheme Advisor',
+      });
+
+      // Start listening directly for citizen's voice
+      this.startListening();
     } catch (e: any) {
       console.error('Failed to start speech recognition engine:', e);
-      this.setState('ERROR');
-      callbacks.onError?.('Could not activate microphone recognition.');
+      this.setState('IDLE');
+      callbacks.onError?.('Could not activate microphone. Tap the microphone button or use typing below.');
     }
   }
 
