@@ -88,16 +88,7 @@ import com.arivomthittam.domain.ai.GeminiVoiceService
 import com.arivomthittam.domain.language.AndroidTranslations
 import com.arivomthittam.domain.language.LanguageDetectionHelper
 import com.arivomthittam.ui.navigation.Screen
-import com.arivomthittam.ui.theme.OnPrimary
-import com.arivomthittam.ui.theme.OnSurface
-import com.arivomthittam.ui.theme.OnSurfaceVariant
-import com.arivomthittam.ui.theme.OutlineVariant
-import com.arivomthittam.ui.theme.PrimaryContainer
-import com.arivomthittam.ui.theme.PrimaryFixed
-import com.arivomthittam.ui.theme.PrimaryIndigo
-import com.arivomthittam.ui.theme.SecondaryContainer
-import com.arivomthittam.ui.theme.Surface
-import com.arivomthittam.ui.theme.SurfaceContainerLowest
+import com.arivomthittam.ui.theme.*
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -377,14 +368,14 @@ fun VoiceInputScreen(
                                     Box(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(4.dp))
-                                            .background(if (isFastMode) Color(0xFFF3E8FF) else Color(0xFFEFF6FF))
+                                            .background(if (isFastMode) SovereignGoldLight.copy(alpha = 0.3f) else SovereignRosePill)
                                             .padding(horizontal = 6.dp, vertical = 2.dp)
                                     ) {
                                         Text(
                                             text = if (isFastMode) "⚡ FAST" else "🎙️ STUDIO",
                                             fontSize = 9.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = if (isFastMode) Color(0xFF7E22CE) else Color(0xFF1D4ED8)
+                                            color = if (isFastMode) SovereignMaroonDeep else SovereignMaroon
                                         )
                                     }
                                 }
@@ -428,7 +419,7 @@ fun VoiceInputScreen(
                                 Icon(
                                     imageVector = if (isFastMode) Icons.Default.FlashOn else Icons.Default.Radio,
                                     contentDescription = "Toggle Fast Mode",
-                                    tint = if (isFastMode) Color(0xFF7E22CE) else PrimaryIndigo,
+                                    tint = if (isFastMode) SovereignGold else PrimaryIndigo,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -684,20 +675,20 @@ fun VoiceInputScreen(
                         ) {
                             Surface(
                                 shape = RoundedCornerShape(16.dp),
-                                color = Color(0xFFF3E8FF),
-                                border = BorderStroke(1.dp, Color(0xFFE9D5FF))
+                                color = SovereignRosePill.copy(alpha = 0.5f),
+                                border = BorderStroke(1.dp, SovereignRosePill)
                             ) {
                                 Row(
                                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                                 ) {
-                                    Icon(Icons.Default.GraphicEq, contentDescription = null, tint = Color(0xFF7E22CE), modifier = Modifier.size(16.dp))
+                                    Icon(Icons.Default.GraphicEq, contentDescription = null, tint = SovereignMaroon, modifier = Modifier.size(16.dp))
                                     Text(
                                         text = "Gemini is thinking...",
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF7E22CE)
+                                        color = SovereignMaroon
                                     )
                                 }
                             }

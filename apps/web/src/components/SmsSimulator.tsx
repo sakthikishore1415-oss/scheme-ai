@@ -106,7 +106,7 @@ export const SmsSimulator: React.FC = () => {
         </button>
         <button
           onClick={() => handleSend('SCHEME EDUCATION KL')}
-          className="px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-blue-300 text-xs font-mono border border-slate-700 cursor-pointer"
+          className="px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-mono border border-slate-700 cursor-pointer"
         >
           SCHEME EDUCATION KL
         </button>
