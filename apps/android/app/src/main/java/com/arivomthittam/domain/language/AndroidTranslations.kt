@@ -186,3 +186,4 @@ object AndroidTranslations {
         "profile.saveProfile" to "പ്രൊഫൈൽ സംരക്ഷിക്കുക"
     )
 }
+

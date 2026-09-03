@@ -20,3 +20,5 @@ local.properties
 *.apk
 *.aab
 arivom-thittam-android-apk/
+__pycache__/
+*.pyc
