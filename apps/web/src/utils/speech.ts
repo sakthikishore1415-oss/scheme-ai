@@ -3,8 +3,9 @@ import { SUPPORTED_LANGUAGES } from '../data/languages';
 class SpeechService {
   private isSynthesizing = false;
   private currentUtterance: SpeechSynthesisUtterance | null = null;
+  private currentAudioElement: HTMLAudioElement | null = null;
   private audioContext: AudioContext | null = null;
-  private speechRate: number = 1.12; // Fast, natural, responsive conversational pace
+  private speechRate: number = 1.05; // Conversational pace
 
   constructor() {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -34,36 +35,127 @@ class SpeechService {
     onError?: (err: any) => void,
     overrideRate?: number
   ) {
+    const cleanText = text.replace(/[*_#`[\]()]/g, '').replace(/\s+/g, ' ').trim();
+    if (!cleanText) {
+      if (onEnd) onEnd();
+      return;
+    }
+
+    this.stop();
+
+    const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
+    const tlMap: Record<string, string> = {
+      ta: 'ta',
+      hi: 'hi',
+      te: 'te',
+      kn: 'kn',
+      ml: 'ml',
+      mr: 'mr',
+      bn: 'bn',
+      gu: 'gu',
+      pa: 'pa',
+      or: 'or',
+      as: 'as',
+      en: 'en-IN',
+    };
+    const tlCode = tlMap[langId] || langId || 'ta';
+
+    // Tier 1: Try High-Fidelity Online Indic TTS stream (supports all Indian regional languages in any browser)
+    if (typeof window !== 'undefined' && navigator.onLine && cleanText.length <= 250) {
+      try {
+        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(
+          cleanText
+        )}&tl=${tlCode}&client=tw-ob`;
+
+        const audio = new Audio(audioUrl);
+        audio.playbackRate = overrideRate || this.speechRate;
+        this.currentAudioElement = audio;
+
+        let hasFinished = false;
+        const cleanupAudio = () => {
+          if (hasFinished) return;
+          hasFinished = true;
+          this.isSynthesizing = false;
+          this.currentAudioElement = null;
+          if (onEnd) onEnd();
+        };
+
+        audio.onplay = () => {
+          this.isSynthesizing = true;
+          if (onStart) onStart();
+        };
+
+        audio.onended = () => {
+          cleanupAudio();
+        };
+
+        audio.onerror = () => {
+          // If network TTS fails, fall back gracefully to browser SpeechSynthesis
+          this.speakViaSpeechSynthesis(cleanText, langConfig, onStart, onEnd, onError, overrideRate);
+        };
+
+        // Safety timeout in case audio loading stalls
+        const maxAudioDuration = Math.max(4000, cleanText.length * 90);
+        setTimeout(() => {
+          if (!hasFinished && this.currentAudioElement === audio) {
+            cleanupAudio();
+          }
+        }, maxAudioDuration);
+
+        audio.play().catch(() => {
+          // Auto-play was blocked or failed, fallback to SpeechSynthesis
+          this.speakViaSpeechSynthesis(cleanText, langConfig, onStart, onEnd, onError, overrideRate);
+        });
+        return;
+      } catch (_) {
+        // Fall through to SpeechSynthesis
+      }
+    }
+
+    // Tier 2: Browser SpeechSynthesis
+    this.speakViaSpeechSynthesis(cleanText, langConfig, onStart, onEnd, onError, overrideRate);
+  }
+
+  private speakViaSpeechSynthesis(
+    text: string,
+    langConfig: any,
+    onStart?: () => void,
+    onEnd?: () => void,
+    onError?: (err: any) => void,
+    overrideRate?: number
+  ) {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-      console.warn('Speech synthesis not supported in browser, using audio simulation fallback.');
       this.simulateSpeechAudio(text, onStart, onEnd);
       return;
     }
 
     try {
-      // Ensure audio context is unpaused
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume();
       }
       window.speechSynthesis.cancel();
 
-      const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = langConfig.bcp47Code || 'ta-IN';
       utterance.rate = overrideRate || this.speechRate;
       utterance.pitch = 1.0;
 
-      // Find best matching system voice
+      // Find best matching voice
       const voices = window.speechSynthesis.getVoices();
       const targetCode = (langConfig.bcp47Code || 'ta-IN').toLowerCase();
       const langPrefix = (langConfig.id || 'ta').toLowerCase();
 
-      const voice = voices.find(
+      let voice = voices.find(
         (v) =>
           v.lang.toLowerCase() === targetCode ||
           v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix) ||
           v.name.toLowerCase().includes(langConfig.name.toLowerCase())
       );
+
+      // If no exact regional voice is installed, fallback to Indian English or first available voice
+      if (!voice && voices.length > 0) {
+        voice = voices.find((v) => v.lang.toLowerCase().includes('in') || v.lang.toLowerCase().includes('en')) || voices[0];
+      }
 
       if (voice) {
         utterance.voice = voice;
@@ -91,23 +183,20 @@ class SpeechService {
       };
 
       utterance.onerror = (e) => {
-        console.warn('Speech synthesis utterance notice:', e);
+        console.warn('Speech synthesis notice:', e);
         finishUtterance();
         if (onError) onError(e);
       };
 
       this.currentUtterance = utterance;
 
-      // Watchdog timer: automatically resolve if browser audio hangs or gets suspended
-      const expectedDurationMs = Math.max(3000, Math.min(12000, text.length * 80));
+      const expectedDurationMs = Math.max(3000, Math.min(15000, text.length * 85));
       watchdogTimer = setTimeout(() => {
         if (!hasFinished && this.isSynthesizing) {
-          console.warn('SpeechSynthesis watchdog safety trigger');
           finishUtterance();
         }
       }, expectedDurationMs);
 
-      // Small tick delay to avoid Chrome cancel race condition
       setTimeout(() => {
         try {
           if (window.speechSynthesis.paused) {
@@ -126,8 +215,17 @@ class SpeechService {
   }
 
   public stop() {
+    if (this.currentAudioElement) {
+      try {
+        this.currentAudioElement.pause();
+        this.currentAudioElement.currentTime = 0;
+      } catch (_) {}
+      this.currentAudioElement = null;
+    }
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
+      try {
+        window.speechSynthesis.cancel();
+      } catch (_) {}
     }
     this.isSynthesizing = false;
     this.currentUtterance = null;
@@ -149,7 +247,11 @@ class SpeechService {
   }
 
   public isSpeaking(): boolean {
-    return this.isSynthesizing || (typeof window !== 'undefined' && window.speechSynthesis?.speaking);
+    return (
+      this.isSynthesizing ||
+      (this.currentAudioElement !== null && !this.currentAudioElement.paused) ||
+      (typeof window !== 'undefined' && window.speechSynthesis?.speaking)
+    );
   }
 
   // Audio tone simulation fallback so audio is NEVER dead

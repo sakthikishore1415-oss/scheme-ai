@@ -98,6 +98,11 @@ export const VoiceAssistantModal: React.FC = () => {
               updated[idx] = msg;
               return updated;
             }
+            // Ignore immediate duplicate consecutive messages with identical content
+            const last = prev[prev.length - 1];
+            if (last && last.role === msg.role && last.text.trim() === msg.text.trim() && !msg.isStreaming) {
+              return prev;
+            }
             return [...prev, msg];
           });
         },

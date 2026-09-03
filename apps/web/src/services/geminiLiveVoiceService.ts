@@ -35,7 +35,7 @@ export interface GeminiLiveVoiceCallbacks {
   onProfileExtracted?: (profile: Record<string, any>) => void;
   onToolCall?: (name: string, args: any) => Promise<any>;
   onError?: (error: string) => void;
-  onStopListening?: (reason: 'pause_timeout' | 'manual' | 'turn_complete') => void;
+  onStopListening?: (reason: 'pause_timeout' | 'manual' | 'turn_complete' | 'turn_processing') => void;
 }
 
 export class GeminiLiveVoiceService {
@@ -135,8 +135,9 @@ export class GeminiLiveVoiceService {
 
     try {
       this.recognition = new SpeechRec();
-      this.recognition.continuous = true;
+      this.recognition.continuous = false;
       this.recognition.interimResults = true;
+      this.recognition.maxAlternatives = 1;
 
       const bcp47Map: Record<string, string> = {
         ta: 'ta-IN',
@@ -173,33 +174,39 @@ export class GeminiLiveVoiceService {
         let finalTranscript = '';
         let interimTranscript = '';
 
-        for (let i = 0; i < event.results.length; ++i) {
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
           const item = event.results[i];
           if (item && item[0]) {
             if (item.isFinal) {
-              finalTranscript += item[0].transcript + ' ';
+              finalTranscript += item[0].transcript;
             } else {
               interimTranscript += item[0].transcript;
             }
           }
         }
 
-        const candidate = (finalTranscript + interimTranscript).trim();
+        const candidate = (finalTranscript || interimTranscript).trim();
 
         if (candidate) {
           this.setState('USER_SPEAKING');
           this.currentInterimText = candidate;
           this.callbacks?.onInterimTranscript?.(candidate);
 
-          // Reset and start 2-second pause silence timer:
-          if (this.pauseSilenceTimer !== null) {
-            clearTimeout(this.pauseSilenceTimer);
-            this.pauseSilenceTimer = null;
+          if (finalTranscript.trim()) {
+            if (this.pauseSilenceTimer !== null) {
+              clearTimeout(this.pauseSilenceTimer);
+              this.pauseSilenceTimer = null;
+            }
+            this.commitTurn(finalTranscript.trim());
+          } else {
+            // Reset and start silence debounce timer
+            if (this.pauseSilenceTimer !== null) {
+              clearTimeout(this.pauseSilenceTimer);
+            }
+            this.pauseSilenceTimer = window.setTimeout(() => {
+              this.handlePauseTimeout();
+            }, this.PAUSE_SILENCE_THRESHOLD_MS);
           }
-
-          this.pauseSilenceTimer = window.setTimeout(() => {
-            this.handlePauseTimeout();
-          }, this.PAUSE_SILENCE_THRESHOLD_MS);
         }
       };
 
@@ -235,8 +242,15 @@ export class GeminiLiveVoiceService {
       };
 
       this.recognition.onend = () => {
-        // Keep speech listener alive during live voice conversation if listening is still active
-        if (this.state !== 'DISCONNECTED' && this.state !== 'IDLE' && this.isListeningActive && this.state !== 'SPEAKING' && this.state !== 'THINKING') {
+        // Keep speech listener cleanly looping between turns when listening is active and assistant is not speaking/thinking
+        if (
+          this.state !== 'DISCONNECTED' &&
+          this.state !== 'IDLE' &&
+          this.state !== 'SPEAKING' &&
+          this.state !== 'THINKING' &&
+          this.isListeningActive &&
+          !this.isProcessingSpeechQueue
+        ) {
           try {
             this.recognition.start();
           } catch (_) {}
@@ -290,12 +304,8 @@ export class GeminiLiveVoiceService {
     if (clean === this.lastProcessedText) return;
     this.lastProcessedText = clean;
 
-    // Stop current recognition turn to flush browser internal buffer
-    if (this.recognition) {
-      try {
-        this.recognition.abort();
-      } catch (_) {}
-    }
+    // Immediately stop mic listening while AI thinks and speaks
+    this.stopListening('turn_processing');
 
     this.callbacks?.onInterimTranscript?.('');
     this.callbacks?.onMessage({
@@ -382,7 +392,11 @@ export class GeminiLiveVoiceService {
       this.isProcessingSpeechQueue = false;
       this.stopSpeechWaveSimulation();
       if (this.state !== 'DISCONNECTED' && this.state !== 'MUTED') {
-        this.startListening();
+        setTimeout(() => {
+          if (this.state !== 'DISCONNECTED' && this.state !== 'MUTED' && !this.isProcessingSpeechQueue) {
+            this.startListening();
+          }
+        }, 300);
       }
       return;
     }
@@ -1019,7 +1033,7 @@ CRITICAL VOICE RULES:
    * Triggers a 'stop listening' event.
    * Can be triggered manually or automatically when the user pauses for > 2 seconds.
    */
-  public stopListening(reason: 'pause_timeout' | 'manual' | 'turn_complete' = 'manual'): void {
+  public stopListening(reason: 'pause_timeout' | 'manual' | 'turn_complete' | 'turn_processing' = 'manual'): void {
     if (this.pauseSilenceTimer !== null) {
       clearTimeout(this.pauseSilenceTimer);
       this.pauseSilenceTimer = null;
