@@ -5,6 +5,18 @@ class SpeechService {
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private audioContext: AudioContext | null = null;
 
+  constructor() {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      // Warm up voices on browser load
+      window.speechSynthesis.getVoices();
+      if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = () => {
+          window.speechSynthesis.getVoices();
+        };
+      }
+    }
+  }
+
   public speak(
     text: string,
     langId: string = 'ta',
@@ -12,63 +24,82 @@ class SpeechService {
     onEnd?: () => void,
     onError?: (err: any) => void
   ) {
-    if (!('speechSynthesis' in window)) {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
       console.warn('Speech synthesis not supported in browser, using audio simulation fallback.');
       this.simulateSpeechAudio(text, onStart, onEnd);
       return;
     }
 
-    // Cancel ongoing speech
-    window.speechSynthesis.cancel();
+    try {
+      // Ensure audio context is unpaused
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+      window.speechSynthesis.cancel();
 
-    const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = langConfig.bcp47Code || 'ta-IN';
-    utterance.rate = 0.95; // Clear pace for citizen accessibility
-    utterance.pitch = 1.0;
+      const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = langConfig.bcp47Code || 'ta-IN';
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
 
-    // Find best voice match
-    const voices = window.speechSynthesis.getVoices();
-    const targetCode = langConfig.bcp47Code.toLowerCase();
-    const langPrefix = langConfig.id.toLowerCase();
+      // Find best matching system voice
+      const voices = window.speechSynthesis.getVoices();
+      const targetCode = (langConfig.bcp47Code || 'ta-IN').toLowerCase();
+      const langPrefix = (langConfig.id || 'ta').toLowerCase();
 
-    const voice = voices.find(
-      (v) =>
-        v.lang.toLowerCase() === targetCode ||
-        v.lang.toLowerCase().startsWith(langPrefix) ||
-        v.name.toLowerCase().includes(langConfig.name.toLowerCase())
-    );
+      const voice = voices.find(
+        (v) =>
+          v.lang.toLowerCase() === targetCode ||
+          v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix) ||
+          v.name.toLowerCase().includes(langConfig.name.toLowerCase())
+      );
 
-    if (voice) {
-      utterance.voice = voice;
-    }
+      if (voice) {
+        utterance.voice = voice;
+      }
 
-    utterance.onstart = () => {
-      this.isSynthesizing = true;
-      if (onStart) onStart();
-    };
+      utterance.onstart = () => {
+        this.isSynthesizing = true;
+        if (onStart) onStart();
+      };
 
-    utterance.onend = () => {
-      this.isSynthesizing = false;
-      this.currentUtterance = null;
-      if (onEnd) onEnd();
-    };
+      utterance.onend = () => {
+        this.isSynthesizing = false;
+        this.currentUtterance = null;
+        if (onEnd) onEnd();
+      };
 
-    utterance.onerror = (e) => {
-      console.warn('Speech synthesis error or regional voice missing, falling back to simulated speech tone:', e);
-      this.isSynthesizing = false;
-      this.currentUtterance = null;
-      // Fallback to simulated audio if browser voice fails
+      utterance.onerror = (e) => {
+        console.warn('Speech synthesis utterance error:', e);
+        this.isSynthesizing = false;
+        this.currentUtterance = null;
+        this.simulateSpeechAudio(text, onStart, onEnd);
+        if (onError) onError(e);
+      };
+
+      this.currentUtterance = utterance;
+
+      // Small tick delay to avoid Chrome cancel race condition
+      setTimeout(() => {
+        try {
+          if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
+          window.speechSynthesis.speak(utterance);
+        } catch (err) {
+          console.warn('SpeechSynthesis speak failed:', err);
+          this.simulateSpeechAudio(text, onStart, onEnd);
+        }
+      }, 20);
+    } catch (err) {
+      console.warn('Failed to initialize speech utterance:', err);
       this.simulateSpeechAudio(text, onStart, onEnd);
-      if (onError) onError(e);
-    };
-
-    this.currentUtterance = utterance;
-    window.speechSynthesis.speak(utterance);
+    }
   }
 
   public stop() {
-    if ('speechSynthesis' in window) {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
     this.isSynthesizing = false;
@@ -76,11 +107,11 @@ class SpeechService {
   }
 
   public hasNativeVoice(langId: string): boolean {
-    if (!('speechSynthesis' in window)) return false;
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false;
     const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
     const voices = window.speechSynthesis.getVoices();
-    const targetCode = langConfig.bcp47Code.toLowerCase();
-    const langPrefix = langConfig.id.toLowerCase();
+    const targetCode = (langConfig.bcp47Code || 'ta-IN').toLowerCase();
+    const langPrefix = (langConfig.id || 'ta').toLowerCase();
 
     return voices.some(
       (v) =>
@@ -102,7 +133,7 @@ class SpeechService {
         if (onStart) onStart();
         setTimeout(() => {
           if (onEnd) onEnd();
-        }, 2000);
+        }, 1500);
         return;
       }
 
@@ -116,35 +147,30 @@ class SpeechService {
 
       if (onStart) onStart();
 
-      // Generate a gentle chime + frequency pattern representing speech cadence
-      const now = this.audioContext.currentTime;
-      const duration = Math.min(6, Math.max(2, text.length * 0.05));
+      const oscillator = this.audioContext.createOscillator();
+      const gainNode = this.audioContext.createGain();
 
-      const osc = this.audioContext.createOscillator();
-      const gain = this.audioContext.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(587.33, this.audioContext.currentTime); // D5 pleasant chime
+      oscillator.frequency.exponentialRampToValueAtTime(880, this.audioContext.currentTime + 0.3); // A5
 
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(440, now);
-      osc.frequency.exponentialRampToValueAtTime(587.33, now + 0.3);
-      osc.frequency.exponentialRampToValueAtTime(440, now + duration - 0.2);
+      gainNode.gain.setValueAtTime(0.08, this.audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.6);
 
-      gain.gain.setValueAtTime(0.08, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+      oscillator.connect(gainNode);
+      gainNode.connect(this.audioContext.destination);
 
-      osc.connect(gain);
-      gain.connect(this.audioContext.destination);
-
-      osc.start(now);
-      osc.stop(now + duration);
+      oscillator.start();
+      oscillator.stop(this.audioContext.currentTime + 0.6);
 
       setTimeout(() => {
         if (onEnd) onEnd();
-      }, duration * 1000);
+      }, 1000);
     } catch (e) {
       if (onStart) onStart();
       setTimeout(() => {
         if (onEnd) onEnd();
-      }, 2000);
+      }, 1000);
     }
   }
 }
