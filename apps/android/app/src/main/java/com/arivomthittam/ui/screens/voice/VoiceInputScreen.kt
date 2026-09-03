@@ -127,9 +127,9 @@ fun VoiceInputScreen(
 
     // In-app Speech Recognizer
     val speechRecognizer = remember {
-        if (SpeechRecognizer.isRecognitionAvailable(context)) {
+        try {
             SpeechRecognizer.createSpeechRecognizer(context)
-        } else {
+        } catch (e: Exception) {
             null
         }
     }
@@ -223,12 +223,18 @@ fun VoiceInputScreen(
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, bcp47)
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
         }
-        speechRecognizer?.startListening(intent)
-        isListening = true
+        try {
+            speechRecognizer?.startListening(intent)
+            isListening = true
+        } catch (e: Exception) {
+            isListening = false
+        }
     }
 
     val stopListening = {
-        speechRecognizer?.stopListening()
+        try {
+            speechRecognizer?.stopListening()
+        } catch (e: Exception) {}
         isListening = false
     }
 
@@ -236,6 +242,15 @@ fun VoiceInputScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
+            startListening()
+        }
+    }
+
+    // Auto-request microphone permission on screen entry if not already granted
+    LaunchedEffect(Unit) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        } else {
             startListening()
         }
     }
