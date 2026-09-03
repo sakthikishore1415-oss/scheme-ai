@@ -35,7 +35,11 @@ class SpeechService {
     onError?: (err: any) => void,
     overrideRate?: number
   ) {
-    const cleanText = text.replace(/[*_#`[\]()]/g, '').replace(/\s+/g, ' ').trim();
+    const cleanText = text
+      .replace(/[*_#`[\]()]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
     if (!cleanText) {
       if (onEnd) onEnd();
       return;
@@ -43,89 +47,8 @@ class SpeechService {
 
     this.stop();
 
-    const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
-    const tlMap: Record<string, string> = {
-      ta: 'ta',
-      hi: 'hi',
-      te: 'te',
-      kn: 'kn',
-      ml: 'ml',
-      mr: 'mr',
-      bn: 'bn',
-      gu: 'gu',
-      pa: 'pa',
-      or: 'or',
-      as: 'as',
-      en: 'en-IN',
-    };
-    const tlCode = tlMap[langId] || langId || 'ta';
-
-    // Tier 1: Try High-Fidelity Online Indic TTS stream (supports all Indian regional languages in any browser)
-    if (typeof window !== 'undefined' && navigator.onLine && cleanText.length <= 250) {
-      try {
-        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(
-          cleanText
-        )}&tl=${tlCode}&client=tw-ob`;
-
-        const audio = new Audio(audioUrl);
-        audio.playbackRate = overrideRate || this.speechRate;
-        this.currentAudioElement = audio;
-
-        let hasFinished = false;
-        const cleanupAudio = () => {
-          if (hasFinished) return;
-          hasFinished = true;
-          this.isSynthesizing = false;
-          this.currentAudioElement = null;
-          if (onEnd) onEnd();
-        };
-
-        audio.onplay = () => {
-          this.isSynthesizing = true;
-          if (onStart) onStart();
-        };
-
-        audio.onended = () => {
-          cleanupAudio();
-        };
-
-        audio.onerror = () => {
-          // If network TTS fails, fall back gracefully to browser SpeechSynthesis
-          this.speakViaSpeechSynthesis(cleanText, langConfig, onStart, onEnd, onError, overrideRate);
-        };
-
-        // Safety timeout in case audio loading stalls
-        const maxAudioDuration = Math.max(4000, cleanText.length * 90);
-        setTimeout(() => {
-          if (!hasFinished && this.currentAudioElement === audio) {
-            cleanupAudio();
-          }
-        }, maxAudioDuration);
-
-        audio.play().catch(() => {
-          // Auto-play was blocked or failed, fallback to SpeechSynthesis
-          this.speakViaSpeechSynthesis(cleanText, langConfig, onStart, onEnd, onError, overrideRate);
-        });
-        return;
-      } catch (_) {
-        // Fall through to SpeechSynthesis
-      }
-    }
-
-    // Tier 2: Browser SpeechSynthesis
-    this.speakViaSpeechSynthesis(cleanText, langConfig, onStart, onEnd, onError, overrideRate);
-  }
-
-  private speakViaSpeechSynthesis(
-    text: string,
-    langConfig: any,
-    onStart?: () => void,
-    onEnd?: () => void,
-    onError?: (err: any) => void,
-    overrideRate?: number
-  ) {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-      this.simulateSpeechAudio(text, onStart, onEnd);
+      this.simulateSpeechAudio(cleanText, onStart, onEnd);
       return;
     }
 
@@ -135,30 +58,28 @@ class SpeechService {
       }
       window.speechSynthesis.cancel();
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = langConfig.bcp47Code || 'ta-IN';
+      const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      const bcp47 = langConfig.bcp47Code || 'ta-IN';
+      utterance.lang = bcp47;
       utterance.rate = overrideRate || this.speechRate;
       utterance.pitch = 1.0;
 
-      // Find best matching voice
+      // Find matching system voice for this specific language ONLY
       const voices = window.speechSynthesis.getVoices();
-      const targetCode = (langConfig.bcp47Code || 'ta-IN').toLowerCase();
+      const targetCode = bcp47.toLowerCase();
       const langPrefix = (langConfig.id || 'ta').toLowerCase();
 
-      let voice = voices.find(
+      // Look for authentic native voice matching language code (e.g. ta, hi, te, kn, ml, etc.)
+      const matchingVoice = voices.find(
         (v) =>
           v.lang.toLowerCase() === targetCode ||
           v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix) ||
-          v.name.toLowerCase().includes(langConfig.name.toLowerCase())
+          (v.lang.toLowerCase().includes(langPrefix) && !v.lang.toLowerCase().startsWith('en'))
       );
 
-      // If no exact regional voice is installed, fallback to Indian English or first available voice
-      if (!voice && voices.length > 0) {
-        voice = voices.find((v) => v.lang.toLowerCase().includes('in') || v.lang.toLowerCase().includes('en')) || voices[0];
-      }
-
-      if (voice) {
-        utterance.voice = voice;
+      if (matchingVoice) {
+        utterance.voice = matchingVoice;
       }
 
       let hasFinished = false;
@@ -183,20 +104,21 @@ class SpeechService {
       };
 
       utterance.onerror = (e) => {
-        console.warn('Speech synthesis notice:', e);
+        console.warn('Speech synthesis utterance notice:', e);
         finishUtterance();
         if (onError) onError(e);
       };
 
       this.currentUtterance = utterance;
 
-      const expectedDurationMs = Math.max(3000, Math.min(15000, text.length * 85));
+      const expectedDurationMs = Math.max(3000, Math.min(15000, cleanText.length * 90));
       watchdogTimer = setTimeout(() => {
         if (!hasFinished && this.isSynthesizing) {
           finishUtterance();
         }
       }, expectedDurationMs);
 
+      // Speak with safe microtask delay
       setTimeout(() => {
         try {
           if (window.speechSynthesis.paused) {
