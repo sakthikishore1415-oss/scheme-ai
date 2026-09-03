@@ -1,6 +1,7 @@
 package com.arivomthittam.ui.screens.voice
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,6 +10,7 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -135,6 +137,49 @@ fun VoiceInputScreen(
         }
     }
 
+    // In-app Speech Recognizer
+    val speechRecognizer = remember {
+        try {
+            SpeechRecognizer.createSpeechRecognizer(context)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    val startListening: () -> Unit = {
+        ttsEngine?.stop()
+        isSpeaking = false
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            val bcp47 = when (currentLanguage) {
+                "ml" -> "ml-IN"
+                "ta" -> "ta-IN"
+                "hi" -> "hi-IN"
+                "te" -> "te-IN"
+                "kn" -> "kn-IN"
+                "bn" -> "bn-IN"
+                "mr" -> "mr-IN"
+                "gu" -> "gu-IN"
+                else -> "en-IN"
+            }
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, bcp47)
+            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+        }
+        try {
+            speechRecognizer?.startListening(intent)
+            isListening = true
+        } catch (e: Exception) {
+            isListening = false
+        }
+    }
+
+    val stopListening: () -> Unit = {
+        try {
+            speechRecognizer?.stopListening()
+        } catch (e: Exception) {}
+        isListening = false
+    }
+
     DisposableEffect(Unit) {
         var tts: TextToSpeech? = null
         tts = TextToSpeech(context) { status ->
@@ -152,6 +197,23 @@ fun VoiceInputScreen(
                 }
                 tts?.language = locale
                 tts?.setSpeechRate(voiceSpeed)
+                tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                    override fun onStart(utteranceId: String?) {
+                        isSpeaking = true
+                    }
+                    override fun onDone(utteranceId: String?) {
+                        isSpeaking = false
+                        // Automatically re-listen so citizen can speak back to assistant's question
+                        (context as? Activity)?.runOnUiThread {
+                            if (!isListening) {
+                                startListening()
+                            }
+                        }
+                    }
+                    override fun onError(utteranceId: String?) {
+                        isSpeaking = false
+                    }
+                })
                 ttsEngine = tts
 
                 // Automatically welcome citizen in chosen language
@@ -165,15 +227,6 @@ fun VoiceInputScreen(
         onDispose {
             tts?.stop()
             tts?.shutdown()
-        }
-    }
-
-    // In-app Speech Recognizer
-    val speechRecognizer = remember {
-        try {
-            SpeechRecognizer.createSpeechRecognizer(context)
-        } catch (e: Exception) {
-            null
         }
     }
 
@@ -262,40 +315,6 @@ fun VoiceInputScreen(
         onDispose {
             speechRecognizer?.destroy()
         }
-    }
-
-    val startListening = {
-        ttsEngine?.stop()
-        isSpeaking = false
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            val bcp47 = when (currentLanguage) {
-                "ml" -> "ml-IN"
-                "ta" -> "ta-IN"
-                "hi" -> "hi-IN"
-                "te" -> "te-IN"
-                "kn" -> "kn-IN"
-                "bn" -> "bn-IN"
-                "mr" -> "mr-IN"
-                "gu" -> "gu-IN"
-                else -> "en-IN"
-            }
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, bcp47)
-            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-        }
-        try {
-            speechRecognizer?.startListening(intent)
-            isListening = true
-        } catch (e: Exception) {
-            isListening = false
-        }
-    }
-
-    val stopListening = {
-        try {
-            speechRecognizer?.stopListening()
-        } catch (e: Exception) {}
-        isListening = false
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
