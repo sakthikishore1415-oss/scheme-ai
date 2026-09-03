@@ -6,44 +6,36 @@ import {
   Sparkles,
   Bookmark,
   User,
-  PhoneCall,
-  MessageSquare,
-  Users,
-  Handshake,
-  Cpu,
 } from 'lucide-react';
 import { ViewTab } from '../types';
 
 export const BottomNav: React.FC = () => {
-  const { activeTab, setActiveTab, setShowVoiceModal, activeMatches, savedSchemeIds, easyMode, uiStrings, selectedVoiceLanguageId } =
+  const { activeTab, setActiveTab, setShowVoiceModal, activeMatches, savedSchemeIds, easyMode, t } =
     useApp();
 
   const strongMatchesCount = activeMatches.filter((m) => m.matchLevel !== 'MORE_INFO').length;
 
-  const tabs: { id: ViewTab; nativeLabel: string; enLabel: string; icon: React.ReactNode; badge?: number; isPrimaryVoice?: boolean }[] = [
-    { id: 'home', nativeLabel: uiStrings.navHome, enLabel: 'HOME', icon: <Home className="w-5 h-5" /> },
+  const tabs: { id: ViewTab; label: string; icon: React.ReactNode; badge?: number; isPrimaryVoice?: boolean }[] = [
+    { id: 'home', label: t('nav.home'), icon: <Home className="w-5 h-5" /> },
     {
       id: 'ask',
-      nativeLabel: selectedVoiceLanguageId === 'ta' ? 'குரல்' : selectedVoiceLanguageId === 'hi' ? 'आवाज' : 'ASK',
-      enLabel: 'VOICE',
+      label: t('nav.voice'),
       icon: <Mic className="w-6 h-6 text-white" />,
       isPrimaryVoice: true,
     },
     {
       id: 'matches',
-      nativeLabel: uiStrings.navMatches,
-      enLabel: 'MATCHES',
+      label: t('nav.matches'),
       icon: <Sparkles className="w-5 h-5" />,
       badge: strongMatchesCount,
     },
     {
       id: 'saved',
-      nativeLabel: uiStrings.navSaved,
-      enLabel: 'SAVED',
+      label: t('nav.saved'),
       icon: <Bookmark className="w-5 h-5" />,
       badge: savedSchemeIds.length > 0 ? savedSchemeIds.length : undefined,
     },
-    { id: 'profile', nativeLabel: uiStrings.navProfile, enLabel: 'PROFILE', icon: <User className="w-5 h-5" /> },
+    { id: 'profile', label: t('nav.profile'), icon: <User className="w-5 h-5" /> },
   ];
 
   return (
@@ -71,7 +63,7 @@ export const BottomNav: React.FC = () => {
                     {tab.icon}
                   </div>
                   <span className="text-[10px] font-extrabold text-[#092554] mt-0.5 tracking-wider">
-                    {tab.nativeLabel}
+                    {tab.label}
                   </span>
                 </button>
               );
@@ -94,14 +86,9 @@ export const BottomNav: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <span className={`text-[10px] tracking-tight mt-0.5 max-w-[65px] truncate ${isActive ? 'font-bold text-[#092554]' : 'font-medium'}`}>
-                  {tab.nativeLabel}
+                <span className={`text-[11px] tracking-tight mt-0.5 max-w-[75px] truncate ${isActive ? 'font-bold text-[#092554]' : 'font-medium'}`}>
+                  {tab.label}
                 </span>
-                {selectedVoiceLanguageId !== 'en' && (
-                  <span className="text-[8px] opacity-60 font-mono tracking-tighter leading-none">
-                    {tab.enLabel}
-                  </span>
-                )}
                 {isActive && (
                   <span className="w-5 h-0.5 bg-[#fea619] rounded-full mt-0.5"></span>
                 )}
@@ -118,7 +105,7 @@ export const BottomNav: React.FC = () => {
       >
         <div className="px-3 py-1.5 border-b border-[#e1e2ec] mb-1">
           <span className="text-[10px] font-bold tracking-widest text-[#757780] uppercase">
-            Arivom Navigation
+            {t('header.title')}
           </span>
         </div>
 
@@ -141,14 +128,7 @@ export const BottomNav: React.FC = () => {
                   <span className={isActive ? 'text-[#fea619]' : 'text-[#757780]'}>
                     {tab.icon}
                   </span>
-                  <div>
-                    <span className="text-xs font-bold block">{tab.nativeLabel}</span>
-                    {selectedVoiceLanguageId !== 'en' && (
-                      <span className={`text-[10px] block opacity-75 ${isActive ? 'text-[#d9e2ff]' : 'text-[#757780]'}`}>
-                        {tab.enLabel}
-                      </span>
-                    )}
-                  </div>
+                  <span className="text-xs font-bold block">{tab.label}</span>
                 </div>
                 {tab.badge !== undefined && tab.badge > 0 && (
                   <span
@@ -172,10 +152,10 @@ export const BottomNav: React.FC = () => {
             <Mic className="w-4 h-4 text-[#fea619] animate-pulse" />
             <div className="text-left">
               <span className="block text-xs font-bold">
-                {selectedVoiceLanguageId === 'ta' ? 'குரல் உரையாடல்' : selectedVoiceLanguageId === 'hi' ? 'आवाज से पूछें' : 'Voice Assistant'}
+                {t('home.startVoiceBtn')}
               </span>
               <span className="block text-[9px] text-[#94f6c4] uppercase tracking-wider">
-                Talk to AI Assistant
+                {t('home.talkToAssistant')}
               </span>
             </div>
           </button>

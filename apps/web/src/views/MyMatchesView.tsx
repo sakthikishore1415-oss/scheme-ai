@@ -2,18 +2,16 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { SchemeCard } from '../components/SchemeCard';
 import { AdaptiveQuestionWizard } from '../components/AdaptiveQuestionWizard';
-import { NEED_CATEGORIES } from '../data/categories';
 import {
   Sparkles,
   Search,
-  RotateCcw,
   Wand2,
   UserPlus,
   Inbox,
 } from 'lucide-react';
 
 export const MyMatchesView: React.FC = () => {
-  const { activeMatches, userProfile, currentStateConfig, easyMode, schemesStatus, setActiveTab, uiStrings, selectedVoiceLanguageId } = useApp();
+  const { activeMatches, userProfile, currentStateConfig, easyMode, setActiveTab, t } = useApp();
 
   const [filterType, setFilterType] = useState<'ALL' | 'STRONG' | 'POTENTIAL' | 'STATE' | 'CENTRAL'>('ALL');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
@@ -46,37 +44,30 @@ export const MyMatchesView: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in pb-12">
-      {/* Header Bar with Dual-Language */}
+      {/* Header Bar */}
       <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#c5c6d0]/60 shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="bg-[#94f6c4]/40 text-[#00462d] text-xs px-2.5 py-0.5 rounded-full font-bold border border-[#57b98c]/50 flex items-center gap-1">
               <Sparkles className="w-3 h-3" />
-              DETERMINISTIC PROFILE MATCHES
+              {t('matches.title')}
             </span>
             <span className="text-xs text-[#757780] font-mono">
               📍 {currentStateConfig.name}
             </span>
           </div>
 
-          <div className="space-y-0.5 mt-1.5">
-            <h1 className={`font-black text-[#092554] tracking-tight ${easyMode ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
-              {uiStrings.matchesHeading}
-            </h1>
-            {selectedVoiceLanguageId !== 'en' && (
-              <p className="text-xs font-bold text-[#757780] uppercase tracking-wider">
-                Eligible Schemes & Entitlements
-              </p>
-            )}
-          </div>
+          <h1 className={`font-black text-[#092554] tracking-tight mt-1.5 ${easyMode ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
+            {t('matches.title')}
+          </h1>
 
           <p className="text-xs text-[#44464f] mt-1">
             {userProfile ? (
               <>
-                {uiStrings.matchesSubheading} (<strong>{userProfile.occupation || 'Citizen'}</strong>, {userProfile.district || currentStateConfig.name})
+                {t('matches.subtitle')} (<strong>{userProfile.occupation || 'Citizen'}</strong>, {userProfile.district || currentStateConfig.name})
               </>
             ) : (
-              uiStrings.profileSubheading
+              t('profile.subtitle')
             )}
           </p>
         </div>
@@ -91,7 +82,7 @@ export const MyMatchesView: React.FC = () => {
           }`}
         >
           <Wand2 className="w-4 h-4 text-[#092554]" />
-          <span>{showWizard ? 'HIDE WIZARD' : 'STEP-BY-STEP QUESTIONS'}</span>
+          <span>{showWizard ? t('common.close') : t('profile.title')}</span>
         </button>
       </div>
 
@@ -112,7 +103,7 @@ export const MyMatchesView: React.FC = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search scheme name, department, or benefits..."
+              placeholder={t('matches.searchPlaceholder')}
               className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#f2f3fa] border border-[#c5c6d0]/60 text-xs text-[#191c1e] placeholder-[#757780] focus:border-[#092554] outline-none"
             />
           </div>
@@ -127,7 +118,7 @@ export const MyMatchesView: React.FC = () => {
                   : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
               }`}
             >
-              All ({activeMatches.length})
+              {t('matches.filterAll')} ({activeMatches.length})
             </button>
             <button
               onClick={() => setFilterType('STRONG')}
@@ -137,7 +128,7 @@ export const MyMatchesView: React.FC = () => {
                   : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
               }`}
             >
-              {uiStrings.strongMatchesBadge}
+              {t('matches.filterStrong')}
             </button>
             <button
               onClick={() => setFilterType('POTENTIAL')}
@@ -147,7 +138,7 @@ export const MyMatchesView: React.FC = () => {
                   : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
               }`}
             >
-              {uiStrings.potentialMatchesBadge}
+              {t('matches.filterPotential')}
             </button>
           </div>
         </div>
@@ -167,10 +158,10 @@ export const MyMatchesView: React.FC = () => {
           </div>
           <div className="space-y-1">
             <h3 className="text-base sm:text-lg font-black text-[#191c1e]">
-              {uiStrings.noMatchesFound}
+              {t('matches.emptyTitle')}
             </h3>
             <p className="text-xs text-[#757780] max-w-md mx-auto leading-relaxed">
-              {uiStrings.noMatchesDesc}
+              {t('matches.emptySubtitle')}
             </p>
           </div>
           <button
@@ -178,7 +169,7 @@ export const MyMatchesView: React.FC = () => {
             className="px-6 py-3 rounded-2xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs shadow-md transition-all inline-flex items-center gap-2 cursor-pointer"
           >
             <UserPlus className="w-4 h-4" />
-            <span>UPDATE PROFILE DETAILS</span>
+            <span>{t('matches.updateProfileBtn')}</span>
           </button>
         </div>
       )}

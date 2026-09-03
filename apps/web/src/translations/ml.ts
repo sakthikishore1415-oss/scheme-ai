@@ -1,0 +1,126 @@
+import { TranslationDictionary } from './types';
+
+export const ml: TranslationDictionary = {
+  // Navigation
+  'nav.home': 'ഹോം',
+  'nav.matches': 'പൊരുത്തപ്പെട്ട പദ്ധതികൾ',
+  'nav.saved': 'സംരക്ഷിച്ചവ',
+  'nav.profile': 'പ്രൊഫൈൽ',
+  'nav.voice': 'ശബ്ദ സഹായം',
+  'nav.support': 'സഹായ കേന്ദ്രം',
+
+  // Header & Brand
+  'header.title': 'അറിവോം തിട്ടം',
+  'header.tagline': 'സർക്കാർ ക്ഷേമപദ്ധതികൾ അറിയൂ, അവകാശങ്ങൾ നേടൂ',
+  'header.createProfile': 'പ്രൊഫൈൽ നിർമ്മിക്കുക',
+  'header.selectLanguage': 'ഭാഷ തിരഞ്ഞെടുക്കൂ',
+  'header.changeState': 'സംസ്ഥാനം മാറ്റുക',
+
+  // Home Screen
+  'home.heroTitle': 'സർക്കാർ പദ്ധതികൾ കണ്ടെത്തുക',
+  'home.heroSubtitle': 'നിങ്ങളുടെ തൊഴിലിനും കുടുംബ വരുമാനത്തിനും അനുയോജ്യമായ സർക്കാർ ക്ഷേമപദ്ധതികൾ വേഗത്തിൽ കണ്ടെത്തൂ.',
+  'home.startVoiceBtn': 'ശബ്ദത്തിലൂടെ സംസാരിക്കൂ',
+  'home.talkToAssistant': 'സഹായിയോട് സംസാരിക്കൂ',
+  'home.browseCatalog': 'എല്ലാ പദ്ധതികളും കാണുക',
+  'home.checkEligibility': 'അർഹത പരിശോധിക്കൂ',
+  'home.quickNeedsHeading': 'ദ്രുത ആവശ്യങ്ങൾ',
+  'home.quickNeedsSubtitle': 'വിഭാഗം തിരിച്ച് സർക്കാർ ക്ഷേമപദ്ധതികൾ പരിശോധിക്കുക',
+  'home.matchesNotice': 'സർക്കാർ പദ്ധതികൾ താങ്കളുടെ പ്രൊഫൈലുമായി പൊരുത്തപ്പെടുന്നു.',
+  'home.viewMatches': 'പദ്ധതികൾ കാണുക',
+  'home.createProfileNotice': 'അർഹമായ പദ്ധതികൾ കണ്ടെത്താൻ താങ്കളുടെ പ്രൊഫൈൽ പൂർത്തിയാക്കുക.',
+
+  // Categories
+  'category.agriculture': 'കൃഷി & കർഷക ക്ഷേമം',
+  'category.education': 'വിദ്യാഭ്യാസം & സ്കോളർഷിപ്പ്',
+  'category.housing': 'ഭവനം & പാർപ്പിടം',
+  'category.employment': 'തൊഴിൽ & തൊഴിലാളികൾ',
+  'category.women': 'സ്ത്രീകൾ & സ്വയംസഹായ സംഘങ്ങൾ',
+  'category.senior': 'മുതിർന്ന പൗരന്മാർ & പെൻഷൻ',
+  'category.health': 'ആരോഗ്യം & ഇൻഷുറൻസ്',
+  'category.financial': 'സാമ്പത്തിക സഹായം & വായ്പകൾ',
+  'category.disability': 'ഭിന്നശേഷി ക്ഷേമം',
+  'category.general': 'പൊതുജന ക്ഷേമം',
+
+  // Professions
+  'profession.farmer': 'കർഷകൻ / കൃഷി',
+  'profession.student': 'വിദ്യാർത്ഥി',
+  'profession.worker': 'തൊഴിലാളി / കൂലിപ്പണിക്കാരൻ',
+  'profession.business': 'ബിസിനസ് / വിൽപ്പനക്കാരൻ',
+  'profession.homemaker': 'വീട്ടമ്മ',
+  'profession.senior': 'മുതിർന്ന പൗരൻ',
+  'profession.pwd': 'ഭിന്നശേഷിയുള്ള വ്യക്തി',
+
+  // Profile Form & Questions
+  'profile.title': 'പൗര പ്രൊഫൈൽ',
+  'profile.subtitle': 'ശരിയായ പദ്ധതികൾ കൃത്യമായി കണ്ടെത്താൻ താങ്കളുടെ വിവരങ്ങൾ നൽകുക.',
+  'profile.step1': 'അടിസ്ഥാന വിവരങ്ങൾ',
+  'profile.step2': 'തൊഴിൽ വിവരങ്ങൾ',
+  'profile.step3': 'ആവശ്യങ്ങളും മുൻഗണനകളും',
+  'profile.fullName': 'മുഴുവൻ പേര്',
+  'profile.age': 'പ്രായം (വയസ്സ്)',
+  'profile.gender': 'ലിംഗഭേദം',
+  'profile.state': 'സംസ്ഥാനം',
+  'profile.district': 'ജില്ല',
+  'profile.occupation': 'പ്രധാന തൊഴിൽ',
+  'profile.annualIncome': 'കുടുംബ വാർഷിക വരുമാനം (₹)',
+  'profile.primaryNeed': 'പ്രധാന ആവശ്യം',
+  'profile.genderMale': 'പുരുഷൻ',
+  'profile.genderFemale': 'സ്ത്രീ',
+  'profile.genderOther': 'മറ്റുള്ളവ',
+  'profile.saveProfile': 'പ്രൊഫൈൽ സംരക്ഷിച്ച് പദ്ധതികൾ കാണുക',
+
+  // Matches Screen
+  'matches.title': 'നിങ്ങൾക്ക് അനുയോജ്യമായ പദ്ധതികൾ',
+  'matches.subtitle': 'ഔദ്യോഗിക സർക്കാർ ഉത്തരവുകൾ അടിസ്ഥാനമാക്കി നിർണ്ണയിച്ചത്.',
+  'matches.filterAll': 'എല്ലാ പദ്ധതികളും',
+  'matches.filterStrong': 'പൂർണ്ണ അർഹത',
+  'matches.filterPotential': 'സാധ്യതയുള്ള അർഹത',
+  'matches.filterMoreInfo': 'കൂടുതൽ വിവരങ്ങൾ ആവശ്യമുണ്ട്',
+  'matches.searchPlaceholder': 'പദ്ധതിയുടെ പേര് അല്ലെങ്കിൽ ആനുകൂല്യം തിരയുക...',
+  'matches.emptyTitle': 'പദ്ധതികൾ ഒന്നും ലഭ്യമായില്ല',
+  'matches.emptySubtitle': 'പ്രൊഫൈൽ വിവരങ്ങൾ മാറ്റി വീണ്ടും ശ്രമിക്കുക.',
+  'matches.updateProfileBtn': 'പ്രൊഫൈൽ പുതുക്കുക',
+  'matches.whyMatches': 'എന്തുകൊണ്ട് യോജിക്കുന്നു?',
+  'matches.viewDetails': 'വിശദവിവരങ്ങൾ',
+
+  // Saved Schemes & Checklist
+  'saved.title': 'സംരക്ഷിച്ച പദ്ധതികളും രേഖകളും',
+  'saved.subtitle': 'അക്ഷയ / ഇ-സേവാ കേന്ദ്രത്തിൽ അപേക്ഷിക്കാൻ തെരഞ്ഞെടുത്ത പദ്ധതികൾ.',
+  'saved.emptyTitle': 'സംരക്ഷിച്ച പദ്ധതികൾ ഒന്നുമില്ല',
+  'saved.emptySubtitle': 'പൊരുത്തപ്പെട്ട പദ്ധതികളിൽ നിന്ന് തെരഞ്ഞെടുത്ത് സ്വന്തം അപേക്ഷാ ലിസ്റ്റ് ഉണ്ടാക്കുക.',
+  'saved.readinessTitle': 'രേഖകളുടെ ലഭ്യത',
+  'saved.readinessSubtitle': 'നിർബന്ധിത അപേക്ഷാ രേഖകൾ പരിശോധിച്ചു',
+  'saved.printBtn': 'ലിസ്റ്റ് പ്രിന്റ് ചെയ്യുക',
+  'saved.discoverBtn': 'പദ്ധതികൾ കണ്ടെത്തുക',
+
+  // Scheme Details & Common Actions
+  'scheme.benefits': 'പ്രധാന ആനുകൂല്യങ്ങൾ',
+  'scheme.documents': 'ആവശ്യമായ രേഖകൾ',
+  'scheme.howToApply': 'എങ്ങനെ അപേക്ഷിക്കാം?',
+  'scheme.whereToApply': 'എവിടെ അപേക്ഷിക്കണം?',
+  'scheme.officialSource': 'ഔദ്യോഗിക വെബ്സൈറ്റ്',
+  'scheme.verifiedBadge': 'ഔദ്യോഗികമായി പരിശോധിച്ചത്',
+  'scheme.save': 'സൂക്ഷിക്കുക',
+  'scheme.saved': 'സൂക്ഷിച്ചിരിക്കുന്നു',
+  'scheme.share': 'പങ്കുവെക്കുക',
+
+  // Voice Assistant
+  'voice.readyTitle': 'സംസാരിക്കാൻ തയ്യാറാണ് — ബട്ടൺ അമർത്തുക',
+  'voice.listeningTitle': 'കേൾക്കുന്നു... ദയവായി സംസാരിക്കൂ',
+  'voice.thinkingTitle': 'വിവരങ്ങൾ പരിശോധിച്ച് പദ്ധതികൾ കണ്ടെത്തുന്നു...',
+  'voice.speakingTitle': 'അറിവോം തിട്ടം സംസാരിക്കുന്നു...',
+  'voice.tapToSpeak': 'സംസാരിക്കാൻ അമർത്തുക',
+  'voice.stopListening': 'നിർത്തുക',
+  'voice.typePlaceholder': 'വിവരങ്ങൾ ഇവിടെ ടൈപ്പ് ചെയ്യുക...',
+  'voice.privacyNote': 'സ്വകാര്യത: താങ്കളുടെ ശബ്ദം സർക്കാർ പദ്ധതികൾ കണ്ടെത്താൻ മാത്രമാണ് ഉപയോഗിക്കുന്നത്.',
+  'voice.viewMatchesBtn': 'ലഭ്യമായ പദ്ധതികൾ കാണുക',
+
+  // Common Buttons & Messages
+  'common.continue': 'തുടരുക',
+  'common.back': 'പിന്നോട്ട്',
+  'common.submit': 'സമർപ്പിക്കുക',
+  'common.close': 'അടയ്ക്കുക',
+  'common.loading': 'വിവരങ്ങൾ ശേഖരിക്കുന്നു...',
+  'common.error': 'തടസ്സം നേരിട്ടു. വീണ്ടും ശ്രമിക്കുക.',
+  'common.retry': 'വീണ്ടും ശ്രമിക്കുക',
+};

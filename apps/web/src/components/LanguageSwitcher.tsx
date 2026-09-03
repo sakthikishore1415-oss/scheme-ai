@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { LANGUAGE_LIST, SUPPORTED_LANGUAGES } from '../data/languages';
-import { Globe, Check, Sparkles, ChevronDown } from 'lucide-react';
+import { Globe, Check, ChevronDown } from 'lucide-react';
 
 interface LanguageSwitcherProps {
   variant?: 'compact' | 'full' | 'header';
@@ -9,10 +9,9 @@ interface LanguageSwitcherProps {
 }
 
 export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
-  variant = 'header',
   className = '',
 }) => {
-  const { selectedVoiceLanguageId, setSelectedVoiceLanguageId } = useApp();
+  const { selectedVoiceLanguageId, setSelectedVoiceLanguageId, t } = useApp();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -44,23 +43,19 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         aria-expanded={isOpen}
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#092554] hover:bg-[#133873] text-white text-xs font-bold border border-[#90a6dd]/40 transition-all cursor-pointer shadow-sm"
-        title="Switch Language / மொழி தேர்வு"
+        title={t('header.selectLanguage')}
       >
         <Globe className="w-4 h-4 text-[#fea619]" />
         <span className="font-extrabold">{currentLang.nativeName}</span>
-        <span className="text-[#d9e2ff] text-[11px]">/ {currentLang.name}</span>
         <ChevronDown className={`w-3.5 h-3.5 text-[#94f6c4] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-[#092554] text-white shadow-2xl border border-[#90a6dd]/40 py-2 z-50 animate-fade-in divide-y divide-white/10">
-          <div className="px-4 py-2 border-b border-white/10 flex items-center justify-between">
-            <span className="text-[10px] font-extrabold text-[#94f6c4] tracking-wider uppercase">
-              SELECT LANGUAGE / மொழி தேர்வு
-            </span>
-            <span className="flex items-center gap-1 text-[10px] text-[#fea619] bg-white/10 px-2 py-0.5 rounded-full font-bold">
-              <Sparkles className="w-2.5 h-2.5" /> 12 Indian Languages
+        <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-[#092554] text-white shadow-2xl border border-[#90a6dd]/40 py-2 z-50 animate-fade-in divide-y divide-white/10">
+          <div className="px-4 py-2 border-b border-white/10">
+            <span className="text-[11px] font-extrabold text-[#94f6c4] tracking-wider uppercase block">
+              {t('header.selectLanguage')}
             </span>
           </div>
 
@@ -78,13 +73,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
                       : 'text-white hover:bg-white/10'
                   }`}
                 >
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-sm font-bold">{lang.nativeName}</span>
-                    <span className={`text-xs ${isSelected ? 'text-[#092554]/80' : 'text-[#d9e2ff]/70'}`}>
-                      / {lang.name}
-                    </span>
-                  </div>
-
+                  <span className="text-sm font-bold">{lang.nativeName}</span>
                   {isSelected && <Check className="w-4 h-4 text-[#092554] shrink-0 font-bold" />}
                 </button>
               );

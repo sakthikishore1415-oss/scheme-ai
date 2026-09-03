@@ -632,7 +632,7 @@ export const ProfileView: React.FC = () => {
                         onChange={(e) => setWorkerSector(e.target.value)}
                         className="w-full p-3 rounded-xl border border-[#c5c6d0] text-[#191c1e] font-medium bg-white focus:border-[#092554]"
                       >
-                        <option>Unorganized / Informal Sector (அமைப்புசாரா)</option>
+                        <option>Unorganized / Informal Sector</option>
                         <option>Organized / Contractual Worker</option>
                       </select>
                     </div>

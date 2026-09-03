@@ -77,7 +77,8 @@ interface AppContextType {
   activeLiveSession: CitizenCallSession | null;
   logCitizenCallStep: (session: Partial<CitizenCallSession>) => void;
 
-  // Translations & Dual-Language
+  // Centralized Localization System
+  t: (key: TranslationKey) => string;
   uiStrings: AppTranslationStrings;
   getDual: (key: keyof AppTranslationStrings) => DualText;
 
@@ -88,6 +89,7 @@ interface AppContextType {
 
 import { detectBrowserLanguage } from '../utils/languageDetector';
 import { AppTranslationStrings, DualText, getUITranslations, getDualText } from '../data/uiTranslations';
+import { getTranslation, TranslationKey } from '../translations';
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -357,6 +359,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         liveSessions,
         activeLiveSession,
         logCitizenCallStep,
+        t: (key: TranslationKey) => getTranslation(selectedVoiceLanguageId, key),
         uiStrings: getUITranslations(selectedVoiceLanguageId),
         getDual: (key: keyof AppTranslationStrings) => getDualText(key, selectedVoiceLanguageId),
         triggerMatchCelebration,

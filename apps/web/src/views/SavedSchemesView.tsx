@@ -6,14 +6,11 @@ import {
   FileCheck2,
   Printer,
   Sparkles,
-  ArrowRight,
-  CheckCircle2,
-  AlertTriangle,
   FolderHeart,
 } from 'lucide-react';
 
 export const SavedSchemesView: React.FC = () => {
-  const { savedSchemeIds, activeMatches, userDocuments, setActiveTab, uiStrings, selectedVoiceLanguageId } = useApp();
+  const { savedSchemeIds, activeMatches, userDocuments, setActiveTab, t } = useApp();
 
   const savedMatches = activeMatches.filter((m) => savedSchemeIds.includes(m.scheme.id));
 
@@ -39,26 +36,19 @@ export const SavedSchemesView: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="bg-rose-100 text-rose-800 text-xs px-2.5 py-0.5 rounded-full font-bold border border-rose-300 flex items-center gap-1">
               <Bookmark className="w-3.5 h-3.5 fill-rose-600" />
-              SAVED CITIZEN PORTFOLIO
+              {t('saved.title')}
             </span>
             <span className="text-xs text-[#757780] font-mono">
-              {savedMatches.length} Schemes Bookmarked
+              {savedMatches.length}
             </span>
           </div>
 
-          <div className="space-y-0.5 mt-1.5">
-            <h1 className="text-xl sm:text-2xl font-black text-[#092554] tracking-tight">
-              {uiStrings.navSaved}
-            </h1>
-            {selectedVoiceLanguageId !== 'en' && (
-              <p className="text-xs font-bold text-[#757780] uppercase tracking-wider">
-                Saved Schemes & Application Checklist
-              </p>
-            )}
-          </div>
+          <h1 className="text-xl sm:text-2xl font-black text-[#092554] tracking-tight mt-1.5">
+            {t('saved.title')}
+          </h1>
 
           <p className="text-xs text-[#44464f] mt-1">
-            Your shortlisted entitlements ready for submission at e-Seva / CSC offices.
+            {t('saved.subtitle')}
           </p>
         </div>
 
@@ -69,7 +59,7 @@ export const SavedSchemesView: React.FC = () => {
             className="px-4 py-2.5 rounded-2xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs flex items-center gap-2 shrink-0 cursor-pointer shadow-xs"
           >
             <Printer className="w-4 h-4" />
-            <span>PRINT / SAVE SUMMARY</span>
+            <span>{t('saved.printBtn')}</span>
           </button>
         )}
       </div>
@@ -81,10 +71,10 @@ export const SavedSchemesView: React.FC = () => {
           </div>
           <div className="space-y-1">
             <h3 className="text-base sm:text-lg font-black text-[#191c1e]">
-              சேமிக்கப்பட்ட திட்டங்கள் இல்லை
+              {t('saved.emptyTitle')}
             </h3>
             <p className="text-xs text-[#757780] max-w-md mx-auto leading-relaxed">
-              Bookmark schemes from your matches or explore categories to build a personalized application checklist.
+              {t('saved.emptySubtitle')}
             </p>
           </div>
           <button
@@ -92,7 +82,7 @@ export const SavedSchemesView: React.FC = () => {
             className="px-6 py-3 rounded-2xl bg-[#00462d] hover:bg-[#002d1c] text-white font-extrabold text-xs shadow-md transition-all inline-flex items-center gap-2 cursor-pointer"
           >
             <Sparkles className="w-4 h-4" />
-            <span>{uiStrings.browseCatalogBtn}</span>
+            <span>{t('saved.discoverBtn')}</span>
           </button>
         </div>
       ) : (
@@ -104,10 +94,10 @@ export const SavedSchemesView: React.FC = () => {
                 <FileCheck2 className="w-5 h-5 text-[#00462d]" />
                 <div>
                   <h3 className="font-extrabold text-sm text-[#191c1e]">
-                    Overall Document Readiness
+                    {t('saved.readinessTitle')}
                   </h3>
                   <p className="text-xs text-[#757780]">
-                    {readyDocsCount} of {totalRequiredDocs.length} mandatory application documents verified
+                    {readyDocsCount} of {totalRequiredDocs.length} {t('saved.readinessSubtitle')}
                   </p>
                 </div>
               </div>

@@ -28,6 +28,7 @@ export const SchemeDetailModal: React.FC = () => {
     setSelectedWhyMeScheme,
     userDocuments,
     toggleUserDocument,
+    t,
   } = useApp();
 
   const [activeSubTab, setActiveSubTab] = useState<'OVERVIEW' | 'DOCUMENTS' | 'APPLY' | 'SIMPLIFIED'>('OVERVIEW');
@@ -58,7 +59,7 @@ export const SchemeDetailModal: React.FC = () => {
   };
 
   const handleCopySummary = () => {
-    const summaryText = `*${scheme.name}*\nDepartment: ${scheme.department || scheme.authority || 'Government Authority'}\nBenefit: ${scheme.benefits?.amount || scheme.benefits?.shortSummary || 'Entitlement'}\nWhere to Apply: ${scheme.offlineApplicationCenter || 'e-Seva Center'}\nOfficial Portal: ${scheme.applicationUrl || scheme.officialSource}\nShared via Arivom Thittam (அறிவோம் திட்டம்)`;
+    const summaryText = `*${scheme.name}*\nDepartment: ${scheme.department || scheme.authority || 'Government Authority'}\nBenefit: ${scheme.benefits?.amount || scheme.benefits?.shortSummary || 'Entitlement'}\nWhere to Apply: ${scheme.offlineApplicationCenter || 'e-Seva Center'}\nOfficial Portal: ${scheme.applicationUrl || scheme.officialSource}\nShared via ${t('header.title')}`;
     navigator.clipboard.writeText(summaryText);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
@@ -523,7 +524,7 @@ export const SchemeDetailModal: React.FC = () => {
                 id="share-whatsapp-btn"
                 onClick={() => {
                   const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
-                    `*${scheme.name}*\nBenefit: ${scheme.benefits?.amount || scheme.benefits?.shortSummary || 'Welfare Benefit'}\nWhere to Apply: ${scheme.offlineApplicationCenter || 'e-Seva Center'}\nPortal: ${scheme.applicationUrl || scheme.officialSource}\nShared via Arivom Thittam (அறிவோம் திட்டம்)`
+                    `*${scheme.name}*\nBenefit: ${scheme.benefits?.amount || scheme.benefits?.shortSummary || 'Welfare Benefit'}\nWhere to Apply: ${scheme.offlineApplicationCenter || 'e-Seva Center'}\nPortal: ${scheme.applicationUrl || scheme.officialSource}\nShared via ${t('header.title')}`
                   )}`;
                   window.open(url, '_blank');
                 }}
