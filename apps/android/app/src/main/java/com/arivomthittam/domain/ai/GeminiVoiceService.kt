@@ -14,6 +14,53 @@ import java.net.URL
 object GeminiVoiceService {
     const val GEMINI_MODEL = "gemini-flash-latest"
 
+    fun getGreeting(language: String): String {
+        return when (language) {
+            "ml" -> "നമസ്കാരം! ഞാൻ അറിവോം. നിങ്ങൾക്ക് എന്ത് സർക്കാർ പദ്ധതിയാണ് വേണ്ടത്?"
+            "ta" -> "வணக்கம்! நான் அறிவோம். உங்களுக்கு என்ன அரசு திட்டம் வேண்டும்?"
+            "te" -> "నమస్కారం! నేను అరివోమ్. మీకు ఏ ప్రభుత్వ పథకం కావాలి?"
+            "kn" -> "ನಮಸ್ಕಾರ! ನಾನು ಅರಿವೋಮ್. ನಿಮಗೆ ಯಾವ ಸರಕಾರಿ ಯೋಜನೆ ಬೇಕು?"
+            "hi" -> "नमस्ते! मैं अरिवोम हूँ। आपको कौन सी सरकारी योजना की जानकारी चाहिए?"
+            "bn" -> "নমস্কার! আমি আরিবোম। আপনার কী সরকারি প্রকল্প প্রয়োজন?"
+            "mr" -> "नमस्कार! मी अरिवोम. आपल्याला कोणत्या सरकारी योजनेची माहिती हवी आहे?"
+            "gu" -> "નમસ્તે! હું અરિવોમ છું. તમારે કઈ સરકારી યોજનાની જરૂર છે?"
+            else -> "Hello! I am Arivom. Which government welfare scheme are you looking for today?"
+        }
+    }
+
+    val starterSuggestions: Map<String, List<String>> = mapOf(
+        "ta" to listOf(
+            "விவசாயிகளுக்கான உதவி திட்டங்கள் என்ன?",
+            "மாணவர்களுக்கான கல்வி உதவித்தொகை பற்றி கூறுங்கள்.",
+            "மகளிர் சுயதொழில் கடன் திட்டங்கள் என்னென்ன?"
+        ),
+        "ml" to listOf(
+            "കർഷകർക്കുള്ള പ്രധാന ആനുകൂല്യങ്ങൾ എന്തൊക്കെയാണ്?",
+            "വിദ്യാർത്ഥികൾക്കുള്ള സ്കോളർഷിപ്പുകളെക്കുറിച്ച് പറയൂ.",
+            "വനിതാ സ്വയംതൊഴിൽ വായ്പകൾ എന്തൊക്കെയാണ്?"
+        ),
+        "te" to listOf(
+            "రైతుల కోసం ఉన్న ప్రభుత్వ పథకాలు ఏమిటి?",
+            "విద్యార్థుల స్కాలర్‌షిప్‌ల గురించి చెప్పండి.",
+            "మహిళల స్వయం ఉపాధి రుణాలు ఏమిటి?"
+        ),
+        "kn" to listOf(
+            "ರೈತರಿಗೆ ಲಭ್ಯವಿರುವ ಪ್ರಮುಖ ಯೋಜನೆಗಳು ಯಾವುವು?",
+            "ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ವಿದ್ಯಾರ್ಥಿವೇತನದ ವಿವರಗಳನ್ನು ತಿಳಿಸಿ.",
+            "ಮಹಿಳಾ ಸ್ವಯಂ ಉದ್ಯೋಗ ಸಾಲಗಳು ಯಾವುವು?"
+        ),
+        "hi" to listOf(
+            "किसानों के लिए प्रमुख सरकारी योजनाएं क्या हैं?",
+            "उच्च शिक्षा के लिए छात्रवृत्ति कैसे मिलती है?",
+            "महिला स्व-रोजगार ऋण योजनाएं क्या हैं?"
+        ),
+        "en" to listOf(
+            "Tell me about welfare initiatives for farmers.",
+            "What scholarships are available for college students?",
+            "How can women entrepreneurs apply for business loans?"
+        )
+    )
+
     /**
      * Generates a context-aware natural conversational reply in the citizen's selected language
      * strictly grounded in verified scheme facts.
@@ -23,7 +70,9 @@ object GeminiVoiceService {
         language: String,
         stateName: String,
         profile: CitizenProfile,
-        matchingSchemes: List<Scheme>
+        matchingSchemes: List<Scheme> = emptyList(),
+        isFastMode: Boolean = true,
+        history: List<Pair<String, String>> = emptyList()
     ): String = withContext(Dispatchers.IO) {
         val apiKey = BuildConfig.GEMINI_API_KEY
         if (apiKey.isBlank()) {
@@ -37,26 +86,46 @@ object GeminiVoiceService {
                 requestMethod = "POST"
                 setRequestProperty("Content-Type", "application/json")
                 doOutput = true
-                connectTimeout = 8000
-                readTimeout = 8000
+                connectTimeout = 7000
+                readTimeout = 7000
             }
 
             val systemInstruction = when (language) {
                 "ml" -> "നിങ്ങൾ അറിവോം (Arivom) എന്ന സർക്കാർ പദ്ധതി ശബ്ദ സഹായിയാണ്. സ്വാഭാവിക മലയാളത്തിൽ മാത്രം സംസാരിക്കുക. തമിഴ് വാക്കുകൾ ഒരിക്കലും ഉപയോഗിക്കരുത്. പദ്ധതി അർഹതകൾ നിർബന്ധമായും താഴെ നൽകിയ വിവരങ്ങളിൽ നിന്ന് മാത്രം നൽകുക."
-                "ta" -> "நீங்கள் அறிவோம் (Arivom) அரசு நலத்திட்ட குரல் வழிகாட்டி. இயல்பான தமிழில் மட்டும் பேசவும். அரசு திட்ட தகவல்களை எப்போதும் துல்லியமாக விளக்குங்கள்."
-                else -> "You are Arivom, a friendly government scheme discovery assistant for India ($stateName). Keep responses concise, warm, conversational, and strictly grounded in the provided verified schemes."
+                "ta" -> "நீங்கள் அறிவோம் (Arivom) அரசு நலத்திட்ட குரல் வழிகாட்டி. இயல்பான தமிழில் மட்டும் பேசவும். அரசு திட்ட தகவல்களை எப்போதும் துல்லியமாக சுருக்கமாக விளக்குங்கள்."
+                "te" -> "మీరు అరివోమ్ (Arivom) ప్రభుత్వ పథకాల వాయిస్ అసిస్టెంట్. సహజమైన తెలుగులో మాత్రమే మాట్లాడండి."
+                "kn" -> "ನೀವು ಅರಿವೋಮ್ (Arivom) ಸರಕಾರಿ ಯೋಜನೆಗಳ ಧ್ವನಿ ಸಹಾಯಕ. ನೈಸರ್ಗಿಕ ಕನ್ನಡದಲ್ಲಿ ಮಾತ್ರ ಮಾತನಾಡಿ."
+                "hi" -> "आप अरिवोम (Arivom) सरकारी कल्याण योजना सहायक हैं। शुद्ध व सरल हिंदी में संक्षेप में उत्तर दें।"
+                else -> "You are Arivom, a friendly government scheme discovery voice assistant for India ($stateName). Keep responses concise, warm, conversational, and strictly grounded in the provided verified schemes."
+            }
+
+            val modeGuidance = if (isFastMode) {
+                "⚡ FAST MODE: Keep answer ultra-concise (1-2 sentences maximum), direct, and easy to hear."
+            } else {
+                "🎙️ STUDIO MODE: Provide clear details on eligibility, benefits, and how to apply in 2-3 sentences."
             }
 
             val schemeSummary = matchingSchemes.take(3).joinToString("; ") {
                 "${it.name} (${it.benefits.shortSummary})"
             }
 
+            val historySummary = history.takeLast(3).joinToString("\n") { (role, txt) ->
+                "$role: $txt"
+            }
+
             val prompt = """
-                Citizen Spoke: "$spokenText"
-                Citizen Profile: Age ${profile.age}, Occupation: ${profile.occupation}, District: ${profile.district ?: "General"}, State: $stateName.
-                Verified Matching Schemes: $schemeSummary.
+                $systemInstruction
+                $modeGuidance
                 
-                Respond in 1-2 natural spoken sentences directly answering the user in the selected language ($language).
+                Citizen Profile: Age ${profile.age}, Occupation: ${profile.occupation}, District: ${profile.district ?: "General"}, State: $stateName.
+                Verified Schemes in Database: $schemeSummary.
+                
+                Recent Conversation:
+                $historySummary
+                
+                Citizen Spoke / Typed: "$spokenText"
+                
+                Respond naturally in the citizen's language ($language).
             """.trimIndent()
 
             val requestJson = JSONObject().apply {
@@ -64,13 +133,13 @@ object GeminiVoiceService {
                     put(JSONObject().apply {
                         put("role", "user")
                         put("parts", JSONArray().apply {
-                            put(JSONObject().put("text", "$systemInstruction\n\n$prompt"))
+                            put(JSONObject().put("text", prompt))
                         })
                     })
                 })
                 put("generationConfig", JSONObject().apply {
-                    put("temperature", 0.4)
-                    put("maxOutputTokens", 150)
+                    put("temperature", if (isFastMode) 0.3 else 0.5)
+                    put("maxOutputTokens", if (isFastMode) 120 else 250)
                 })
             }
 
@@ -98,24 +167,14 @@ object GeminiVoiceService {
     }
 
     private fun getFallbackReply(spokenText: String, language: String, matchingSchemes: List<Scheme>): String {
-        val topScheme = matchingSchemes.firstOrNull()?.name ?: "Government Schemes"
+        val top = matchingSchemes.firstOrNull()?.name ?: "பிரதான் மந்திரி கிசான் சம்மான் நிதி"
         return when (language) {
-            "ml" -> if (matchingSchemes.isNotEmpty()) {
-                "താങ്കളുടെ വിവരങ്ങൾ പ്രകാരം ${matchingSchemes.size} സർക്കാർ പദ്ധതികൾ ലഭ്യമാണ്. പ്രധാന പദ്ധതി: $topScheme. കൂടുതൽ അറിയണമെന്നുണ്ടോ?"
-            } else {
-                "താങ്കൾ പറഞ്ഞത് മനസ്സിലായി. അർഹമായ പദ്ധതികൾക്കായി കൂടുതൽ വിവരങ്ങൾ നൽകാം."
-            }
-            "ta" -> if (matchingSchemes.isNotEmpty()) {
-                "உங்கள் தகுதியின் அடிப்படையில் ${matchingSchemes.size} அரசு திட்டங்கள் கண்டறியப்பட்டுள்ளன. முதன்மை திட்டம்: $topScheme. இதன் பலன்களை அறிய விரும்புகிறீர்களா?"
-            } else {
-                "நீங்கள் கூறியது புரிந்தது. உங்களுக்கு பொருத்தமான அரசு திட்டங்களை தேடுகிறேன்."
-            }
-            else -> if (matchingSchemes.isNotEmpty()) {
-                "Based on your profile, ${matchingSchemes.size} schemes match your criteria, including $topScheme. Would you like to hear the benefits?"
-            } else {
-                "Understood. Searching verified government welfare schemes matching your profile."
-            }
+            "ml" -> "തീർച്ചയായും! നിങ്ങൾക്ക് അനുയോജ്യമായ സർക്കാർ പദ്ധതി കണ്ടെത്താം. $top പോലുള്ള പദ്ധതികൾ നിങ്ങൾക്ക് ലഭിക്കാൻ സാധ്യതയുണ്ട്."
+            "ta" -> "நிச்சயமாக! உங்கள் தகுதிக்கு ஏற்ற அரசு திட்டங்களை கண்டறியலாம். $top திட்டம் உங்களுக்கு பொருந்தும்."
+            "te" -> "తప్పకుండా! మీ అర్హతకు తగిన ప్రభుత్వ పథకాలను మేము కనుగొనవచ్చు. $top మీకు ఉపయోగపడుతుంది."
+            "kn" -> "ಖಂಡಿತ! ನಿಮ್ಮ ಅರ್ಹತೆಗೆ ಸೂಕ್ತವಾದ ಸರಕಾರಿ ಯೋಜನೆಗಳನ್ನು ನಾವು ಹುಡುಕಬಹುದು."
+            "hi" -> "ज़रूर! आपकी पात्रता के अनुसार उपयुक्त सरकारी योजनाएं खोजी जा रही हैं।"
+            else -> "Sure! We can match the best government welfare schemes for you, such as $top."
         }
     }
 }
-
