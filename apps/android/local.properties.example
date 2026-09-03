@@ -12,3 +12,4 @@ API_BASE_URL=https://api.arivomthittam.gov.in
 
 # Optional Gemini / AI Studio API key (for voice explanation / natural language assist)
 GEMINI_API_KEY=
+
