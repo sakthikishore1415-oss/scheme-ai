@@ -34,51 +34,54 @@ export const HomeView: React.FC = () => {
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in pb-12">
       {/* Hero Welcome & Quick Voice Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-linear-to-br from-slate-950 via-emerald-950 to-slate-900 text-white p-6 sm:p-10 border border-emerald-900/60 shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <section className="relative overflow-hidden rounded-3xl bg-[#092554] text-white p-6 sm:p-10 border border-[#243b6b] shadow-2xl">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#243b6b]/40 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="relative z-10 max-w-3xl space-y-5">
           {/* Top Pill Info */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="bg-emerald-500/20 text-emerald-300 text-xs px-3 py-1 rounded-full font-bold border border-emerald-500/30 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5" />
+            <span className="bg-[#243b6b] text-[#d9e2ff] text-xs px-3 py-1 rounded-full font-bold border border-[#90a6dd]/30 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-[#94f6c4]" />
               <span>{currentStateConfig.name}</span>
-              <span className="text-emerald-400 font-mono">({currentStateConfig.nativeName})</span>
+              <span className="text-[#94f6c4] font-medium">({currentStateConfig.nativeName})</span>
             </span>
 
-            <span className="bg-teal-500/20 text-teal-300 text-xs px-3 py-1 rounded-full font-bold border border-teal-500/30 flex items-center gap-1.5">
-              <Volume2 className="w-3.5 h-3.5" />
+            <span className="bg-[#243b6b] text-[#d9e2ff] text-xs px-3 py-1 rounded-full font-bold border border-[#90a6dd]/30 flex items-center gap-1.5">
+              <Volume2 className="w-3.5 h-3.5 text-[#fea619]" />
               <span>Voice: {currentLanguageConfig.name}</span>
             </span>
 
             <button
               onClick={() => setShowSetupModal(true)}
-              className="text-xs text-emerald-400 hover:text-emerald-300 font-bold underline cursor-pointer"
+              className="text-xs text-[#94f6c4] hover:text-white font-bold underline cursor-pointer ml-1"
             >
               Change State / Language
             </button>
           </div>
 
           {/* Heading */}
-          <div className="space-y-1">
+          <div className="space-y-1.5">
+            <span className="text-xs font-extrabold text-[#fea619] tracking-wider uppercase">
+              அரசு திட்டங்கள் • CIVIC SCHEME DISCOVERY
+            </span>
             <h1 className={`font-black text-white tracking-tight ${easyMode ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl'}`}>
-              Discover Your Entitled Government Schemes
+              உங்களுக்கு என்ன கிடைக்கும்?
             </h1>
-            <p className="text-xs sm:text-sm text-emerald-200/90 font-medium">
-              State-Aware, Voice-First Civic Platform for All Indian Citizens.
+            <p className="text-xs sm:text-sm text-[#d9e2ff] font-medium leading-relaxed">
+              Find government schemes and welfare entitlements you qualify for — evaluated directly against published gazette guidelines.
             </p>
           </div>
 
           {/* Primary Voice Mic Action Box */}
-          <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-emerald-800/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-[#243b6b]/60 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-[#90a6dd]/20 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="space-y-1 text-center sm:text-left">
-              <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider block">
+              <span className="text-[11px] font-bold text-[#94f6c4] uppercase tracking-wider block">
                 SPEAK IN YOUR REGIONAL LANGUAGE
               </span>
               <p className="text-xs sm:text-sm font-semibold text-white">
                 Tell us your age, occupation, and needs to discover schemes
               </p>
-              <p className="text-[11px] text-slate-400 font-mono">
+              <p className="text-[11px] text-[#d9e2ff] font-mono">
                 {currentLanguageConfig.samplePhrase}
               </p>
             </div>
@@ -86,7 +89,7 @@ export const HomeView: React.FC = () => {
             <button
               id="home-hero-mic-btn"
               onClick={() => setShowVoiceModal(true)}
-              className="px-6 py-3 rounded-2xl bg-linear-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-600 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-emerald-500/30 transition-all flex items-center gap-2.5 shrink-0 cursor-pointer group"
+              className="px-6 py-3 rounded-2xl bg-[#fea619] hover:bg-[#ffb95f] text-[#684000] font-black text-xs sm:text-sm shadow-xl shadow-[#fea619]/20 transition-all flex items-center gap-2.5 shrink-0 cursor-pointer group"
             >
               <Mic className="w-5 h-5 group-hover:scale-110 transition-transform" />
               <span>TALK TO ARIVOM</span>
@@ -97,23 +100,23 @@ export const HomeView: React.FC = () => {
 
       {/* Onboarding State if no profile */}
       {!userProfile && (
-        <section className="bg-white rounded-3xl p-6 sm:p-8 border border-emerald-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
+        <section className="bg-white rounded-3xl p-6 sm:p-8 border border-[#c5c6d0]/60 shadow-soft flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="space-y-2 max-w-xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-300">
-              <UserPlus className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#d9e2ff] text-[#001944] text-xs font-bold border border-[#b0c6ff]">
+              <UserPlus className="w-3.5 h-3.5 text-[#092554]" />
               GET STARTED
             </div>
-            <h2 className="text-xl font-black text-slate-900">
-              Let's create your profile to find schemes you may qualify for.
+            <h2 className="text-xl font-bold text-[#092554]">
+              Let's create your profile to find schemes you qualify for.
             </h2>
-            <p className="text-xs text-slate-600 leading-relaxed">
+            <p className="text-xs text-[#44464f] leading-relaxed">
               Enter your basic demographic information (age, occupation, income, state) or speak with our regional voice assistant to evaluate government scheme eligibility.
             </p>
           </div>
 
           <button
             onClick={() => setActiveTab('profile')}
-            className="px-6 py-3 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+            className="px-6 py-3 rounded-2xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 shrink-0 cursor-pointer"
           >
             <UserPlus className="w-4 h-4" />
             <span>CREATE YOUR PROFILE</span>
@@ -125,17 +128,17 @@ export const HomeView: React.FC = () => {
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-xs font-bold text-emerald-700 tracking-wider uppercase">
+            <span className="text-xs font-bold text-[#092554] tracking-wider uppercase">
               EXPLORE BY SECTOR
             </span>
-            <h2 className="text-lg font-black text-slate-900">
+            <h2 className="text-lg font-bold text-[#092554]">
               Popular Needs in {currentStateConfig.name}
             </h2>
           </div>
 
           <button
             onClick={() => setActiveTab('matches')}
-            className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 cursor-pointer"
+            className="text-xs font-bold text-[#092554] hover:text-[#243b6b] flex items-center gap-1 cursor-pointer"
           >
             <span>View All Sectors</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -148,17 +151,17 @@ export const HomeView: React.FC = () => {
               key={cat.id}
               id={`home-need-card-${cat.id}`}
               onClick={() => quickSearchNeed(cat.id)}
-              className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all text-left group cursor-pointer flex flex-col justify-between"
+              className="p-4 rounded-2xl bg-white border border-[#c5c6d0]/60 hover:border-[#092554] hover:shadow-card-hover transition-all text-left group cursor-pointer flex flex-col justify-between"
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-2xl">{cat.icon}</span>
-                <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-emerald-600 transition-colors" />
+                <ArrowRight className="w-3.5 h-3.5 text-[#c5c6d0] group-hover:text-[#092554] transition-colors" />
               </div>
               <div>
-                <h3 className="font-extrabold text-xs text-slate-900 group-hover:text-emerald-700 transition-colors">
+                <h3 className="font-bold text-xs text-[#191c1e] group-hover:text-[#092554] transition-colors">
                   {cat.label}
                 </h3>
-                <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                <p className="text-[11px] text-[#757780] font-medium mt-0.5">
                   {cat.tamilLabel}
                 </p>
               </div>
@@ -171,11 +174,11 @@ export const HomeView: React.FC = () => {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-xs font-bold text-emerald-700 tracking-wider uppercase flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5" />
+            <span className="text-xs font-bold text-[#092554] tracking-wider uppercase flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-[#fea619]" />
               PERSONALIZED MATCHES ({currentStateConfig.name})
             </span>
-            <h2 className="text-lg font-black text-slate-900">
+            <h2 className="text-lg font-bold text-[#092554]">
               {userProfile?.name ? `Top Eligible Schemes for ${userProfile.name}` : 'Personalized Scheme Matches'}
             </h2>
           </div>
@@ -184,7 +187,7 @@ export const HomeView: React.FC = () => {
             <button
               id="home-view-all-matches-btn"
               onClick={() => setActiveTab('matches')}
-              className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <span>VIEW ALL ({activeMatches.length})</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -199,16 +202,16 @@ export const HomeView: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-3xl p-8 border border-slate-200 text-center space-y-3">
-            <Info className="w-8 h-8 mx-auto text-slate-400" />
-            <h3 className="font-bold text-slate-800 text-sm">
+          <div className="bg-white rounded-3xl p-8 border border-[#c5c6d0]/60 text-center space-y-3 shadow-soft">
+            <Info className="w-8 h-8 mx-auto text-[#757780]" />
+            <h3 className="font-bold text-[#191c1e] text-sm">
               {!userProfile
                 ? 'No scheme matches yet. Complete your profile to discover schemes.'
                 : schemesStatus === 'NO_DATA'
                 ? 'No government schemes loaded from connected repository.'
                 : 'No matching schemes found for your current profile criteria.'}
             </h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
+            <p className="text-xs text-[#44464f] max-w-md mx-auto">
               {!userProfile
                 ? 'Fill out your profile or use the voice assistant to calculate your eligibility against official government guidelines.'
                 : 'Try adjusting your stated sector need or explore all available sectors above.'}
@@ -216,7 +219,7 @@ export const HomeView: React.FC = () => {
             {!userProfile && (
               <button
                 onClick={() => setActiveTab('profile')}
-                className="mt-2 px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer"
+                className="mt-2 px-5 py-2.5 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer transition-colors"
               >
                 <UserPlus className="w-4 h-4" />
                 <span>Create Profile</span>
@@ -227,16 +230,16 @@ export const HomeView: React.FC = () => {
       </section>
 
       {/* Zero Internet Button Phone Feature Highlight */}
-      <section className="rounded-3xl bg-slate-900 text-white p-6 sm:p-8 border border-slate-800 shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
+      <section className="rounded-3xl bg-[#092554] text-white p-6 sm:p-8 border border-[#243b6b] shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="space-y-2 max-w-xl">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fea619]/20 text-[#fea619] text-xs font-bold border border-[#fea619]/30">
             <PhoneCall className="w-3.5 h-3.5" />
             BUTTON PHONE ACCESSIBILITY
           </div>
-          <h3 className="text-xl font-extrabold text-white">
+          <h3 className="text-xl font-bold text-white">
             Have a Basic Button Phone with No Internet?
           </h3>
-          <p className="text-xs text-slate-300 leading-relaxed">
+          <p className="text-xs text-[#d9e2ff] leading-relaxed">
             Citizens can dial our Toll-Free Civic IVR Helpline <strong className="text-white">1800-425-7000</strong> or send an SMS to receive spoken scheme audio and text summaries without smartphones.
           </p>
         </div>
@@ -244,7 +247,7 @@ export const HomeView: React.FC = () => {
         <button
           id="home-open-button-phone-btn"
           onClick={() => setActiveTab('button_phone')}
-          className="px-6 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+          className="px-6 py-3 rounded-2xl bg-[#fea619] hover:bg-[#ffb95f] text-[#684000] font-bold text-xs shadow-lg shadow-[#fea619]/20 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
         >
           <PhoneCall className="w-4 h-4" />
           <span>LAUNCH BUTTON PHONE SIMULATOR</span>

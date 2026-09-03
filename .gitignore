@@ -10,6 +10,7 @@ coverage/
 bun.lock*
 bun.lockb
 design_system/
+web_design_system/
 *.zip
 
 # Android & Gradle
@@ -18,3 +19,4 @@ design_system/
 local.properties
 *.apk
 *.aab
+arivom-thittam-android-apk/

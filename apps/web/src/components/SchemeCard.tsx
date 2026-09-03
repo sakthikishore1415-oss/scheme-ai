@@ -53,32 +53,32 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
     );
   };
 
-  const getScoreBadgeColor = (level: string) => {
+  const getScoreBadgeStyles = (level: string) => {
     switch (level) {
       case 'STRONG':
-        return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+        return 'bg-[#94f6c4]/40 text-[#00462d] border-[#57b98c]/50';
       case 'POTENTIAL':
-        return 'bg-amber-100 text-amber-800 border-amber-300';
+        return 'bg-[#ffddb8] text-[#855300] border-[#fea619]/60';
       default:
-        return 'bg-slate-100 text-slate-700 border-slate-300';
+        return 'bg-[#edeef0] text-[#44464f] border-[#c5c6d0]';
     }
   };
 
   return (
     <div
       id={`scheme-card-${scheme.id}`}
-      className={`bg-white rounded-2xl border transition-all duration-200 hover:shadow-md flex flex-col justify-between overflow-hidden ${
+      className={`bg-white rounded-2xl border transition-all duration-200 hover:shadow-card-hover flex flex-col justify-between overflow-hidden ${
         matchLevel === 'STRONG'
-          ? 'border-emerald-200/90 ring-1 ring-emerald-500/20'
-          : 'border-slate-200'
+          ? 'border-[#57b98c]/60 ring-1 ring-[#00462d]/10'
+          : 'border-[#c5c6d0]/60'
       } ${easyMode ? 'p-5 sm:p-6' : 'p-4 sm:p-5'}`}
     >
       {/* Header Badges */}
       <div>
-        <div className="flex items-center justify-between gap-2 mb-2">
+        <div className="flex items-center justify-between gap-2 mb-2.5">
           <div className="flex items-center gap-1.5 flex-wrap">
             <span
-              className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-md border flex items-center gap-1 ${getScoreBadgeColor(
+              className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border flex items-center gap-1 ${getScoreBadgeStyles(
                 matchLevel
               )}`}
             >
@@ -87,10 +87,10 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
             </span>
 
             <span
-              className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
+              className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
                 scheme.schemeType === 'central'
-                  ? 'bg-blue-50 text-blue-800 border border-blue-200'
-                  : 'bg-teal-50 text-teal-800 border border-teal-200'
+                  ? 'bg-[#d9e2ff] text-[#001944] border border-[#b0c6ff]'
+                  : 'bg-[#f2f4f6] text-[#092554] border border-[#c5c6d0]'
               }`}
             >
               {scheme.schemeType === 'central' ? 'Central Scheme' : `${scheme.stateId || scheme.state || 'State'} Scheme`}
@@ -103,20 +103,20 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
               e.stopPropagation();
               toggleSaveScheme(scheme.id);
             }}
-            className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
+            className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
               isSaved
-                ? 'bg-rose-50 text-rose-600 border-rose-200'
-                : 'bg-slate-50 text-slate-400 border-slate-200 hover:text-slate-700'
+                ? 'bg-[#ffdad6] text-[#ba1a1a] border-[#ffdad6]'
+                : 'bg-[#f2f4f6] text-[#757780] border-[#c5c6d0]/60 hover:text-[#191c1e]'
             }`}
             title={isSaved ? 'Remove from Saved' : 'Save Scheme'}
           >
-            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-rose-600' : ''}`} />
+            <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-[#ba1a1a]' : ''}`} />
           </button>
         </div>
 
         {/* Scheme Title & Native Name */}
         <h3
-          className={`font-extrabold text-slate-900 leading-snug cursor-pointer hover:text-emerald-700 transition-colors ${
+          className={`font-bold text-[#092554] leading-snug cursor-pointer hover:text-[#243b6b] transition-colors ${
             easyMode ? 'text-lg sm:text-xl' : 'text-base sm:text-lg'
           }`}
           onClick={() => setSelectedSchemeDetail(scheme)}
@@ -124,27 +124,27 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
           {scheme.name}
         </h3>
         {scheme.nativeName && (
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
+          <p className="text-xs text-[#44464f] font-medium mt-0.5">
             {scheme.nativeName}
           </p>
         )}
 
         {/* Department Info */}
-        <p className="text-[11px] text-slate-400 font-medium mt-1 flex items-center gap-1">
-          <Building className="w-3 h-3 shrink-0" />
+        <p className="text-[11px] text-[#757780] font-medium mt-1 flex items-center gap-1">
+          <Building className="w-3 h-3 shrink-0 text-[#092554]" />
           <span className="truncate">{scheme.department || scheme.authority || 'Government Authority'}</span>
         </p>
 
         {/* Benefit Box */}
-        <div className="mt-3.5 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200/80">
-          <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block mb-0.5">
+        <div className="mt-3.5 p-3 rounded-xl bg-[#f2f4f6] border border-[#c5c6d0]/60">
+          <span className="text-[10px] font-bold text-[#855300] uppercase tracking-wider block mb-0.5">
             Potential Benefit
           </span>
-          <p className={`font-bold text-emerald-950 ${easyMode ? 'text-base' : 'text-sm'}`}>
+          <p className={`font-bold text-[#002d1c] ${easyMode ? 'text-base' : 'text-sm'}`}>
             {scheme.benefits?.amount || scheme.benefits?.shortSummary || 'Welfare Entitlement'}
           </p>
           {scheme.benefits?.shortSummary && (
-            <p className="text-[11px] text-emerald-800/90 mt-0.5 leading-relaxed line-clamp-2">
+            <p className="text-[11px] text-[#44464f] mt-0.5 leading-relaxed line-clamp-2">
               {scheme.benefits.shortSummary}
             </p>
           )}
@@ -152,38 +152,38 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
 
         {/* Criteria Matching Summary Chips */}
         <div className="mt-3 flex items-center gap-2 flex-wrap text-[11px]">
-          <span className="inline-flex items-center gap-1 text-slate-600">
+          <span className="inline-flex items-center gap-1 text-[#44464f] font-medium">
             {criteriaBreakdown.age ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#00462d] shrink-0" />
             ) : (
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+              <AlertTriangle className="w-3.5 h-3.5 text-[#fea619] shrink-0" />
             )}
             Age
           </span>
-          <span className="text-slate-300">•</span>
-          <span className="inline-flex items-center gap-1 text-slate-600">
+          <span className="text-[#c5c6d0]">•</span>
+          <span className="inline-flex items-center gap-1 text-[#44464f] font-medium">
             {criteriaBreakdown.income ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#00462d] shrink-0" />
             ) : (
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+              <AlertTriangle className="w-3.5 h-3.5 text-[#fea619] shrink-0" />
             )}
             Income
           </span>
-          <span className="text-slate-300">•</span>
-          <span className="inline-flex items-center gap-1 text-slate-600">
+          <span className="text-[#c5c6d0]">•</span>
+          <span className="inline-flex items-center gap-1 text-[#44464f] font-medium">
             {criteriaBreakdown.occupation ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#00462d] shrink-0" />
             ) : (
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+              <AlertTriangle className="w-3.5 h-3.5 text-[#fea619] shrink-0" />
             )}
             Occupation
           </span>
-          <span className="text-slate-300">•</span>
-          <span className="inline-flex items-center gap-1 text-slate-600">
+          <span className="text-[#c5c6d0]">•</span>
+          <span className="inline-flex items-center gap-1 text-[#44464f] font-medium">
             {criteriaBreakdown.location ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#00462d] shrink-0" />
             ) : (
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+              <AlertTriangle className="w-3.5 h-3.5 text-[#fea619] shrink-0" />
             )}
             State
           </span>
@@ -191,16 +191,16 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
       </div>
 
       {/* Action Buttons Bar */}
-      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-1.5 flex-wrap">
+      <div className="mt-4 pt-3 border-t border-[#edeef0] flex items-center justify-between gap-1.5 flex-wrap">
         <div className="flex items-center gap-1.5">
           {/* Why Me Button */}
           <button
             id={`why-me-btn-${scheme.id}`}
             onClick={() => setSelectedWhyMeScheme(matchResult)}
-            className="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-slate-200"
+            className="px-2.5 py-1.5 rounded-xl bg-[#d9e2ff]/60 hover:bg-[#d9e2ff] text-[#001944] font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-[#b0c6ff]/60"
             title="Explain why this scheme matches your profile"
           >
-            <HelpCircle className="w-3.5 h-3.5 text-emerald-700" />
+            <HelpCircle className="w-3.5 h-3.5 text-[#092554]" />
             <span>WHY ME?</span>
           </button>
 
@@ -208,14 +208,14 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
           <button
             id={`hear-scheme-voice-btn-${scheme.id}`}
             onClick={handlePlayVoice}
-            className={`px-2.5 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 border transition-all cursor-pointer ${
+            className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 border transition-all cursor-pointer ${
               isPlayingVoice
-                ? 'bg-emerald-600 text-white border-emerald-700 animate-pulse'
-                : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border-emerald-200'
+                ? 'bg-[#092554] text-white border-[#092554] animate-pulse'
+                : 'bg-[#f2f4f6] hover:bg-[#edeef0] text-[#092554] border-[#c5c6d0]/60'
             }`}
             title="Hear explanation in regional language voice"
           >
-            <Volume2 className="w-3.5 h-3.5 text-emerald-700" />
+            <Volume2 className="w-3.5 h-3.5 text-[#092554]" />
             <span>{isPlayingVoice ? 'SPEAKING...' : 'HEAR'}</span>
           </button>
         </div>
@@ -224,7 +224,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
         <button
           id={`view-details-btn-${scheme.id}`}
           onClick={() => setSelectedSchemeDetail(scheme)}
-          className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-colors flex items-center gap-1 cursor-pointer"
+          className="px-3.5 py-1.5 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs shadow-xs transition-colors flex items-center gap-1 cursor-pointer"
         >
           <span>DETAILS</span>
           <ArrowRight className="w-3.5 h-3.5" />

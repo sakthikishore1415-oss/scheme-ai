@@ -1,1 +1,66 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary: #092554;
+  --color-primary-container: #243b6b;
+  --color-primary-fixed: #d9e2ff;
+  --color-primary-fixed-dim: #b0c6ff;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #90a6dd;
+  --color-on-primary-fixed: #001944;
+
+  --color-secondary: #855300;
+  --color-secondary-container: #fea619;
+  --color-secondary-fixed: #ffddb8;
+  --color-secondary-fixed-dim: #ffb95f;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #684000;
+  --color-on-secondary-fixed: #2a1700;
+
+  --color-tertiary: #002d1c;
+  --color-tertiary-container: #00462d;
+  --color-tertiary-fixed: #94f6c4;
+  --color-tertiary-fixed-dim: #78d9aa;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #57b98c;
+  --color-on-tertiary-fixed: #002113;
+
+  --color-surface: #f8f9fb;
+  --color-surface-dim: #d9dadc;
+  --color-surface-bright: #f8f9fb;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container: #edeef0;
+  --color-surface-container-high: #e7e8ea;
+  --color-surface-container-highest: #e1e2e4;
+
+  --color-on-surface: #191c1e;
+  --color-on-surface-variant: #44464f;
+  --color-outline: #757780;
+  --color-outline-variant: #c5c6d0;
+
+  --font-sans: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #f8f9fb;
+  color: #191c1e;
+}
+
+.shadow-soft {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-card-hover {
+  box-shadow: 0 4px 16px rgba(9, 37, 84, 0.08);
+}
+
+@keyframes subtle-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.04); opacity: 0.94; }
+}
+
+.animate-subtle-pulse {
+  animation: subtle-pulse 3s infinite ease-in-out;
+}
