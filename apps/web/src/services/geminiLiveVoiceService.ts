@@ -95,7 +95,7 @@ export class GeminiLiveVoiceService {
         // Send initial setup frame
         const setupFrame = {
           setup: {
-            model: 'models/gemini-2.5-flash',
+            model: 'models/gemini-2.5-flash-native-audio-preview-12-2025',
             generationConfig: {
               responseModalities: ['AUDIO'],
               speechConfig: {
