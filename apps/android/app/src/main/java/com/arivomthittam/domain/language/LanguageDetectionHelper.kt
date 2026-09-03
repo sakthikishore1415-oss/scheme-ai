@@ -4,6 +4,16 @@ import java.util.Locale
 
 object LanguageDetectionHelper {
 
+    fun containsIndicScript(text: String): Boolean {
+        for (char in text) {
+            val code = char.code
+            if (code in 0x0900..0x0D7F) {
+                return true
+            }
+        }
+        return false
+    }
+
     /**
      * Unicode script ranges for Indian regional languages
      */
@@ -52,4 +62,3 @@ object LanguageDetectionHelper {
         }
     }
 }
-

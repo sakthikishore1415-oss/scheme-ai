@@ -17,6 +17,10 @@ const SCRIPT_RANGES: { langId: string; regex: RegExp; name: string }[] = [
   { langId: 'as', regex: /[\u0980-\u09FF]/, name: 'Assamese' },
 ];
 
+export function containsIndicScript(text: string): boolean {
+  return /[\u0900-\u0D7F]/.test(text);
+}
+
 /**
  * Automatically detects the language from a given text string based on Unicode character distribution.
  */

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { getVoicePack } from '../data/locales';
 import { speechService } from '../utils/speech';
-import { extractProfileFromSpokenText, ExtractedProfileData } from '../utils/nlpExtractor';
+import { extractProfileFromSpokenText, translateToEnglish, ExtractedProfileData } from '../utils/nlpExtractor';
 import { detectLanguageFromText } from '../utils/languageDetector';
 import { SUPPORTED_LANGUAGES } from '../data/languages';
 import {
@@ -313,10 +313,10 @@ export const VoiceAssistantModal: React.FC = () => {
           {/* 2. UNDERSTANDING & BUILDING PROFILE STATE */}
           {(voiceState === 'UNDERSTANDING' || voiceState === 'BUILDING_PROFILE') && (
             <div className="space-y-4 max-w-md w-full text-left">
-              <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 space-y-2">
+              <div className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider block">
-                    Captured Spoken Input
+                    🗣️ Spoken Input
                   </span>
                   {detectedLangFeedback && (
                     <span className="flex items-center gap-1 text-[10px] font-bold text-teal-300 bg-teal-950/80 border border-teal-700/60 px-2 py-0.5 rounded-full">
@@ -325,9 +325,19 @@ export const VoiceAssistantModal: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <p className="text-sm font-semibold text-white italic">
+                <p className="text-sm font-semibold text-white">
                   "{spokenTranscript || customTextInput}"
                 </p>
+
+                {/* English Translation */}
+                <div className="pt-2 border-t border-slate-700/80">
+                  <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider block mb-1">
+                    🌐 English Translation
+                  </span>
+                  <p className="text-xs text-amber-100 font-medium italic">
+                    "{translateToEnglish(spokenTranscript || customTextInput, extractedData?.detectedLanguage)}"
+                  </p>
+                </div>
               </div>
 
               <div className="bg-slate-800/90 p-5 rounded-2xl border border-slate-700 space-y-3">

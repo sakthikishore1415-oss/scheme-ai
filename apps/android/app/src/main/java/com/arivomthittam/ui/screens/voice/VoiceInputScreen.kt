@@ -370,17 +370,67 @@ fun VoiceInputScreen(
                             else -> "No speech recorded yet. Tap the microphone above."
                         }
 
-                        Text(
-                            text = displayText,
-                            fontSize = 15.sp,
-                            fontWeight = if (recognizedText.isNotEmpty() || partialText.isNotEmpty()) FontWeight.Bold else FontWeight.Normal,
-                            color = if (recognizedText.isNotEmpty() || partialText.isNotEmpty()) OnSurface else OnSurfaceVariant,
-                            lineHeight = 22.sp,
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(SurfaceContainerLow, RoundedCornerShape(10.dp))
-                                .padding(12.dp)
-                        )
+                                .background(SurfaceContainerLow, RoundedCornerShape(12.dp))
+                                .padding(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Text(
+                                    text = "🗣️ Spoken (${detectedLanguage?.uppercase() ?: currentLanguage.uppercase()}):",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = PrimaryIndigo
+                                )
+                            }
+                            Text(
+                                text = displayText,
+                                fontSize = 15.sp,
+                                fontWeight = if (recognizedText.isNotEmpty() || partialText.isNotEmpty()) FontWeight.Bold else FontWeight.Normal,
+                                color = if (recognizedText.isNotEmpty() || partialText.isNotEmpty()) OnSurface else OnSurfaceVariant,
+                                lineHeight = 22.sp
+                            )
+                        }
+
+                        // English Translation Box
+                        if (recognizedText.isNotEmpty() || partialText.isNotEmpty()) {
+                            val activeText = recognizedText.ifEmpty { partialText }
+                            val englishTranslation = com.arivomthittam.domain.language.TranslationHelper.translateToEnglish(activeText, detectedLanguage)
+
+                            if (englishTranslation.isNotEmpty()) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(PrimaryFixed.copy(alpha = 0.45f), RoundedCornerShape(12.dp))
+                                        .padding(12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                    ) {
+                                        Text(
+                                            text = "🌐 English Translation:",
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = PrimaryIndigo
+                                        )
+                                    }
+                                    Text(
+                                        text = "“$englishTranslation”",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = Color(0xFF001944),
+                                        lineHeight = 20.sp
+                                    )
+                                }
+                            }
+                        }
 
                         if (errorMessage != null) {
                             Text(
