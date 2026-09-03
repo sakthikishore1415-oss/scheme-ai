@@ -195,3 +195,4 @@ export const VoiceOrbVisualizer: React.FC<VoiceOrbVisualizerProps> = ({
     </div>
   );
 };
+

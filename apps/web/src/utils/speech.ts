@@ -75,6 +75,21 @@ class SpeechService {
     this.currentUtterance = null;
   }
 
+  public hasNativeVoice(langId: string): boolean {
+    if (!('speechSynthesis' in window)) return false;
+    const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
+    const voices = window.speechSynthesis.getVoices();
+    const targetCode = langConfig.bcp47Code.toLowerCase();
+    const langPrefix = langConfig.id.toLowerCase();
+
+    return voices.some(
+      (v) =>
+        v.lang.toLowerCase() === targetCode ||
+        v.lang.toLowerCase().startsWith(langPrefix) ||
+        v.name.toLowerCase().includes(langConfig.name.toLowerCase())
+    );
+  }
+
   public isSpeaking(): boolean {
     return this.isSynthesizing || (typeof window !== 'undefined' && window.speechSynthesis?.speaking);
   }

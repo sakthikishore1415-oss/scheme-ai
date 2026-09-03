@@ -1,6 +1,8 @@
 export interface RegionalVoicePack {
   langId: string;
-  greetingPrompt: string; // e.g. "வணக்கம்! உங்கள் தேவையை சொல்லுங்கள்."
+  greetingPrompt: string;
+  sessionWelcomeConfirmation: string;
+  languageSwitchConfirmation: string;
   listeningPrompt: string;
   understandingPrompt: string;
   heardConfirmation: (transcript: string) => string;
@@ -31,6 +33,8 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
   ta: {
     langId: 'ta',
     greetingPrompt: 'வணக்கம்! அறிவோம் திட்டம் உங்களை வரவேற்கிறது. உங்கள் தேவையை சொல்லுங்கள்.',
+    sessionWelcomeConfirmation: 'வணக்கம்! நான் உங்களிடம் தமிழில் பேசுவேன். நீங்கள் எப்போது வேண்டுமானாலும் மொழியை மாற்றலாம். உங்களுக்கு என்ன உதவி தேவை?',
+    languageSwitchConfirmation: 'மொழி தமிழாக மாற்றப்பட்டது. நான் உங்களிடம் தமிழில் பேசுவேன். உங்களுக்கு எவ்வாறு உதவலாம்?',
     listeningPrompt: 'உங்கள் குரலை கவனிக்கிறோம்... பேசுங்கள்.',
     understandingPrompt: 'உங்கள் தேவையை புரிந்து கொள்கிறோம்...',
     heardConfirmation: (transcript) => `நீங்கள் கூறியதை கேட்டேன்: "${transcript}".`,
@@ -80,6 +84,8 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
   hi: {
     langId: 'hi',
     greetingPrompt: 'नमस्ते! अरिवोम थित्तम में आपका स्वागत है। कृपया अपनी आवश्यकता बताएं।',
+    sessionWelcomeConfirmation: 'नमस्ते! मैं आपसे हिंदी में बात करूँगा। आप कभी भी भाषा बदल सकते हैं। आपको क्या सहायता चाहिए?',
+    languageSwitchConfirmation: 'भाषा हिंदी में बदल दी गई है। मैं आपकी कैसे मदद कर सकता हूँ?',
     listeningPrompt: 'सुन रहे हैं... कृपया बोलिए।',
     understandingPrompt: 'आपकी आवश्यकता का विश्लेषण किया जा रहा है...',
     heardConfirmation: (transcript) => `मैंने सुना: "${transcript}".`,
@@ -120,6 +126,8 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
   ml: {
     langId: 'ml',
     greetingPrompt: 'നമസ്കാരം! അറിവോം തിട്ടം. നിങ്ങൾക്ക് എന്ത് സർക്കാർ സഹായമാണ് വേണ്ടത്?',
+    sessionWelcomeConfirmation: 'നമസ്കാരം! ഞാൻ നിങ്ങളോട് മലയാളത്തിൽ സംസാരിക്കും. നിങ്ങൾക്ക് എപ്പോൾ വേണമെങ്കിലും ഭാഷ മാറ്റാം. എന്ത് സഹായമാണ് വേണ്ടത്?',
+    languageSwitchConfirmation: 'ഭാഷ മലയാളത്തിലേക്ക് മാറ്റി. ഞാൻ എങ്ങനെ സഹായിക്കണം?',
     listeningPrompt: 'കേൾക്കുന്നു... സംസാരിക്കൂ.',
     understandingPrompt: 'താങ്കളുടെ ആവശ്യം പരിശോധിക്കുന്നു...',
     heardConfirmation: (transcript) => `താങ്കൾ പറഞ്ഞത് കേട്ടു: "${transcript}".`,
@@ -157,6 +165,8 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
   kn: {
     langId: 'kn',
     greetingPrompt: 'ನಮಸ್ಕಾರ! ಅರಿವೋಮ್ ತಿಟ್ಟಂ ಗೆ ಸ್ವಾಗತ. ನಿಮಗೆ ಯಾವ ಸರ್ಕಾರದ ಸಹಾಯ ಬೇಕು?',
+    sessionWelcomeConfirmation: 'ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮೊಂದಿಗೆ ಕನ್ನಡದಲ್ಲಿ ಮಾತನಾಡುತ್ತೇನೆ. ನೀವು ಯಾವಾಗ ಬೇಕಾದರೂ ಭಾಷೆಯನ್ನು ಬದಲಾಯಿಸಬಹುದು. ನಿಮಗೆ ಯಾವ ಸಹಾಯ ಬೇಕು?',
+    languageSwitchConfirmation: 'ಭಾಷೆಯನ್ನು ಕನ್ನಡಕ್ಕೆ ಬದಲಾಯಿಸಲಾಗಿದೆ. ನಾನು ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?',
     listeningPrompt: 'ಕೇಳಿಸಿಕೊಳ್ಳುತ್ತಿದ್ದೇವೆ... ಮಾತನಾಡಿ.',
     understandingPrompt: 'ನಿಮ್ಮ ವಿವರಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತಿದ್ದೇವೆ...',
     heardConfirmation: (transcript) => `ನೀವು ಹೇಳಿದ್ದು ಕೇಳಿಸಿತು: "${transcript}".`,
@@ -191,6 +201,8 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
   te: {
     langId: 'te',
     greetingPrompt: 'నమస్కారం! అరివోమ్ తిట్టం కు స్వాగతం. మీకు ఏ ప్రభుత్వ పథకం సహాయం కావాలి?',
+    sessionWelcomeConfirmation: 'నమస్కారం! నేను మీతో తెలుగులో మాట్లాడతాను. మీరు ఎప్పుడైనా భాషను మార్చవచ్చు. మీకు ఏమి సహాయం కావాలి?',
+    languageSwitchConfirmation: 'భాష తెలుగులోకి మార్చబడింది. నేను మీకు ఎలా సహాయపడగలను?',
     listeningPrompt: 'వింటున్నాము... మాట్లాడండి.',
     understandingPrompt: 'మీ అభ్యర్థనను పరిశీలిస్తున్నాము...',
     heardConfirmation: (transcript) => `మీరు చెప్పింది విన్నాను: "${transcript}".`,
@@ -212,7 +224,7 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     matchedHeading: (count) => `అభినందనలు! మీ వివరాలకు సంబంధించి ${count} పథకాలు లభించాయి.`,
     whyMeHeading: 'ఈ పథకం మీకు ఎందుకు సరిపోతుంది?',
     explainSimplyIntro: 'సులభమైన వివరణ:',
-    ivrWelcome: 'అరివోమ్ తిట్టం కు స్వాగతం.',
+    ivrWelcome: 'அரிவோమ్ తిట్టం కు స్వాగతం.',
     ivrLanguagePrompt: 'తెలుగు కోసం 1 నొక్కండి. For English press 2.',
     ivrSchemeIntro: (idx, name) => `పథకం ${idx}: ${name}.`,
     ivrSchemeDetailsPrompt: 'ఈ పథకం వివరాలు వినడానికి 1 నొక్కండి.',
@@ -225,6 +237,8 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
   bn: {
     langId: 'bn',
     greetingPrompt: 'নমস্কার! অরিভোম থিত্তমে আপনাকে স্বাগতম। আপনার কি ধরণের সরকারি সাহায্য প্রয়োজন?',
+    sessionWelcomeConfirmation: 'নমস্কার! আমি আপনার সাথে বাংলায় কথা বলব। আপনি যে কোনো সময় ভাষা পরিবর্তন করতে পারেন। আপনার কি সাহায্য প্রয়োজন?',
+    languageSwitchConfirmation: 'ভাষা বাংলায় পরিবর্তিত হয়েছে। আমি আপনাকে কিভাবে সাহায্য করতে পারি?',
     listeningPrompt: 'শুনছি... বলুন।',
     understandingPrompt: 'আপনার প্রয়োজন যাচাই করা হচ্ছে...',
     heardConfirmation: (transcript) => `আমি শুনেছি: "${transcript}".`,
@@ -253,6 +267,8 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
   mr: {
     langId: 'mr',
     greetingPrompt: 'नमस्कार! अरिवोम थित्तम मध्ये आपले स्वागत आहे. आपणास कोणत्या सरकारी मदतीची गरज आहे?',
+    sessionWelcomeConfirmation: 'नमस्कार! मी तुमच्याशी मराठीत बोलेन. तुम्ही कधीही भाषा बदलू शकता. तुम्हाला कोणती मदत हवी आहे?',
+    languageSwitchConfirmation: 'भाषा मराठीमध्ये बदलली आहे. मी तुम्हाला कशी मदत करू शकतो?',
     listeningPrompt: 'ऐकत आहोत... बोला.',
     understandingPrompt: 'तुमची माहिती तपासत आहोत...',
     heardConfirmation: (transcript) => `मी ऐकले: "${transcript}".`,
@@ -281,6 +297,8 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
   gu: {
     langId: 'gu',
     greetingPrompt: 'નમસ્તે! અરિવોમ થિત્તમમાં તમારું સ્વાગત છે. તમને કઈ સરકારી યોજનાની મદદ જોઈએ છે?',
+    sessionWelcomeConfirmation: 'નમસ્તે! હું તમારી સાથે ગુજરાતીમાં વાત કરીશ. તમે ગમે ત્યારે ભાષા બદલી શકો છો. તમને કઈ મદદ જોઈએ છે?',
+    languageSwitchConfirmation: 'ભાષા ગુજરાતીમાં બદલાઈ ગઈ છે. હું તમને કેવી રીતે મદદ કરી શકું?',
     listeningPrompt: 'સાંભળી રહ્યા છીએ... બોલો.',
     understandingPrompt: 'તમારી વિગતો ચકાસી રહ્યા છીએ...',
     heardConfirmation: (transcript) => `મેં સાંભળ્યું: "${transcript}".`,
@@ -309,6 +327,8 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
   or: {
     langId: 'or',
     greetingPrompt: 'ନମସ୍କାର! ଅରିଭୋମ୍ ଥିତ୍ତମକୁ ଆପଣଙ୍କୁ ସ୍ୱାଗତ। ଆପଣଙ୍କୁ କେଉଁ ସରକାରୀ ଯୋଜନା ସାହାଯ୍ୟ ଦରକାର?',
+    sessionWelcomeConfirmation: 'ନମସ୍କାର! ମୁଁ ଆପଣଙ୍କ ସହ ଓଡ଼ିଆରେ କଥା ହେବି। ଆପଣ ଯେକୌଣସି ସମୟରେ ଭାଷା ବଦଳାଇ ପାରିବେ। ଆପଣଙ୍କୁ କ’ଣ ସାହାଯ୍ୟ ଦରକାର?',
+    languageSwitchConfirmation: 'ଭାଷା ଓଡ଼ିଆରେ ପରିବର୍ତ୍ତିତ ହୋଇଛି। ମୁଁ ଆପଣଙ୍କୁ କିପରି ସାହାଯ୍ୟ କରିପାରିବି?',
     listeningPrompt: 'ଶୁଣୁଛୁ... କୁହନ୍ତୁ।',
     understandingPrompt: 'ଆପଣଙ୍କର ଆବଶ୍ୟକତା ଯାଞ୍ଚ ହେଉଛି...',
     heardConfirmation: (transcript) => `ମୁଁ ଶୁଣିଲି: "${transcript}".`,
@@ -337,6 +357,8 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
   pa: {
     langId: 'pa',
     greetingPrompt: 'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਅਰੀਵੋਮ ਥਿੱਤਮ ਵਿੱਚ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ। ਤੁਹਾਨੂੰ ਕਿਹੜੀ ਸਰਕਾਰੀ ਸਹਾਇਤਾ ਚਾਹੀਦੀ ਹੈ?',
+    sessionWelcomeConfirmation: 'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਤੁਹਾਡੇ ਨਾਲ ਪੰਜਾਬੀ ਵਿੱਚ ਗੱਲ ਕਰਾਂਗਾ। ਤੁਸੀਂ ਕਿਸੇ ਵੀ ਸਮੇਂ ਭਾਸ਼ਾ ਬਦਲ ਸਕਦੇ ਹੋ। ਤੁਹਾਨੂੰ ਕੀ ਮਦਦ ਚਾਹੀਦੀ ਹੈ?',
+    languageSwitchConfirmation: 'ਭਾਸ਼ਾ ਪੰਜਾਬੀ ਵਿੱਚ ਬਦਲ ਦਿੱਤੀ ਗਈ ਹੈ। ਮੈਂ ਤੁਹਾਡੀ ਕਿਵੇਂ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?',
     listeningPrompt: 'ਸੁਣ ਰਹੇ ਹਾਂ... ਬੋਲੋ।',
     understandingPrompt: 'ਤੁਹਾਡੀ ਜਾਣਕਾਰੀ ਦੀ ਜਾਂਚ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ...',
     heardConfirmation: (transcript) => `ਮੈਂ ਸੁਣਿਆ: "${transcript}".`,
@@ -365,6 +387,8 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
   as: {
     langId: 'as',
     greetingPrompt: 'নমস্কাৰ! অৰিভোম থিত্তমলৈ আপোনাক স্বাগতম। আপোনাক কি চৰকাৰী আঁচনিৰ সাহায্য লাগে?',
+    sessionWelcomeConfirmation: 'নমস্কাৰ! মই আপোনাৰ লগত অসমীয়াত কথা পাতিম। আপুনি যিকোনো সময়তে ভাষা সলনি কৰিব পাৰে। আপোনাক কি সাহায্য লাগে?',
+    languageSwitchConfirmation: 'ভাষা অসমীয়ালৈ সলনি কৰা হৈছে। মই আপোনাক কেনেকৈ সহায় কৰিব পাৰোঁ?',
     listeningPrompt: 'শুনি আছোঁ... কওক।',
     understandingPrompt: 'আপোনাৰ প্ৰয়োজন চালিজাৰি চোৱা হৈছে...',
     heardConfirmation: (transcript) => `মই শুনিলোঁ: "${transcript}".`,
@@ -393,6 +417,8 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
   en: {
     langId: 'en',
     greetingPrompt: 'Welcome to Arivom Thittam. What government assistance do you need today?',
+    sessionWelcomeConfirmation: 'Welcome! I will speak with you in English. You can change the language anytime. What assistance do you need?',
+    languageSwitchConfirmation: 'Language switched to English. How may I help you today?',
     listeningPrompt: 'Listening carefully... please speak.',
     understandingPrompt: 'Analyzing your situation and intent...',
     heardConfirmation: (transcript) => `I heard: "${transcript}".`,

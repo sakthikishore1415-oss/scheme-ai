@@ -143,10 +143,7 @@ export const VoiceAssistantModal: React.FC = () => {
       setExtractedData(null);
       setShowTypingFallback(false);
 
-      const welcomeText =
-        selectedVoiceLanguageId === 'ta'
-          ? 'வணக்கம்! அறிவோம் திட்டம் உங்களை வரவேற்கிறது. உங்கள் நலனுக்கான அரசு திட்டங்களை கண்டறிய நான் உதவலாமா?'
-          : 'Welcome to Arivom Thittam. I am your civic companion. May I help you find government welfare schemes you are entitled to?';
+      const welcomeText = voicePack.sessionWelcomeConfirmation;
 
       assistantSay(
         welcomeText,
@@ -574,10 +571,12 @@ export const VoiceAssistantModal: React.FC = () => {
                   onClick={() => {
                     setSelectedVoiceLanguageId(lang.id);
                     setShowLangPicker(false);
+                    const newPack = getVoicePack(lang.id);
+                    if (recognitionRef.current) {
+                      recognitionRef.current.lang = lang.bcp47Code;
+                    }
                     assistantSay(
-                      lang.id === 'ta'
-                        ? 'தமிழ் மொழி தேர்வு செய்யப்பட்டது. நான் உங்களுக்கு எவ்வாறு உதவலாம்?'
-                        : `Switched language to ${lang.name}. How may I help you?`,
+                      newPack.languageSwitchConfirmation,
                       undefined,
                       phase
                     );
@@ -646,9 +645,17 @@ export const VoiceAssistantModal: React.FC = () => {
               )}
 
               {orbState === 'READY' && !liveTranscript && (
-                <p className="text-xs text-[#D9E2FF]/80 max-w-xs mx-auto">
-                  Tap the microphone button or orb to speak. You can say your age, profession, or ask about specific subsidies.
-                </p>
+                <div className="space-y-2 max-w-xs mx-auto">
+                  <p className="text-xs text-[#D9E2FF]/80">
+                    Tap the microphone button or orb to speak. You can say your age, profession, or ask about specific subsidies.
+                  </p>
+                  {!speechService.hasNativeVoice(selectedVoiceLanguageId) && (
+                    <div className="p-2 rounded-xl bg-amber-500/15 border border-amber-400/30 text-[11px] text-amber-200 flex items-center gap-1.5 text-left">
+                      <HelpCircle className="w-3.5 h-3.5 shrink-0 text-amber-300" />
+                      <span>Live subtitles & simulated audio active for {currentLanguageConfig.name}.</span>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
