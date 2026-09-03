@@ -178,8 +178,8 @@ object GeminiVoiceService {
                     })
                 })
                 put("generationConfig", JSONObject().apply {
-                    put("temperature", if (isFastMode) 0.3 else 0.5)
-                    put("maxOutputTokens", if (isFastMode) 120 else 250)
+                    put("temperature", 0.4)
+                    put("maxOutputTokens", 1000)
                 })
             }
 
@@ -218,14 +218,47 @@ object GeminiVoiceService {
     }
 
     private fun getFallbackReply(spokenText: String, language: String, matchingSchemes: List<Scheme>): String {
+        val q = spokenText.lowercase()
+        val isTa = language == "ta"
+        val isMl = language == "ml"
+        val isHi = language == "hi"
+
+        if (q.contains("விவசாய") || q.contains("farmer") || q.contains("பயிர்") || q.contains("கடன்") || q.contains("കൃഷി")) {
+            if (isTa) return "விவசாயிகளுக்காக பிரதமரின் கிசான் திட்டம் (PM-KISAN) மற்றும் கலைஞரின் அனைத்து கிராம ஒருங்கிணைந்த வேளாண் வளர்ச்சி திட்டம் பயன்படும். உங்களிடம் பட்டா சிட்டா ஆவணம் உள்ளதா?"
+            if (isMl) return "കർഷകർക്കായി പിഎം കിസാൻ പദ്ധതി വഴി പ്രതിവർഷം ₹6,000 ലഭിക്കും. നിങ്ങളുടെ പേരിൽ കൃഷിഭൂമിയുടെ രേഖകൾ ഉണ്ടോ?"
+            if (isHi) return "किसानों के लिए पीएम किसान योजना के तहत ₹6,000 वार्षिक सहायता मिलती है। क्या आपके पास कृषि भूमि है?"
+            return "Farmers can benefit from PM-KISAN (₹6,000/year) and agricultural inputs. Do you have land documents?"
+        }
+
+        if (q.contains("மாணவர்") || q.contains("student") || q.contains("பள்ளி") || q.contains("கல்லூரி") || q.contains("படிப்பு") || q.contains("വിദ്യാർത്ഥി") || q.contains("scholarship")) {
+            if (isTa) return "மாணவர்களுக்கான புதுமைப் பெண் மற்றும் தமிழ்ப் புதல்வன் திட்டங்கள் மூலம் மாதம் ₹1,000 உதவித்தொகை வழங்கப்படுகிறது. நீங்கள் அரசுப் பள்ளியில் படித்தவரா?"
+            if (isMl) return "വിദ്യാർത്ഥികൾക്കായി പോസ്റ്റ്-മെട്രിക് സ്കോളർഷിപ്പും ഉന്നത വിദ്യാഭ്യാസ ഗ്രാന്റുകളും ലഭ്യമാണ്. നിങ്ങൾ ഏത് കോഴ്സാണ് പഠിക്കുന്നത്?"
+            if (isHi) return "छात्रों के लिए पोस्ट-मैट्रिक छात्रवृत्ति और उच्च शिक्षा सहायता उपलब्ध है। आप किस कक्षा में पढ़ रहे हैं?"
+            return "Students can receive monthly scholarships (₹1,000/month). Are you enrolled in college or school?"
+        }
+
+        if (q.contains("பெண்") || q.contains("women") || q.contains("மகளிர்") || q.contains("தாய்") || q.contains("സ്ത്രീ") || q.contains("mahila")) {
+            if (isTa) return "மகளிருக்காக கலைஞர் மகளிர் உரிமைத் திட்டம் மூலம் மாதம் ₹1,000 உரிமைத்தொகை வழங்கப்படுகிறது. உங்களிடம் ஸ்மார்ட் ரேஷன் கார்டு உள்ளதா?"
+            if (isMl) return "വനിതകൾക്കായി സ്വയംതൊഴിൽ വായ്പകളും കുടുംബശ്രീ സഹായങ്ങളും ലഭ്യമാണ്. നിങ്ങളുടെ വരുമാന പരിധി എത്രയാണ്?"
+            if (isHi) return "महिलाओं के लिए आजीविका मिशन और मातृत्व वंदना योजना उपलब्ध हैं। क्या आपके पास आधार कार्ड है?"
+            return "Women can access monthly direct financial aid. Do you have a ration card and Aadhaar card ready?"
+        }
+
+        if (q.contains("முதியோர்") || q.contains("senior") || q.contains("வயது") || q.contains("pension") || q.contains("பென்ஷன்") || q.contains("പെൻഷൻ")) {
+            if (isTa) return "முதியோருக்கான இந்திரா காந்தி தேசிய முதியோர் ஓய்வூதியத் திட்டம் (IGNOAPS) மூலம் மாதம் ₹1,000 வழங்கப்படுகிறது. உங்கள் வயது 60க்கு மேல் உள்ளதா?"
+            if (isMl) return "മുതിർന്ന പൗരന്മാർക്കായി ₹1,600 പ്രതിമാസ പെൻഷൻ പദ്ധതി ലഭ്യമാണ്. അപേക്ഷ സമർപ്പിക്കാൻ സഹായിക്കണോ?"
+            if (isHi) return "वरिष्ठ नागरिकों के लिए राष्ट्रीय वृद्धावस्था पेंशन योजना उपलब्ध है। क्या आपकी आयु 60 वर्ष से अधिक है?"
+            return "Senior citizens can receive monthly old-age pensions (IGNOAPS). Is your age 60 years or above?"
+        }
+
         val top = matchingSchemes.firstOrNull()?.name ?: "பிரதான் மந்திரி கிசான் சம்மான் நிதி"
         return when (language) {
-            "ml" -> "തീർച്ചയായും! നിങ്ങൾക്ക് അനുയോജ്യമായ സർക്കാർ പദ്ധതി കണ്ടെത്താം. $top പോലുള്ള പദ്ധതികൾ നിങ്ങൾക്ക് ലഭിക്കാൻ സാധ്യതയുണ്ട്."
-            "ta" -> "நிச்சயமாக! உங்கள் தகுதிக்கு ஏற்ற அரசு திட்டங்களை கண்டறியலாம். $top திட்டம் உங்களுக்கு பொருந்தும்."
-            "te" -> "తప్పకుండా! మీ అర్హతకు తగిన ప్రభుత్వ పథకాలను మేము కనుగొనవచ్చు. $top మీకు ఉపయోగపడుతుంది."
-            "kn" -> "ಖಂಡಿತ! ನಿಮ್ಮ ಅರ್ಹತೆಗೆ ಸೂಕ್ತವಾದ ಸರಕಾರಿ ಯೋಜನೆಗಳನ್ನು ನಾವು ಹುಡುಕಬಹುದು."
-            "hi" -> "ज़रूर! आपकी पात्रता के अनुसार उपयुक्त सरकारी योजनाएं खोजी जा रही हैं।"
-            else -> "Sure! We can match the best government welfare schemes for you, such as $top."
+            "ml" -> "തീർച്ചയായും! കൃഷി, വിദ്യാഭ്യാസം, പെൻഷൻ പദ്ധതികൾ ലഭ്യമാണ്. നിങ്ങൾക്ക് ഏത് സഹായമാണ് വേണ്ടത്?"
+            "ta" -> "நிச்சயமாக! விவசாயம், கல்வி உதவித்தொகை, மகளிர் உரிமை மற்றும் மருத்துவக் காப்பீடு திட்டங்கள் உள்ளன. உங்களுக்கு என்ன உதவி தேவை?"
+            "te" -> "తప్పకుండా! వ్యవసాయం, విద్యార్థుల స్కాలర్‌షిప్‌లు మరియు పింఛన్ పథకాలు అందుబాటులో ఉన్నాయి. మీకు ఏ సమాచారం కావాలి?"
+            "kn" -> "ಖಂಡಿತ! ಕೃಷಿ, ವಿದ್ಯಾರ್ಥಿವೇತನ ಮತ್ತು ಪಿಂಚಣಿ ಯೋಜನೆಗಳು ಲಭ್ಯವಿದೆ. ನಿಮಗೆ ಯಾವ ಮಾಹಿತಿ ಬೇಕು?"
+            "hi" -> "ज़रूर! कृषि, छात्रवृत्ति, पेंशन और स्वास्थ्य योजनाओं की जानकारी उपलब्ध है। आपको किस योजना में रुचि है?"
+            else -> "Sure! We have verified schemes for agriculture, education, pensions, and healthcare. What type of assistance are you seeking?"
         }
     }
 }

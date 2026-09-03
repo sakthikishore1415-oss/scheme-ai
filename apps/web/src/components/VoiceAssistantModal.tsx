@@ -416,7 +416,7 @@ export const VoiceAssistantModal: React.FC = () => {
         {/* ========================================================= */}
         <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0 relative">
           {/* LEFT: Living Animated Voice Visualizer Stage (Light Theme) */}
-          <div className="lg:col-span-5 p-6 flex flex-col items-center justify-center text-center space-y-4 border-b lg:border-b-0 lg:border-r border-[#e8e1dc] bg-[#faf8f3] relative">
+          <div className="lg:col-span-5 p-3 sm:p-6 flex flex-col items-center justify-center text-center space-y-2 sm:space-y-4 border-b lg:border-b-0 lg:border-r border-[#e8e1dc] bg-[#faf8f3] relative">
             <VoiceOrbVisualizer
               state={
                 voiceState === 'SPEAKING'
@@ -429,7 +429,7 @@ export const VoiceAssistantModal: React.FC = () => {
               }
               soundLevel={audioLevel}
               onClick={handleToggleListening}
-              size={180}
+              size={typeof window !== 'undefined' && window.innerWidth < 640 ? 120 : 170}
               langInitial={getLanguageInitial(selectedVoiceLanguageId)}
             />
 

@@ -6,6 +6,7 @@
     "build": "turbo run build && mkdir -p dist && cp -r apps/web/dist/* dist/",
     "lint": "turbo run lint",
     "clean": "turbo run clean",
+    "export:schemes": "python3 scripts/export_schemes.py",
     "fetch-schemes": "python3 scripts/fetch_all_india_schemes.py"
   },
   "packageManager": "pnpm@9.15.4",

@@ -424,182 +424,46 @@ export class GeminiLiveVoiceService {
     }
   }
 
-  // Ultra-Fast Stream-to-Speech (TTFA < 500ms)
+  // Fast / Conversational Mode Processing
   private async processFastTurn(spokenText: string): Promise<void> {
-    const langConfig = SUPPORTED_LANGUAGES[this.currentLanguageId] || SUPPORTED_LANGUAGES['ta'];
-    const languageName = `${langConfig.name} (${langConfig.nativeName})`;
-
-    const systemInstruction = `You are Arivom (அறிவோம்), a warm, lightning-fast civic voice assistant for citizens in ${this.currentStateName}, India.
-CURRENT SPOKEN LANGUAGE: ${languageName.toUpperCase()}
-CRITICAL RULES FOR INSTANT VOICE:
-1. Reply STRICTLY in natural, spoken ${languageName}.
-2. Keep response to 1 or 2 SHORT sentences (maximum 20-25 words).
-3. Do NOT use markdown, bullet points, asterisks, URLs, or lists. Everything you say is spoken aloud instantly.
-4. If citizen asks for schemes, directly mention 1 or 2 relevant programs and invite questions.`;
-
-    const historyPayload = this.conversationHistory.slice(-6).map((h) => ({
-      role: h.role === 'assistant' ? 'assistant' : 'user',
-      text: h.text,
-    }));
-
     const assistantMsgId = `asst-${Date.now()}`;
-    let fullText = '';
-    let spokenIndex = 0;
-
-    // Create initial streaming entry in transcript
+    
+    // Set initial Thinking state in transcript
     this.callbacks?.onMessage({
       id: assistantMsgId,
       role: 'assistant',
-      text: '',
+      text: '...',
       isStreaming: true,
       timestamp: Date.now(),
       audioVoice: 'Arivom Scheme Advisor',
     });
 
-    try {
-      const response = await fetch('/api/gemini-stream', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: this.currentAbortController?.signal,
-        body: JSON.stringify({
-          systemInstruction,
-          history: historyPayload,
-          prompt: spokenText,
-        }),
-      });
+    const reply = await this.generateGeminiReply(spokenText);
+    if (this.currentAbortController?.signal.aborted) return;
 
-      if (!response.ok || !response.body) {
-        throw new Error(`Stream error: ${response.status}`);
-      }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      while (true) {
-        if (this.currentAbortController?.signal.aborted) {
-          try {
-            await reader.cancel();
-          } catch (_) {}
-          return;
-        }
-
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
-
-        for (const line of lines) {
-          if (this.currentAbortController?.signal.aborted) {
-            try {
-              await reader.cancel();
-            } catch (_) {}
-            return;
-          }
-
-          const trimmed = line.trim();
-          if (trimmed.startsWith('data:')) {
-            const jsonStr = trimmed.replace(/^data:\s*/, '');
-            if (jsonStr === '[DONE]') continue;
-            try {
-              const parsed = JSON.parse(jsonStr);
-              const partText = parsed.candidates?.[0]?.content?.parts?.[0]?.text || '';
-              if (partText) {
-                fullText += partText;
-
-                // Live transcript update
-                this.callbacks?.onMessage({
-                  id: assistantMsgId,
-                  role: 'assistant',
-                  text: fullText,
-                  isStreaming: true,
-                  timestamp: Date.now(),
-                  audioVoice: 'Arivom Scheme Advisor',
-                });
-
-                // Immediate sentence-level audio piping:
-                // As soon as the first sentence boundary is reached, start speaking immediately!
-                const unhandled = fullText.slice(spokenIndex);
-                const sentenceBoundaryMatch = unhandled.match(/([.?!।\n]+|\s*;\s*)/);
-                if (sentenceBoundaryMatch && sentenceBoundaryMatch.index !== undefined) {
-                  const boundaryEnd = sentenceBoundaryMatch.index + sentenceBoundaryMatch[0].length;
-                  const sentenceToSpeak = unhandled.slice(0, boundaryEnd).trim();
-                  if (sentenceToSpeak.length >= 2) {
-                    spokenIndex += boundaryEnd;
-                    if (!this.currentAbortController?.signal.aborted) {
-                      this.enqueueSpeech(sentenceToSpeak);
-                    }
-                  }
-                }
-              }
-            } catch (_) {}
-          }
-        }
-      }
-
-      if (this.currentAbortController?.signal.aborted) return;
-
-      // Speak any remaining unsent portion of the reply
-      const trailing = fullText.slice(spokenIndex).trim();
-      if (trailing.length >= 2 && !this.currentAbortController?.signal.aborted) {
-        this.enqueueSpeech(trailing);
-      }
-
-      // Mark streaming as finalized
+    if (reply) {
       this.callbacks?.onMessage({
         id: assistantMsgId,
         role: 'assistant',
-        text: fullText.trim(),
+        text: reply,
         isStreaming: false,
         timestamp: Date.now(),
         audioVoice: 'Arivom Scheme Advisor',
       });
-
-      if (fullText.trim()) {
-        this.conversationHistory.push({ role: 'assistant', text: fullText.trim() });
-      }
-    } catch (streamErr: any) {
-      if (streamErr?.name === 'AbortError' || this.currentAbortController?.signal.aborted) {
-        // Quietly exit on intentional user interruption
-        return;
-      }
-      console.warn('Fast stream notice, falling back to instant generate:', streamErr);
-
-      // Instant single-hop fallback
-      const fallbackReply = await this.generateGeminiReply(spokenText);
-      if (this.currentAbortController?.signal.aborted) return;
-
-      if (fallbackReply) {
-        this.callbacks?.onMessage({
-          id: assistantMsgId,
-          role: 'assistant',
-          text: fallbackReply,
-          isStreaming: false,
-          timestamp: Date.now(),
-          audioVoice: 'Arivom Scheme Advisor',
-        });
-        this.conversationHistory.push({ role: 'assistant', text: fallbackReply });
-        this.enqueueSpeech(fallbackReply);
-      } else {
-        const fallbacks: Record<string, string> = {
-          ta: 'மன்னிக்கவும், உங்கள் குரல் கேட்கவில்லை. மீண்டும் கூற முடியுமா?',
-          hi: 'माफ़ कीजिए, मैं सुन नहीं पाया। क्या आप दोबारा कह सकते हैं?',
-          te: 'క్షమించండి, మీ మాట వినిపించలేదు. దయచేసి మళ్ళీ చెప్పండి.',
-          kn: 'ಕ್ಷಮಿಸಿ, ಕೇಳಿಸಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಇನ್ನೊಮ್ಮೆ ಹೇಳಿ.',
-          ml: 'ക്ഷമിക്കണം, വ്യക്തമായില്ല. വീണ്ടും പറയാമോ?',
-          mr: 'माफ करा, ऐकू आले नाही. पुन्हा सांगा.',
-          bn: 'দুঃখিত, শুনতে পাইনি। আবার বলবেন কি?',
-          gu: 'માફ કરશો, સંભળાયું નહીં. ફરીથી કહો.',
-          or: 'କ୍ଷମା କରିବେ, ଶୁଣାଗଲା ନାହିଁ। ପୁଣି କୁହନ୍ତୁ।',
-          pa: 'ਮਾਫ਼ ਕਰਨਾ, ਸੁਣਿਆ ਨਹੀਂ। ਦੁਬਾਰਾ ਬੋਲੋ।',
-          as: 'ক্ষমা কৰিব, শুনা নাপালোঁ। আকৌ কওক।',
-          en: "I didn't catch that. Could you say that again?",
-        };
-        const msg = fallbacks[this.currentLanguageId] || fallbacks.en;
-        this.enqueueSpeech(msg);
-      }
+      this.conversationHistory.push({ role: 'assistant', text: reply });
+      this.enqueueSpeech(reply);
+    } else {
+      const contextualReply = this.getContextualOfflineReply(spokenText);
+      this.callbacks?.onMessage({
+        id: assistantMsgId,
+        role: 'assistant',
+        text: contextualReply,
+        isStreaming: false,
+        timestamp: Date.now(),
+        audioVoice: 'Arivom Scheme Advisor',
+      });
+      this.conversationHistory.push({ role: 'assistant', text: contextualReply });
+      this.enqueueSpeech(contextualReply);
     }
   }
 
@@ -721,8 +585,8 @@ CRITICAL VOICE RULES:
         body: JSON.stringify({
           contents,
           generationConfig: {
-            temperature: this.voiceMode === 'fast' ? 0.3 : 0.5,
-            maxOutputTokens: this.voiceMode === 'fast' ? 120 : 250,
+            temperature: 0.4,
+            maxOutputTokens: 1000,
           },
         }),
       });
@@ -737,7 +601,7 @@ CRITICAL VOICE RULES:
             .trim();
         }
       } else {
-        // Fallback endpoint if gemini-3.6-flash has temporary model alias issue
+        // Fallback endpoint: gemini-flash-latest
         const fallbackEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
         const fallbackRes = await fetch(fallbackEndpoint, {
           method: 'POST',
@@ -750,7 +614,7 @@ CRITICAL VOICE RULES:
             contents,
             generationConfig: {
               temperature: 0.4,
-              maxOutputTokens: 150,
+              maxOutputTokens: 1000,
             },
           }),
         });
@@ -773,6 +637,53 @@ CRITICAL VOICE RULES:
       console.warn('Gemini conversational generation notice:', e);
     }
     return '';
+  }
+
+  private getContextualOfflineReply(spokenText: string): string {
+    const q = spokenText.toLowerCase();
+    const isTa = this.currentLanguageId === 'ta';
+    const isMl = this.currentLanguageId === 'ml';
+    const isHi = this.currentLanguageId === 'hi';
+
+    if (q.includes('விவசாய') || q.includes('farmer') || q.includes('பயிர்') || q.includes('கடன்') || q.includes('കൃഷി')) {
+      if (isTa) return 'விவசாயிகளுக்காக பிரதமரின் கிசான் திட்டம் (PM-KISAN) மற்றும் கலைஞரின் அனைத்து கிராம ஒருங்கிணைந்த வேளாண் வளர்ச்சி திட்டம் பயன்படும். உங்களிடம் பட்டா சிட்டா ஆவணம் உள்ளதா?';
+      if (isMl) return 'കർഷകർക്കായി പിഎം കിസാൻ പദ്ധതി വഴി പ്രതിവർഷം ₹6,000 ലഭിക്കും. നിങ്ങളുടെ പേരിൽ കൃഷിഭൂമിയുടെ രേഖകൾ ഉണ്ടോ?';
+      if (isHi) return 'किसानों के लिए पीएम किसान योजना के तहत ₹6,000 वार्षिक सहायता मिलती है। क्या आपके नाम पर कृषि भूमि है?';
+      return 'Farmers can benefit from PM-KISAN (₹6,000/year) and subsidized agricultural inputs. Do you hold agricultural land records?';
+    }
+
+    if (q.includes('மாணவர்') || q.includes('student') || q.includes('பள்ளி') || q.includes('கல்லூரி') || q.includes('படிப்பு') || q.includes('വിദ്യാർത്ഥി') || q.includes('scholarship')) {
+      if (isTa) return 'மாணவர்களுக்கான புதுமைப் பெண் மற்றும் தமிழ்ப் புதல்வன் திட்டங்கள் மூலம் மாதம் ₹1,000 உதவித்தொகை வழங்கப்படுகிறது. நீங்கள் அரசுப் பள்ளியில் படித்தவரா?';
+      if (isMl) return 'വിദ്യാർത്ഥികൾക്കായി പോസ്റ്റ്-മെട്രിക് സ്കോളർഷിപ്പും ഉന്നത വിദ്യാഭ്യാസ ഗ്രാന്റുകളും ലഭ്യമാണ്. നിങ്ങൾ ഏത് കോഴ്സാണ് പഠിക്കുന്നത്?';
+      if (isHi) return 'छात्रों के लिए पोस्ट-मैट्रिक छात्रवृत्ति और उच्च शिक्षा सहायता उपलब्ध है। आप किस कक्षा या कोर्स में पढ़ रहे हैं?';
+      return 'Students can receive monthly scholarships (₹1,000/month) and tuition fee waivers. Are you studying in government or aided institutions?';
+    }
+
+    if (q.includes('பெண்') || q.includes('women') || q.includes('மகளிர்') || q.includes('தாய்') || q.includes('സ്ത്രീ') || q.includes('mahila')) {
+      if (isTa) return 'மகளிருக்காக கலைஞர் மகளிர் உரிமைத் திட்டம் மூலம் மாதம் ₹1,000 உரிமைத்தொகையும் விடியல் பயணமும் வழங்கப்படுகிறது. உங்களிடம் ஸ்மார்ட் ரேஷன் கார்டு உள்ளதா?';
+      if (isMl) return 'വനിതകൾക്കായി സ്വയംതൊഴിൽ വായ്പകളും കുടുംബശ്രീ സഹായങ്ങളും ലഭ്യമാണ്. നിങ്ങൾക്ക് കൂടുതൽ വിവരങ്ങൾ അറിയണമെന്നുണ്ടോ?';
+      if (isHi) return 'महिलाओं के लिए आजीविका मिशन और मातृत्व वंदना योजना उपलब्ध हैं। क्या आपके पास आधार कार्ड है?';
+      return 'Women can access monthly direct financial aid and zero-fare transit schemes. Do you have a ration card and Aadhaar card ready?';
+    }
+
+    if (q.includes('முதியோர்') || q.includes('senior') || q.includes('வயது') || q.includes('pension') || q.includes('பென்ஷன்') || q.includes('പെൻഷൻ')) {
+      if (isTa) return 'முதியோருக்கான இந்திரா காந்தி தேசிய முதியோர் ஓய்வூதியத் திட்டம் (IGNOAPS) மூலம் மாதம் ₹1,000 வழங்கப்படுகிறது. உங்கள் வயது 60க்கு மேல் உள்ளதா?';
+      if (isMl) return 'മുതിർന്ന പൗരന്മാർക്കായി ₹1,600 പ്രതിമാസ പെൻഷൻ പദ്ധതി ലഭ്യമാണ്. അപേക്ഷ സമർപ്പിക്കാൻ സഹായിക്കണോ?';
+      if (isHi) return 'वरिष्ठ नागरिकों के लिए राष्ट्रीय वृद्धावस्था पेंशन योजना उपलब्ध है। क्या आपकी आयु 60 वर्ष से अधिक है?';
+      return 'Senior citizens can receive monthly old-age pensions (IGNOAPS). Is your age 60 years or above?';
+    }
+
+    if (q.includes('மருத்துவ') || q.includes('health') || q.includes('சிகிச்சை') || q.includes('ஆரோக்கிய') || q.includes('ആശുപത്രി')) {
+      if (isTa) return 'முதலமைச்சரின் விரிவான மருத்துவக் காப்பீட்டுத் திட்டம் (CMCHIS) மற்றும் ஆயுஷ்மான் பாரத் மூலம் ₹5 லட்சம் வரை இலவச சிகிச்சை பெறலாம். உங்களிடம் முதலமைச்சர் காப்பீட்டு அட்டை உள்ளதா?';
+      if (isMl) return 'കാരുണ്യ ആരോഗ്യ സുരക്ഷാ പദ്ധതി (KASP) വഴി ₹5 ലക്ഷം വരെയുള്ള സൗജന്യ ചികിത്സ ലഭ്യമാണ്. നിങ്ങളുടെ റേഷൻ കാർഡ് ബിപിഎൽ ആണോ?';
+      if (isHi) return 'आयुष्मान भारत योजना के तहत प्रति वर्ष ₹5 लाख तक का निःशुल्क उपचार उपलब्ध है। क्या आपके पास आयुष्मान कार्ड है?';
+      return 'Ayushman Bharat and State Health Insurance provide up to ₹5 Lakhs free hospitalization per year. Do you have a health card?';
+    }
+
+    if (isTa) return `வணக்கம்! ${this.currentStateName} மாநிலத்தில் விவசாயம், கல்வி, மகளிர் நலம், முதியோர் ஓய்வூதியம் மற்றும் மருத்துவக் காப்பீடு திட்டங்கள் உள்ளன. உங்களுக்கு எந்தத் துறையின் உதவி தேவைப்படுகிறது?`;
+    if (isMl) return `നമസ്കാരം! കൃഷി, വിദ്യാഭ്യാസം, വനിതാ ക്ഷേമം, പെൻഷൻ പദ്ധതികളെക്കുറിച്ച് അറിയാൻ സഹായിക്കാം. നിങ്ങൾക്ക് ഏത് സഹായമാണ് വേണ്ടത്?`;
+    if (isHi) return `नमस्ते! कृषि, छात्रवृत्ति, महिला कल्याण, पेंशन और स्वास्थ्य योजनाओं की जानकारी उपलब्ध है। आप किस प्रकार की योजना चाहते हैं?`;
+    return `Hello! We have verified government schemes for agriculture, education, women empowerment, pensions, and healthcare in ${this.currentStateName}. Which category are you looking for?`;
   }
 
   public async speak(text: string): Promise<void> {
