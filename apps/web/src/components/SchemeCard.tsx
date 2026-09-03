@@ -153,7 +153,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
         {/* Criteria Matching Summary Chips */}
         <div className="mt-3 flex items-center gap-2 flex-wrap text-[11px]">
           <span className="inline-flex items-center gap-1 text-[#44464f] font-medium">
-            {criteriaBreakdown.age ? (
+            {criteriaBreakdown?.age ? (
               <CheckCircle2 className="w-3.5 h-3.5 text-[#00462d] shrink-0" />
             ) : (
               <AlertTriangle className="w-3.5 h-3.5 text-[#fea619] shrink-0" />
@@ -162,7 +162,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
           </span>
           <span className="text-[#c5c6d0]">•</span>
           <span className="inline-flex items-center gap-1 text-[#44464f] font-medium">
-            {criteriaBreakdown.income ? (
+            {criteriaBreakdown?.income ? (
               <CheckCircle2 className="w-3.5 h-3.5 text-[#00462d] shrink-0" />
             ) : (
               <AlertTriangle className="w-3.5 h-3.5 text-[#fea619] shrink-0" />
@@ -171,7 +171,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
           </span>
           <span className="text-[#c5c6d0]">•</span>
           <span className="inline-flex items-center gap-1 text-[#44464f] font-medium">
-            {criteriaBreakdown.occupation ? (
+            {criteriaBreakdown?.occupation ? (
               <CheckCircle2 className="w-3.5 h-3.5 text-[#00462d] shrink-0" />
             ) : (
               <AlertTriangle className="w-3.5 h-3.5 text-[#fea619] shrink-0" />
@@ -180,7 +180,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
           </span>
           <span className="text-[#c5c6d0]">•</span>
           <span className="inline-flex items-center gap-1 text-[#44464f] font-medium">
-            {criteriaBreakdown.location ? (
+            {criteriaBreakdown?.location ? (
               <CheckCircle2 className="w-3.5 h-3.5 text-[#00462d] shrink-0" />
             ) : (
               <AlertTriangle className="w-3.5 h-3.5 text-[#fea619] shrink-0" />
