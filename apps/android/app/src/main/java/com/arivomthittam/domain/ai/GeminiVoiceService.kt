@@ -12,7 +12,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object GeminiVoiceService {
-    const val GEMINI_MODEL = "gemini-2.5-flash-native-audio-preview-12-2025"
+    const val GEMINI_MODEL = "gemini-3.6-flash"
 
     /**
      * Generates a context-aware natural conversational reply in the citizen's selected language
