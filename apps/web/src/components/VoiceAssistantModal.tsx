@@ -1,41 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import { getVoicePack } from '../data/locales';
-import { speechService } from '../utils/speech';
-import { extractProfileFromSpokenText, translateToEnglish, ExtractedProfileData } from '../utils/nlpExtractor';
-import { detectLanguageFromText } from '../utils/languageDetector';
-import { SUPPORTED_LANGUAGES, getLanguageInitial } from '../data/languages';
-import { VoiceOrbVisualizer, VoiceOrbState } from './voice/VoiceOrbVisualizer';
 import {
-  ConversationPhase,
-  ConversationTurn,
-  parseVoiceIntent,
-  generateFollowUpQuestion,
-  generateSchemeExplanation,
-} from '../utils/voiceConversationEngine';
+  realtimeVoiceService,
+  RealtimeVoiceState,
+  RealtimeMessage,
+} from '../services/realtimeVoiceService';
+import { getLanguageInitial, SUPPORTED_LANGUAGES } from '../data/languages';
+import { VoiceOrbVisualizer } from './voice/VoiceOrbVisualizer';
 import {
   Mic,
   MicOff,
   Volume2,
   VolumeX,
-  RotateCcw,
+  PhoneOff,
   Sparkles,
   ArrowRight,
-  X,
-  AlertCircle,
-  CheckCircle2,
-  FileCheck2,
   Shield,
   Keyboard,
   Globe,
-  Sliders,
-  BookmarkPlus,
-  HelpCircle,
-  PhoneCall,
-  MapPin,
   Send,
   User,
-  Bot,
+  MessageSquare,
+  CheckCircle2,
+  RefreshCw,
 } from 'lucide-react';
 
 export const VoiceAssistantModal: React.FC = () => {
@@ -48,519 +35,225 @@ export const VoiceAssistantModal: React.FC = () => {
     currentLanguageConfig,
     userProfile,
     updateUserProfile,
-    setActiveTab,
-    triggerMatchCelebration,
     activeMatches,
-    logCitizenCallStep,
     schemes,
-    toggleSaveScheme,
-    savedSchemeIds,
+    setActiveTab,
+    t,
   } = useApp();
 
-  // Conversational Lifecycle States
-  const [phase, setPhase] = useState<ConversationPhase>('GREETING');
-  const [orbState, setOrbState] = useState<VoiceOrbState>('READY');
-  const [conversationHistory, setConversationHistory] = useState<ConversationTurn[]>([]);
-  const [currentAssistantSpeech, setCurrentAssistantSpeech] = useState<string>('');
-  const [activeSentence, setActiveSentence] = useState<string>('');
-  const [liveTranscript, setLiveTranscript] = useState<string>('');
-  const [extractedData, setExtractedData] = useState<ExtractedProfileData | null>(null);
-
-  // Audio & Interaction Settings
-  const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [speechRate, setSpeechRate] = useState<number>(0.92); // Calm, accessible citizen pace
-  const [showTypingFallback, setShowTypingFallback] = useState<boolean>(false);
-  const [typedMessage, setTypedMessage] = useState<string>('');
-  const [showLangPicker, setShowLangPicker] = useState<boolean>(false);
+  // Session & UI States
+  const [voiceState, setVoiceState] = useState<RealtimeVoiceState>('CONNECTING');
   const [audioLevel, setAudioLevel] = useState<number>(0);
+  const [messages, setMessages] = useState<RealtimeMessage[]>([]);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [activeMode, setActiveMode] = useState<'VOICE' | 'TEXT'>('VOICE');
+  const [typedInput, setTypedInput] = useState<string>('');
+  const [showLangPicker, setShowLangPicker] = useState<boolean>(false);
+  const [lastError, setLastError] = useState<string | null>(null);
 
-  const voicePack = getVoicePack(selectedVoiceLanguageId);
-  const recognitionRef = useRef<any>(null);
-  const timelineEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll conversation timeline
+  // Auto-scroll conversation transcript
   useEffect(() => {
-    timelineEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [conversationHistory, liveTranscript, currentAssistantSpeech]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-  // Assistant speaks a message aloud & adds to conversation history
-  const assistantSay = (
-    text: string,
-    actionButtons?: { label: string; action: string }[],
-    newPhase?: ConversationPhase,
-    onSpeechEnd?: () => void
-  ) => {
-    setCurrentAssistantSpeech(text);
-    setActiveSentence(text);
-    setOrbState('SPEAKING');
+  // Connect to Realtime Voice Session on Mount
+  useEffect(() => {
+    if (!showVoiceModal) return;
 
-    if (newPhase) setPhase(newPhase);
+    setLastError(null);
+    setMessages([]);
 
-    const turnId = `asst-${Date.now()}`;
-    const englishTrans = translateToEnglish(text, selectedVoiceLanguageId);
-
-    setConversationHistory((prev) => [
-      ...prev,
+    realtimeVoiceService.startSession(
+      selectedVoiceLanguageId,
+      currentStateConfig.name,
       {
-        id: turnId,
-        role: 'assistant',
-        text,
-        englishTranslation: englishTrans,
-        timestamp: Date.now(),
-        actionButtons,
-      },
-    ]);
-
-    if (!isMuted) {
-      speechService.speak(
-        text,
-        selectedVoiceLanguageId,
-        () => {
-          setOrbState('SPEAKING');
+        onStateChange: (st) => setVoiceState(st),
+        onAudioLevel: (lvl) => setAudioLevel(lvl),
+        onMessage: (msg) => {
+          setMessages((prev) => {
+            const idx = prev.findIndex((m) => m.id === msg.id);
+            if (idx >= 0) {
+              const updated = [...prev];
+              updated[idx] = msg;
+              return updated;
+            }
+            return [...prev, msg];
+          });
         },
-        () => {
-          setOrbState('READY');
-          if (onSpeechEnd) onSpeechEnd();
+        onMessageDelta: (id, delta) => {
+          setMessages((prev) =>
+            prev.map((m) => (m.id === id ? { ...m, text: m.text + delta } : m))
+          );
         },
-        () => {
-          setOrbState('READY');
-        }
-      );
-    } else {
-      setTimeout(() => {
-        setOrbState('READY');
-        if (onSpeechEnd) onSpeechEnd();
-      }, 1500);
-    }
-  };
-
-  // Initial greeting upon opening
-  useEffect(() => {
-    if (showVoiceModal) {
-      setPhase('GREETING');
-      setConversationHistory([]);
-      setLiveTranscript('');
-      setExtractedData(null);
-      setShowTypingFallback(false);
-
-      const welcomeText = voicePack.sessionWelcomeConfirmation;
-
-      assistantSay(
-        welcomeText,
-        [
-          { label: selectedVoiceLanguageId === 'ta' ? 'ஆம், தொடரலாம்' : 'Yes, proceed', action: 'START_DETAILS' },
-          { label: selectedVoiceLanguageId === 'ta' ? 'மொழி மாற்று' : 'Change Language', action: 'OPEN_LANG_PICKER' },
-        ],
-        'PERMISSION'
-      );
-    } else {
-      speechService.stop();
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop();
-        } catch (e) {}
+        onProfileExtracted: (data) => {
+          updateUserProfile(data);
+        },
+        onToolCall: async (name, args) => {
+          if (name === 'update_citizen_profile') {
+            updateUserProfile(args);
+            return { status: 'success', updatedProfile: args };
+          }
+          if (name === 'get_matching_schemes') {
+            return {
+              count: activeMatches.length,
+              schemes: activeMatches.slice(0, 3).map((m) => ({
+                id: m.scheme.id,
+                name: m.scheme.name,
+                benefit: m.scheme.benefits?.amount || m.scheme.benefits?.shortSummary,
+                department: m.scheme.department || m.scheme.authority,
+              })),
+            };
+          }
+          if (name === 'get_scheme_details') {
+            const target = schemes.find((s) => s.id === args.schemeId) || schemes[0];
+            return {
+              name: target.name,
+              benefits: target.benefits,
+              documents: target.documents,
+              howToApply: target.applicationUrl || target.officialSource,
+              whereToApply: target.offlineApplicationCenter,
+            };
+          }
+          return { status: 'success' };
+        },
+        onError: (err) => {
+          setLastError(err);
+        },
       }
-    }
-  }, [showVoiceModal, selectedVoiceLanguageId]);
+    );
+
+    return () => {
+      realtimeVoiceService.endSession();
+    };
+  }, [showVoiceModal, selectedVoiceLanguageId, currentStateConfig.name]);
 
   if (!showVoiceModal) return null;
 
-  // Interruption / Barge-in: Stop current speech immediately
-  const handleInterruptSpeech = () => {
-    speechService.stop();
-    setOrbState('READY');
+  const handleEndCall = () => {
+    realtimeVoiceService.endSession();
+    setShowVoiceModal(false);
   };
 
-  // Start Real-Time Voice Listening
-  const handleToggleListening = () => {
-    if (orbState === 'LISTENING') {
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop();
-        } catch (e) {}
-      }
-      setOrbState('READY');
-      return;
-    }
-
-    handleInterruptSpeech();
-    setOrbState('LISTENING');
-    setLiveTranscript('');
-
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
-    if (SpeechRecognition) {
-      try {
-        const recognition = new SpeechRecognition();
-        recognitionRef.current = recognition;
-        recognition.lang = currentLanguageConfig.bcp47Code || 'ta-IN';
-        recognition.interimResults = true;
-        recognition.continuous = false;
-
-        let finalCaptured = '';
-
-        recognition.onresult = (event: any) => {
-          const transcript = Array.from(event.results)
-            .map((result: any) => result[0].transcript)
-            .join('');
-          finalCaptured = transcript;
-          setLiveTranscript(transcript);
-          setAudioLevel(0.8);
-        };
-
-        recognition.onend = () => {
-          setAudioLevel(0);
-          if (finalCaptured.trim()) {
-            handleUserUtterance(finalCaptured);
-          } else {
-            setOrbState('READY');
-          }
-        };
-
-        recognition.onerror = (err: any) => {
-          console.warn('Speech recognition error:', err);
-          setOrbState('ERROR');
-          setAudioLevel(0);
-          assistantSay(
-            voicePack.errorVoicePrompt,
-            [{ label: 'Tap to Speak Again', action: 'RETRY_MIC' }],
-            phase
-          );
-        };
-
-        recognition.start();
-        return;
-      } catch (err) {
-        console.warn('Speech start error:', err);
-      }
-    }
-
-    setOrbState('ERROR');
-    setShowTypingFallback(true);
-    assistantSay(
-      'Microphone recognition is unavailable in this browser. Please use the accessible text typing box below.',
-      [],
-      phase
-    );
+  const handleToggleMute = () => {
+    const muted = realtimeVoiceService.toggleMute();
+    setIsMuted(muted);
   };
 
-  // Core Conversational Turn Handler
-  const handleUserUtterance = (text: string) => {
-    setOrbState('THINKING');
-    setLiveTranscript('');
-
-    // Add user utterance to history
-    const userTurnId = `user-${Date.now()}`;
-    const englishTrans = translateToEnglish(text, selectedVoiceLanguageId);
-
-    setConversationHistory((prev) => [
-      ...prev,
-      {
-        id: userTurnId,
-        role: 'user',
-        text,
-        englishTranslation: englishTrans,
-        timestamp: Date.now(),
-      },
-    ]);
-
-    const intent = parseVoiceIntent(text);
-
-    // 1. Voice Command handling
-    if (intent === 'REPEAT') {
-      assistantSay(currentAssistantSpeech, undefined, phase);
-      return;
-    }
-
-    if (intent === 'SPEAK_SLOWER') {
-      setSpeechRate(0.8);
-      assistantSay(
-        selectedVoiceLanguageId === 'ta'
-          ? 'நிச்சயமாக, இனி நான் மெதுவாக பேசுகிறேன்.'
-          : 'Understood. I will speak more slowly and clearly.',
-        undefined,
-        phase
-      );
-      return;
-    }
-
-    if (intent === 'CHANGE_LANGUAGE') {
-      setShowLangPicker(true);
-      assistantSay(
-        'Please select your preferred regional language from the menu above.',
-        undefined,
-        phase
-      );
-      return;
-    }
-
-    if (intent === 'DOCUMENTS_REQUIRED') {
-      assistantSay(
-        voicePack.documentExplanation([]),
-        [{ label: 'View Scheme Checklist', action: 'GO_TO_MATCHES' }],
-        'NEXT_ACTIONS'
-      );
-      return;
-    }
-
-    if (intent === 'SAVE_SCHEME') {
-      if (activeMatches.length > 0) {
-        toggleSaveScheme(activeMatches[0].scheme.id);
-        assistantSay(
-          selectedVoiceLanguageId === 'ta'
-            ? 'திட்டம் உங்கள் ஆவணப் பெட்டகத்தில் வெற்றிகரமாக சேமிக்கப்பட்டது!'
-            : 'The scheme has been safely bookmarked in your Locker.',
-          [{ label: 'View Saved Schemes', action: 'GO_TO_SAVED' }],
-          'NEXT_ACTIONS'
-        );
-      }
-      return;
-    }
-
-    // 2. Extract citizen profile demographics from text
-    const extracted = extractProfileFromSpokenText(text, selectedVoiceLanguageId);
-    setExtractedData((prev) => ({
-      ...prev,
-      ...extracted,
-    }));
-
-    // Conversational state transitions
-    if (phase === 'GREETING' || phase === 'PERMISSION') {
-      // Transition to collecting basics
-      const askBasics =
-        selectedVoiceLanguageId === 'ta'
-          ? 'நன்றி! உங்கள் பெயர், வயது மற்றும் உங்கள் தொழில் என்ன என்று கூறுங்கள்?'
-          : 'Thank you! Could you please share your name, age, and current occupation?';
-
-      assistantSay(askBasics, undefined, 'COLLECTING_BASICS');
-      return;
-    }
-
-    if (phase === 'COLLECTING_BASICS') {
-      const activeProf = extracted.occupation || 'farmer';
-      const followUpQuestion = generateFollowUpQuestion(activeProf, selectedVoiceLanguageId);
-
-      assistantSay(
-        `${voicePack.heardConfirmation(text)} ${followUpQuestion}`,
-        undefined,
-        'ADAPTIVE_FOLLOWUP'
-      );
-      return;
-    }
-
-    if (phase === 'ADAPTIVE_FOLLOWUP' || phase === 'CONFIRMATION') {
-      // Update store with finalized profile
-      const prof = extractedData?.occupation || extracted.occupation || 'Farmer';
-      const age = extractedData?.age || extracted.age || 42;
-
-      updateUserProfile({
-        name: extractedData?.beneficiary || userProfile?.name || 'Citizen',
-        age,
-        occupation: prof,
-        annualIncome: extractedData?.annualIncome || 120000,
-        need: extractedData?.need || 'general',
-        district: userProfile?.district || currentStateConfig.districts[0],
-        state: currentStateConfig.id,
-      });
-
-      // Calculate and announce matches
-      const eligibleCount = activeMatches.filter((m) => m.matchLevel !== 'MORE_INFO').length;
-      const countToAnnounce = eligibleCount > 0 ? eligibleCount : Math.max(3, activeMatches.length);
-
-      triggerMatchCelebration();
-
-      const topSchemeName = activeMatches[0]?.scheme?.nativeName || activeMatches[0]?.scheme?.name || 'முதலமைச்சரின் உழவர் பாதுகாப்பு திட்டம்';
-      const topSchemeNameEn = activeMatches[0]?.scheme?.name || 'State Farmer Support Scheme';
-
-      const summary =
-        selectedVoiceLanguageId === 'ta'
-          ? `உங்கள் விவரங்களின் அடிப்படையில், ${countToAnnounce} அரசு நலத்திட்டங்கள் உங்களுக்கு பொருந்தக்கூடும். முதல் திட்டம்: ${topSchemeName}. மேலும் விவரங்களை அறிய விரும்புகிறீர்களா?`
-          : `Based on the details you shared, ${countToAnnounce} government schemes may be suitable for you. Top match: ${topSchemeNameEn}. Would you like me to explain the benefits or required documents?`;
-
-      assistantSay(
-        summary,
-        [
-          { label: 'Explain Scheme Benefits', action: 'EXPLAIN_SCHEME' },
-          { label: 'Required Documents', action: 'SHOW_DOCS' },
-          { label: 'View All Matches', action: 'GO_TO_MATCHES' },
-        ],
-        'MATCH_ANNOUNCEMENT'
-      );
-    }
-  };
-
-  const handleActionClick = (action: string) => {
-    if (action === 'START_DETAILS') {
-      assistantSay(
-        selectedVoiceLanguageId === 'ta'
-          ? 'உங்கள் வயது மற்றும் தொழிலை கூறுங்கள்?'
-          : 'Could you please state your age and occupation?',
-        undefined,
-        'COLLECTING_BASICS'
-      );
-    } else if (action === 'OPEN_LANG_PICKER') {
-      setShowLangPicker(true);
-    } else if (action === 'RETRY_MIC') {
-      handleToggleListening();
-    } else if (action === 'EXPLAIN_SCHEME') {
-      if (activeMatches.length > 0) {
-        const explanation = generateSchemeExplanation(
-          activeMatches[0].scheme,
-          selectedVoiceLanguageId
-        );
-        assistantSay(
-          explanation,
-          [
-            { label: 'Required Documents', action: 'SHOW_DOCS' },
-            { label: 'Save Scheme', action: 'SAVE_TOP' },
-            { label: 'View All Matches', action: 'GO_TO_MATCHES' },
-          ],
-          'DEEP_DIVE'
-        );
-      } else {
-        assistantSay(
-          selectedVoiceLanguageId === 'ta'
-            ? 'இந்த திட்டம் நேரடி பண உதவி மற்றும் மானியங்களை வழங்குகிறது.'
-            : 'This scheme provides direct financial subsidy and welfare support.',
-          [{ label: 'View All Matches', action: 'GO_TO_MATCHES' }],
-          'DEEP_DIVE'
-        );
-      }
-    } else if (action === 'SHOW_DOCS') {
-      assistantSay(
-        voicePack.documentExplanation([]),
-        [{ label: 'View Full Matches', action: 'GO_TO_MATCHES' }],
-        'NEXT_ACTIONS'
-      );
-    } else if (action === 'SAVE_TOP') {
-      if (activeMatches.length > 0) {
-        toggleSaveScheme(activeMatches[0].scheme.id);
-        assistantSay(
-          selectedVoiceLanguageId === 'ta'
-            ? 'திட்டம் உங்கள் சேமிக்கப்பட்ட பட்டியலில் சேர்க்கப்பட்டது!'
-            : 'Scheme successfully saved to your profile!',
-          [{ label: 'View Matches', action: 'GO_TO_MATCHES' }],
-          'NEXT_ACTIONS'
-        );
-      }
-    } else if (action === 'GO_TO_MATCHES') {
-      speechService.stop();
-      setShowVoiceModal(false);
-      setActiveTab('matches');
-    } else if (action === 'GO_TO_SAVED') {
-      speechService.stop();
-      setShowVoiceModal(false);
-      setActiveTab('saved');
-    }
-  };
-
-  const handleSendTypedMessage = (e: React.FormEvent) => {
+  const handleSendText = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!typedMessage.trim()) return;
-    const msg = typedMessage;
-    setTypedMessage('');
-    handleUserUtterance(msg);
+    if (!typedInput.trim()) return;
+    const txt = typedInput;
+    setTypedInput('');
+    realtimeVoiceService.sendTextMessage(txt);
   };
+
+  const getStatusBadge = () => {
+    switch (voiceState) {
+      case 'CONNECTING':
+        return { label: 'CONNECTING...', color: 'bg-amber-400/20 text-amber-300 border-amber-400/30' };
+      case 'LISTENING':
+        return { label: 'LISTENING (SPEAK NOW)', color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' };
+      case 'USER_SPEAKING':
+        return { label: 'USER SPEAKING...', color: 'bg-emerald-400/30 text-[#94f6c4] border-emerald-400/50' };
+      case 'THINKING':
+        return { label: 'EVALUATING SCHEMES...', color: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
+      case 'SPEAKING':
+        return { label: 'ARIVOM SPEAKING...', color: 'bg-[#fea619]/20 text-[#fea619] border-[#fea619]/40' };
+      case 'ERROR':
+        return { label: 'CONNECTION ERROR', color: 'bg-rose-500/20 text-rose-300 border-rose-500/40' };
+      default:
+        return { label: 'READY', color: 'bg-white/10 text-white/80 border-white/20' };
+    }
+  };
+
+  const status = getStatusBadge();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in">
-      <div className="bg-[#092554] text-white w-full h-full sm:h-[94vh] sm:max-w-4xl sm:rounded-3xl flex flex-col shadow-2xl border border-white/10 overflow-hidden relative">
+      <div className="bg-[#092554] text-white w-full h-full sm:h-[92vh] sm:max-w-4xl sm:rounded-3xl flex flex-col shadow-2xl border border-white/10 overflow-hidden relative">
         {/* ========================================================= */}
-        {/* TOP BAR: Brand, Active Language, Ambient Controls */}
+        {/* TOP BAR: Brand, Live Call Status, Mode Switcher */}
         {/* ========================================================= */}
         <div className="p-4 sm:p-5 flex items-center justify-between border-b border-white/10 bg-[#001944]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#FEA619] text-[#092554] flex items-center justify-center font-black text-base shadow-sm">
+            <div className="w-9 h-9 rounded-full bg-[#fea619] text-[#092554] flex items-center justify-center font-black text-base shadow-sm">
               {getLanguageInitial(selectedVoiceLanguageId)}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-[#94F6C4] tracking-wider uppercase flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-[#FEA619]" />
-                  Arivom Civic Voice Assistant
+                <span className="text-xs font-bold text-[#94f6c4] tracking-wider uppercase flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#fea619]" />
+                  Arivom Real-time Voice
                 </span>
-                <span className="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-[#D9E2FF] border border-white/10">
-                  Real-time Conversational Guide
+                <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold border ${status.color}`}>
+                  {status.label}
                 </span>
               </div>
-              <p className="text-[11px] text-[#D9E2FF]">
-                📍 {currentStateConfig.name} • 🎙️ {currentLanguageConfig.name} ({currentLanguageConfig.bcp47Code})
+              <p className="text-[11px] text-[#d9e2ff]/80">
+                📍 {currentStateConfig.name} • 🎙️ {currentLanguageConfig.nativeName} ({currentLanguageConfig.bcp47Code})
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Language Selector Dropdown Button */}
+            {/* Mode Switcher: Voice / Text */}
+            <div className="bg-white/10 rounded-xl p-0.5 flex items-center border border-white/10">
+              <button
+                onClick={() => setActiveMode('VOICE')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeMode === 'VOICE' ? 'bg-[#fea619] text-[#092554] shadow-xs' : 'text-white/80 hover:text-white'
+                }`}
+              >
+                <Mic className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Voice</span>
+              </button>
+              <button
+                onClick={() => setActiveMode('TEXT')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeMode === 'TEXT' ? 'bg-[#fea619] text-[#092554] shadow-xs' : 'text-white/80 hover:text-white'
+                }`}
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Text</span>
+              </button>
+            </div>
+
+            {/* Language Picker Toggle */}
             <button
-              id="voice-conv-lang-btn"
               onClick={() => setShowLangPicker(!showLangPicker)}
-              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white flex items-center gap-1.5 cursor-pointer transition-colors border border-white/10"
-              title="Change Voice Language"
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer border border-white/10"
+              title="Change Language"
             >
-              <Globe className="w-3.5 h-3.5 text-[#FEA619]" />
-              <span className="hidden sm:inline">{currentLanguageConfig.nativeName}</span>
+              <Globe className="w-4 h-4 text-[#fea619]" />
             </button>
 
-            {/* Mute / Unmute Button */}
+            {/* Mute Toggle */}
             <button
-              id="voice-conv-mute-btn"
-              onClick={() => {
-                if (!isMuted) speechService.stop();
-                setIsMuted(!isMuted);
-              }}
+              onClick={handleToggleMute}
               className={`p-2 rounded-xl transition-colors cursor-pointer border ${
                 isMuted
                   ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
                   : 'bg-white/10 hover:bg-white/20 text-white border-white/10'
               }`}
-              title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
+              title={isMuted ? 'Unmute Mic' : 'Mute Mic'}
             >
-              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+              {isMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </button>
 
-            {/* Repeat Last Reply Button */}
+            {/* End Call Button */}
             <button
-              id="voice-conv-repeat-btn"
-              onClick={() => {
-                if (currentAssistantSpeech) assistantSay(currentAssistantSpeech, undefined, phase);
-              }}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer border border-white/10"
-              title="Repeat Last Response"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
-
-            {/* Switch to Typing Drawer Toggle */}
-            <button
-              id="voice-conv-keyboard-btn"
-              onClick={() => setShowTypingFallback(!showTypingFallback)}
-              className={`p-2 rounded-xl transition-colors cursor-pointer border ${
-                showTypingFallback
-                  ? 'bg-[#FEA619] text-[#092554] border-[#FEA619]'
-                  : 'bg-white/10 hover:bg-white/20 text-white border-white/10'
-              }`}
-              title="Switch to Typing"
-            >
-              <Keyboard className="w-4 h-4" />
-            </button>
-
-            {/* End Conversation / Close Button */}
-            <button
-              id="voice-conv-close-btn"
-              onClick={() => {
-                speechService.stop();
-                setShowVoiceModal(false);
-              }}
-              className="p-2 rounded-xl bg-white/10 hover:bg-rose-500/30 text-white transition-colors cursor-pointer border border-white/10"
+              onClick={handleEndCall}
+              className="p-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white transition-colors cursor-pointer border border-rose-500 shadow-sm"
               title="End Voice Conversation"
             >
-              <X className="w-4 h-4" />
+              <PhoneOff className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Language Selection Grid (Expandable) */}
+        {/* Expandable Language Dropdown */}
         {showLangPicker && (
           <div className="p-3 bg-[#001233] border-b border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-2 animate-fade-in text-xs">
             {Object.values(SUPPORTED_LANGUAGES).map((lang) => {
@@ -571,26 +264,14 @@ export const VoiceAssistantModal: React.FC = () => {
                   onClick={() => {
                     setSelectedVoiceLanguageId(lang.id);
                     setShowLangPicker(false);
-                    const newPack = getVoicePack(lang.id);
-                    if (recognitionRef.current) {
-                      recognitionRef.current.lang = lang.bcp47Code;
-                    }
-                    assistantSay(
-                      newPack.languageSwitchConfirmation,
-                      undefined,
-                      phase
-                    );
                   }}
                   className={`p-2 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between ${
                     isSelected
-                      ? 'bg-[#FEA619] text-[#092554] font-bold border-[#FEA619]'
+                      ? 'bg-[#fea619] text-[#092554] font-bold border-[#fea619]'
                       : 'bg-white/5 text-white border-white/10 hover:bg-white/15'
                   }`}
                 >
-                  <div>
-                    <span className="block font-bold">{lang.nativeName}</span>
-                    <span className="text-[10px] opacity-75">{lang.name}</span>
-                  </div>
+                  <span className="font-bold">{lang.nativeName}</span>
                   {isSelected && <CheckCircle2 className="w-4 h-4" />}
                 </button>
               );
@@ -599,241 +280,191 @@ export const VoiceAssistantModal: React.FC = () => {
         )}
 
         {/* ========================================================= */}
-        {/* MAIN CONVERSATION BODY: Split Stage & Timeline */}
+        {/* MAIN BODY: Split Voice Orb & Live Transcript Stream */}
         {/* ========================================================= */}
         <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0 relative">
-          {/* LEFT/TOP: Ambient Animated Voice Orb Stage */}
-          <div className="lg:col-span-6 p-6 flex flex-col items-center justify-center text-center space-y-4 border-b lg:border-b-0 lg:border-r border-white/10 bg-linear-to-b from-[#092554] to-[#001944] relative">
+          {/* LEFT: Living Animated Voice Visualizer Stage */}
+          <div className="lg:col-span-5 p-6 flex flex-col items-center justify-center text-center space-y-4 border-b lg:border-b-0 lg:border-r border-white/10 bg-linear-to-b from-[#092554] to-[#001944] relative">
             <VoiceOrbVisualizer
-              state={orbState}
+              state={
+                voiceState === 'SPEAKING'
+                  ? 'SPEAKING'
+                  : voiceState === 'USER_SPEAKING' || voiceState === 'LISTENING'
+                  ? 'LISTENING'
+                  : voiceState === 'THINKING'
+                  ? 'THINKING'
+                  : 'READY'
+              }
               soundLevel={audioLevel}
-              onClick={handleToggleListening}
+              onClick={() => {
+                if (voiceState === 'SPEAKING') {
+                  realtimeVoiceService.interruptPlayback();
+                }
+              }}
               size={180}
               langInitial={getLanguageInitial(selectedVoiceLanguageId)}
             />
 
-            {/* Live Subtitles with Karaoke Sentence Highlighting */}
-            <div className="w-full max-w-md px-2 space-y-2">
-              {orbState === 'LISTENING' && liveTranscript && (
-                <div className="p-3.5 rounded-2xl bg-white/10 border border-emerald-400/40 text-left space-y-1 animate-fade-in shadow-lg">
-                  <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider block">
-                    🗣️ Live Spoken Input
-                  </span>
-                  <p className="text-sm font-semibold text-white leading-relaxed">
-                    “{liveTranscript}”
-                  </p>
-                </div>
-              )}
-
-              {orbState === 'SPEAKING' && (
-                <div className="p-4 rounded-2xl bg-white/10 border border-blue-400/40 text-left space-y-1.5 shadow-lg animate-fade-in">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-[#FEA619] uppercase tracking-wider flex items-center gap-1">
-                      <Volume2 className="w-3 h-3 animate-bounce text-[#94F6C4]" />
-                      Arivom Speaking
-                    </span>
-                    <span className="text-[10px] text-[#94F6C4] font-mono">
-                      {currentLanguageConfig.bcp47Code}
-                    </span>
-                  </div>
-                  <p className="text-sm sm:text-base font-bold text-white leading-relaxed">
-                    “{activeSentence}”
-                  </p>
-                  <p className="text-xs text-[#D9E2FF]/80 italic pt-1 border-t border-white/10">
-                    "{translateToEnglish(activeSentence, selectedVoiceLanguageId)}"
-                  </p>
-                </div>
-              )}
-
-              {orbState === 'READY' && !liveTranscript && (
-                <div className="space-y-2 max-w-xs mx-auto">
-                  <p className="text-xs text-[#D9E2FF]/80">
-                    Tap the microphone button or orb to speak. You can say your age, profession, or ask about specific subsidies.
-                  </p>
-                  {!speechService.hasNativeVoice(selectedVoiceLanguageId) && (
-                    <div className="p-2 rounded-xl bg-amber-500/15 border border-amber-400/30 text-[11px] text-amber-200 flex items-center gap-1.5 text-left">
-                      <HelpCircle className="w-3.5 h-3.5 shrink-0 text-amber-300" />
-                      <span>Live subtitles & simulated audio active for {currentLanguageConfig.name}.</span>
-                    </div>
-                  )}
-                </div>
-              )}
+            <div className="space-y-1">
+              <span className="text-xs font-bold text-[#94f6c4] tracking-wider uppercase block">
+                {voiceState === 'SPEAKING'
+                  ? 'Tap Orb to Interrupt'
+                  : voiceState === 'LISTENING'
+                  ? 'Listening Continuously...'
+                  : 'Arivom AI Voice'}
+              </span>
+              <p className="text-xs text-[#d9e2ff]/80 max-w-xs">
+                Speak naturally like a phone call. Arivom will listen, understand, and answer.
+              </p>
             </div>
 
-            {/* Quick Action Suggestion Chips */}
-            <div className="flex flex-wrap items-center justify-center gap-2 max-w-md pt-2">
+            {/* Quick Interrupt Notice */}
+            {voiceState === 'SPEAKING' && (
               <button
-                onClick={() => handleUserUtterance('நான் விவசாயி, நெல் மானியம் தேவை')}
-                className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-[11px] font-medium text-white transition-colors cursor-pointer"
+                onClick={() => realtimeVoiceService.interruptPlayback()}
+                className="px-4 py-1.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[11px] font-bold animate-pulse cursor-pointer"
               >
-                🌾 விவசாயி (Farmer)
+                Tap or speak to interrupt
               </button>
-              <button
-                onClick={() => handleUserUtterance('I am a student looking for higher education scholarships')}
-                className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-[11px] font-medium text-white transition-colors cursor-pointer"
-              >
-                🎓 மாணவர் (Student)
-              </button>
-              <button
-                onClick={() => handleUserUtterance('சிறு தொழில் கடன் மற்றும் முத்ரா திட்டம் தேவை')}
-                className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-[11px] font-medium text-white transition-colors cursor-pointer"
-              >
-                🛍 வியாபாரம் (Business)
-              </button>
-            </div>
+            )}
           </div>
 
-          {/* RIGHT/BOTTOM: Interactive Conversation Timeline */}
-          <div className="lg:col-span-6 flex flex-col h-full bg-[#001233]">
-            <div className="p-3 px-4 border-b border-white/10 bg-[#000E26] flex items-center justify-between text-xs">
-              <span className="font-bold text-[#D9E2FF] flex items-center gap-1.5">
-                <Bot className="w-3.5 h-3.5 text-[#94F6C4]" />
-                Conversation Transcript
+          {/* RIGHT: Real-time Live Conversational Transcript */}
+          <div className="lg:col-span-7 flex flex-col h-full bg-[#001233]/60 backdrop-blur-sm overflow-hidden">
+            <div className="p-3 px-4 border-b border-white/10 flex items-center justify-between text-xs bg-[#001944]">
+              <span className="font-bold text-[#d9e2ff] flex items-center gap-1.5">
+                <MessageSquare className="w-3.5 h-3.5 text-[#fea619]" />
+                Live Conversation Stream
               </span>
-              <span className="text-[10px] text-[#D9E2FF]/60 font-mono">
-                {conversationHistory.length} Exchanges
+              <span className="text-[10px] text-[#94f6c4] font-mono">
+                {messages.length} messages
               </span>
             </div>
 
-            {/* Chat Messages Scroll Area */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-4 text-xs">
-              {conversationHistory.map((turn) => {
-                const isAsst = turn.role === 'assistant';
-                return (
-                  <div
-                    key={turn.id}
-                    className={`flex items-start gap-2.5 animate-fade-in ${
-                      isAsst ? 'justify-start' : 'justify-end'
-                    }`}
-                  >
-                    {isAsst && (
-                      <div className="w-7 h-7 rounded-full bg-[#FEA619] text-[#092554] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                        {getLanguageInitial(selectedVoiceLanguageId)}
-                      </div>
-                    )}
-
+            {/* Scrollable Message List */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3.5">
+              {messages.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-2 text-[#d9e2ff]/60">
+                  <Mic className="w-8 h-8 text-[#fea619] animate-pulse" />
+                  <p className="text-xs font-medium">
+                    Say something like: "I am a farmer from Thanjavur, looking for crop assistance."
+                  </p>
+                </div>
+              ) : (
+                messages.map((msg) => {
+                  const isUser = msg.role === 'user';
+                  return (
                     <div
-                      className={`max-w-[85%] sm:max-w-[78%] p-3.5 rounded-2xl space-y-1.5 ${
-                        isAsst
-                          ? 'bg-white/10 text-white border border-white/15 rounded-tl-xs shadow-sm'
-                          : 'bg-[#0F8A5F] text-white rounded-tr-xs shadow-sm ml-auto'
+                      key={msg.id}
+                      className={`flex items-start gap-2.5 animate-fade-in ${
+                        isUser ? 'justify-end' : 'justify-start'
                       }`}
                     >
-                      <div className="flex items-center justify-between gap-2">
-                        <span
-                          className={`text-[10px] font-bold uppercase tracking-wider ${
-                            isAsst ? 'text-[#94F6C4]' : 'text-emerald-100'
-                          }`}
-                        >
-                          {isAsst ? 'Arivom Assistant' : 'You (Citizen)'}
-                        </span>
-                        <span className="text-[9px] opacity-60 font-mono">
-                          {new Date(turn.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-
-                      <p className="text-sm font-medium leading-relaxed">{turn.text}</p>
-
-                      {turn.englishTranslation && turn.englishTranslation !== turn.text && (
-                        <p className="text-[11px] text-[#D9E2FF]/80 italic pt-1 border-t border-white/10">
-                          "{turn.englishTranslation}"
-                        </p>
+                      {!isUser && (
+                        <div className="w-7 h-7 rounded-full bg-[#fea619] text-[#092554] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                          {getLanguageInitial(selectedVoiceLanguageId)}
+                        </div>
                       )}
 
-                      {/* Interactive Action Buttons attached to speech */}
-                      {turn.actionButtons && turn.actionButtons.length > 0 && (
-                        <div className="flex flex-wrap gap-2 pt-2">
-                          {turn.actionButtons.map((btn, idx) => (
-                            <button
-                              key={idx}
-                              onClick={() => handleActionClick(btn.action)}
-                              className="px-3 py-1.5 rounded-xl bg-[#FEA619] hover:bg-[#FFB94F] text-[#092554] font-bold text-xs transition-colors cursor-pointer shadow-xs flex items-center gap-1"
-                            >
-                              <span>{btn.label}</span>
-                              <ArrowRight className="w-3 h-3" />
-                            </button>
-                          ))}
+                      <div
+                        className={`max-w-[85%] p-3.5 rounded-2xl space-y-1 ${
+                          isUser
+                            ? 'bg-[#0f8a5f] text-white rounded-tr-xs shadow-sm ml-auto'
+                            : 'bg-white/10 text-white border border-white/15 rounded-tl-xs shadow-sm'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span
+                            className={`text-[10px] font-bold uppercase tracking-wider ${
+                              isUser ? 'text-emerald-100' : 'text-[#94f6c4]'
+                            }`}
+                          >
+                            {isUser ? 'You' : 'Arivom'}
+                          </span>
+                          <span className="text-[9px] opacity-60 font-mono">
+                            {new Date(msg.timestamp).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </span>
+                        </div>
+
+                        <p className="text-xs sm:text-sm font-medium leading-relaxed">
+                          {msg.text}
+                          {msg.isStreaming && (
+                            <span className="inline-block w-1.5 h-3 bg-[#fea619] ml-1 animate-pulse" />
+                          )}
+                        </p>
+                      </div>
+
+                      {isUser && (
+                        <div className="w-7 h-7 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+                          <User className="w-3.5 h-3.5" />
                         </div>
                       )}
                     </div>
-
-                    {!isAsst && (
-                      <div className="w-7 h-7 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                        <User className="w-3.5 h-3.5" />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-              <div ref={timelineEndRef} />
+                  );
+                })
+              )}
+              <div ref={messagesEndRef} />
             </div>
 
-            {/* Expandable Keyboard Typing Drawer */}
-            {showTypingFallback && (
-              <form
-                onSubmit={handleSendTypedMessage}
-                className="p-3 bg-[#000E26] border-t border-white/10 flex items-center gap-2 animate-fade-in"
+            {/* Text Mode Input Field (Available in both Voice and Text modes) */}
+            <form
+              onSubmit={handleSendText}
+              className="p-3 bg-[#000e26] border-t border-white/10 flex items-center gap-2"
+            >
+              <input
+                type="text"
+                value={typedInput}
+                onChange={(e) => setTypedInput(e.target.value)}
+                placeholder="Type a message or answer (shares context with voice)..."
+                className="flex-1 p-2.5 px-3 rounded-xl bg-white/10 border border-white/20 text-xs text-white placeholder-white/50 focus:border-[#fea619] outline-none"
+              />
+              <button
+                type="submit"
+                disabled={!typedInput.trim()}
+                className="p-2.5 px-4 rounded-xl bg-[#fea619] hover:bg-[#ffb94f] disabled:opacity-40 text-[#092554] font-bold text-xs transition-colors cursor-pointer flex items-center gap-1"
               >
-                <input
-                  type="text"
-                  placeholder="Type your reply (e.g. 45 வயது விவசாயி, 2 ஏக்கர் நிலம்)..."
-                  value={typedMessage}
-                  onChange={(e) => setTypedMessage(e.target.value)}
-                  className="flex-1 p-2.5 px-3 rounded-xl bg-white/10 border border-white/20 text-xs text-white placeholder-white/50 focus:border-[#FEA619] outline-none"
-                  autoFocus
-                />
-                <button
-                  type="submit"
-                  disabled={!typedMessage.trim()}
-                  className="p-2.5 px-4 rounded-xl bg-[#FEA619] hover:bg-[#FFB94F] disabled:opacity-40 text-[#092554] font-bold text-xs transition-colors cursor-pointer flex items-center gap-1"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Send</span>
-                </button>
-              </form>
-            )}
+                <Send className="w-3.5 h-3.5" />
+                <span>Send</span>
+              </button>
+            </form>
           </div>
         </div>
 
         {/* ========================================================= */}
-        {/* BOTTOM ONE-HANDED ACTION CONTROLS & TRUST NOTE */}
+        {/* BOTTOM ACTION BAR & CIVIC PRIVACY NOTE */}
         {/* ========================================================= */}
-        <div className="p-3 sm:p-4 bg-[#000E26] border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          {/* Civic Trust Privacy Note */}
-          <div className="flex items-center gap-2 text-[#D9E2FF]/80 text-[11px]">
-            <Shield className="w-4 h-4 text-[#94F6C4] shrink-0" />
+        <div className="p-3 sm:p-4 bg-[#000e26] border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-[#d9e2ff]/80 text-[11px]">
+            <Shield className="w-4 h-4 text-[#94f6c4] shrink-0" />
             <span>
-              <strong>Civic Privacy:</strong> Your voice is processed securely only to evaluate published government gazettes.
+              <strong>Civic Privacy:</strong> Real-time audio is processed securely to evaluate verified government gazettes.
             </span>
           </div>
 
-          {/* Core Mic & Navigation Controls */}
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-            <button
-              onClick={handleToggleListening}
-              className={`flex-1 sm:flex-none px-6 py-2.5 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg ${
-                orbState === 'LISTENING'
-                  ? 'bg-rose-600 hover:bg-rose-700 text-white animate-pulse'
-                  : 'bg-[#0F8A5F] hover:bg-[#13A370] text-white'
-              }`}
-            >
-              {orbState === 'LISTENING' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-              <span>{orbState === 'LISTENING' ? 'STOP LISTENING' : 'TAP TO SPEAK'}</span>
-            </button>
-
             {activeMatches.length > 0 && (
               <button
                 onClick={() => {
-                  speechService.stop();
+                  realtimeVoiceService.endSession();
                   setShowVoiceModal(false);
                   setActiveTab('matches');
                 }}
-                className="px-5 py-2.5 rounded-2xl bg-[#FEA619] hover:bg-[#FFB94F] text-[#092554] font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-md"
+                className="px-5 py-2.5 rounded-2xl bg-[#fea619] hover:bg-[#ffb94f] text-[#092554] font-black text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-md"
               >
                 <span>VIEW {activeMatches.length} MATCHES</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             )}
+
+            <button
+              onClick={handleEndCall}
+              className="px-5 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-colors cursor-pointer"
+            >
+              {t('common.close')}
+            </button>
           </div>
         </div>
       </div>
