@@ -72,23 +72,23 @@ export const MyMatchesView: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Header Bar */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#c5c6d0]/60 shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-[#4a1f2d] text-white rounded-3xl p-6 sm:p-8 border border-[#6b3548] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="bg-[#94f6c4]/40 text-[#00462d] text-xs px-2.5 py-0.5 rounded-full font-bold border border-[#57b98c]/50 flex items-center gap-1">
-              <Sparkles className="w-3 h-3" />
+            <span className="bg-[#6b3548] text-[#ffd9e1] text-xs px-2.5 py-0.5 rounded-full font-bold border border-[#e8e1dc]/30 flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5 text-[#c8a96b]" />
               {t('matches.title')}
             </span>
-            <span className="text-xs text-[#757780] font-mono">
+            <span className="text-xs text-[#c8a96b] font-mono font-bold">
               📍 {currentStateConfig.name}
             </span>
           </div>
 
-          <h1 className={`font-black text-[#4a1f2d] tracking-tight mt-1.5 ${easyMode ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
+          <h1 className={`font-black text-white tracking-tight mt-2 ${easyMode ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
             {t('matches.title')}
           </h1>
 
-          <p className="text-xs text-[#44464f] mt-1">
+          <p className="text-xs sm:text-sm text-[#ffd9e1] mt-1">
             {userProfile ? (
               <>
                 {t('matches.subtitle')} (<strong>{userProfile.occupation || 'Citizen'}</strong>, {userProfile.district || currentStateConfig.name})
@@ -102,13 +102,9 @@ export const MyMatchesView: React.FC = () => {
         <button
           id="toggle-wizard-btn"
           onClick={() => setShowWizard(!showWizard)}
-          className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
-            showWizard
-              ? 'bg-[#4a1f2d] text-white'
-              : 'bg-[#d9e2ff] text-[#001944] border border-[#b0c6ff] hover:bg-[#b0c6ff]'
-          }`}
+          className="px-5 py-2.5 rounded-xl bg-[#c8a96b] hover:bg-[#e3c282] text-[#310a18] text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer shadow-xs"
         >
-          <Wand2 className="w-4 h-4 text-[#4a1f2d]" />
+          <Wand2 className="w-4 h-4 text-[#310a18]" />
           <span>{showWizard ? t('common.close') : t('profile.title')}</span>
         </button>
       </div>
@@ -121,22 +117,22 @@ export const MyMatchesView: React.FC = () => {
       )}
 
       {/* Search & Filter Controls */}
-      <div className="bg-white rounded-3xl p-4 sm:p-5 border border-[#c5c6d0]/60 shadow-soft space-y-3.5">
+      <div className="bg-white rounded-3xl p-4 sm:p-5 border border-[#e8e1dc] shadow-xs space-y-3.5">
         {/* Row 1: Search Bar & Reset */}
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 absolute left-3.5 top-3 text-[#757780]" />
+            <Search className="w-4 h-4 absolute left-3.5 top-3 text-[#756a6f]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('matches.searchPlaceholder')}
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-[#f2f3fa] border border-[#e8e1dc] text-[#111827] placeholder-[#6b7280] focus:border-[#4a1f2d] outline-none"
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-[#faf8f3] border border-[#e8e1dc] text-[#111827] placeholder-[#6b7280] focus:border-[#4a1f2d] outline-none text-xs sm:text-sm"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-3 text-[#757780] hover:text-[#191c1e] cursor-pointer"
+                className="absolute right-3 top-3 text-[#756a6f] hover:text-[#21191d] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -146,7 +142,7 @@ export const MyMatchesView: React.FC = () => {
           {hasActiveFilters && (
             <button
               onClick={handleResetFilters}
-              className="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1 border border-rose-200"
+              className="px-3.5 py-2 rounded-xl bg-[#ffdad6] text-[#ba1a1a] hover:bg-[#fcd0cb] text-xs font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1 border border-[#ba1a1a]/30"
             >
               <X className="w-3.5 h-3.5" />
               <span>Reset Filters</span>
@@ -156,8 +152,8 @@ export const MyMatchesView: React.FC = () => {
 
         {/* Row 2: Level / Jurisdiction Filter Tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-          <span className="text-[11px] font-bold text-[#757780] flex items-center gap-1 mr-1 shrink-0">
-            <Filter className="w-3 h-3" />
+          <span className="text-[11px] font-bold text-[#756a6f] flex items-center gap-1 mr-1 shrink-0">
+            <Filter className="w-3 h-3 text-[#4a1f2d]" />
             <span>Type:</span>
           </span>
 
@@ -166,7 +162,7 @@ export const MyMatchesView: React.FC = () => {
             className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
               filterType === 'ALL'
                 ? 'bg-[#4a1f2d] text-white shadow-xs'
-                : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
+                : 'bg-[#faf8f3] text-[#514346] hover:bg-[#eedfe4] border border-[#e8e1dc]'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -177,8 +173,8 @@ export const MyMatchesView: React.FC = () => {
             onClick={() => setFilterType('STATE')}
             className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
               filterType === 'STATE'
-                ? 'bg-[#00462d] text-white shadow-xs'
-                : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
+                ? 'bg-[#4a1f2d] text-white shadow-xs'
+                : 'bg-[#faf8f3] text-[#514346] hover:bg-[#eedfe4] border border-[#e8e1dc]'
             }`}
           >
             <Building2 className="w-3.5 h-3.5" />
@@ -189,8 +185,8 @@ export const MyMatchesView: React.FC = () => {
             onClick={() => setFilterType('CENTRAL')}
             className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
               filterType === 'CENTRAL'
-                ? 'bg-[#684000] text-white shadow-xs'
-                : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
+                ? 'bg-[#4a1f2d] text-white shadow-xs'
+                : 'bg-[#faf8f3] text-[#514346] hover:bg-[#eedfe4] border border-[#e8e1dc]'
             }`}
           >
             <Landmark className="w-3.5 h-3.5" />
@@ -201,8 +197,8 @@ export const MyMatchesView: React.FC = () => {
             onClick={() => setFilterType('STRONG')}
             className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 ${
               filterType === 'STRONG'
-                ? 'bg-emerald-700 text-white shadow-xs'
-                : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
+                ? 'bg-[#15803d] text-white shadow-xs'
+                : 'bg-[#faf8f3] text-[#514346] hover:bg-[#eedfe4] border border-[#e8e1dc]'
             }`}
           >
             <span>{t('matches.filterStrong')}</span>
@@ -212,8 +208,8 @@ export const MyMatchesView: React.FC = () => {
             onClick={() => setFilterType('POTENTIAL')}
             className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 ${
               filterType === 'POTENTIAL'
-                ? 'bg-amber-700 text-white shadow-xs'
-                : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
+                ? 'bg-[#b45309] text-white shadow-xs'
+                : 'bg-[#faf8f3] text-[#514346] hover:bg-[#eedfe4] border border-[#e8e1dc]'
             }`}
           >
             <span>{t('matches.filterPotential')}</span>
@@ -221,8 +217,8 @@ export const MyMatchesView: React.FC = () => {
         </div>
 
         {/* Row 3: Category Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs pt-1 border-t border-[#e1e2ec]">
-          <span className="text-[11px] font-bold text-[#757780] mr-1 shrink-0">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs pt-1 border-t border-[#e8e1dc]">
+          <span className="text-[11px] font-bold text-[#756a6f] mr-1 shrink-0">
             Category:
           </span>
           {categories.map((cat) => {
@@ -231,10 +227,10 @@ export const MyMatchesView: React.FC = () => {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer shrink-0 border ${
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer shrink-0 border ${
                   isSelected
-                    ? 'bg-[#fea619] text-[#4a1f2d] border-[#fea619] font-bold shadow-xs'
-                    : 'bg-[#f2f3fa] text-[#44464f] border-[#c5c6d0]/40 hover:bg-[#e1e2ec]'
+                    ? 'bg-[#c8a96b] text-[#310a18] border-[#c8a96b] shadow-xs'
+                    : 'bg-[#faf8f3] text-[#514346] border-[#e8e1dc] hover:bg-[#eedfe4]'
                 }`}
               >
                 {cat.label}
@@ -245,7 +241,7 @@ export const MyMatchesView: React.FC = () => {
       </div>
 
       {/* Results Header Summary */}
-      <div className="flex items-center justify-between px-1 text-xs text-[#757780]">
+      <div className="flex items-center justify-between px-1 text-xs text-[#756a6f]">
         <span>
           Showing <strong>{filteredMatches.length}</strong> matching schemes
         </span>
@@ -259,21 +255,21 @@ export const MyMatchesView: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="bg-white rounded-3xl p-10 sm:p-14 border border-[#c5c6d0]/60 text-center space-y-4 shadow-soft">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-[#f2f3fa] text-[#757780] flex items-center justify-center">
-            <Inbox className="w-7 h-7" />
+        <div className="bg-white rounded-3xl p-10 sm:p-14 border border-[#e8e1dc] text-center space-y-4 shadow-xs">
+          <div className="w-14 h-14 mx-auto rounded-2xl bg-[#faf8f3] text-[#756a6f] flex items-center justify-center">
+            <Inbox className="w-7 h-7 text-[#4a1f2d]" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-base sm:text-lg font-black text-[#191c1e]">
+            <h3 className="text-base sm:text-lg font-bold text-[#21191d]">
               No schemes match your filter
             </h3>
-            <p className="text-xs text-[#757780] max-w-md mx-auto leading-relaxed">
+            <p className="text-xs text-[#756a6f] max-w-md mx-auto leading-relaxed">
               Try adjusting your category, keyword search, or resetting filters to view all available schemes.
             </p>
           </div>
           <button
             onClick={handleResetFilters}
-            className="px-6 py-2.5 rounded-2xl bg-[#4a1f2d] hover:bg-[#243b6b] text-white font-bold text-xs shadow-md transition-all inline-flex items-center gap-2 cursor-pointer"
+            className="px-6 py-2.5 rounded-xl bg-[#4a1f2d] hover:bg-[#310a18] text-white font-bold text-xs shadow-xs transition-all inline-flex items-center gap-2 cursor-pointer"
           >
             <span>Reset All Filters</span>
           </button>

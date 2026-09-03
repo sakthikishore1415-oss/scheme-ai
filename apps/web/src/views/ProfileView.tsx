@@ -182,35 +182,35 @@ export const ProfileView: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Header */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-[#c5c6d0]/60 shadow-soft flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-[#4a1f2d] text-white rounded-3xl p-6 sm:p-8 border border-[#6b3548] shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="bg-[#d9e2ff] text-[#001944] text-xs px-2.5 py-0.5 rounded-full font-bold border border-[#b0c6ff] flex items-center gap-1">
-              <User className="w-3.5 h-3.5 text-[#4a1f2d]" />
+            <span className="bg-[#6b3548] text-[#ffd9e1] text-xs px-2.5 py-0.5 rounded-full font-bold border border-[#e8e1dc]/30 flex items-center gap-1">
+              <User className="w-3.5 h-3.5 text-[#c8a96b]" />
               CITIZEN PROFILE
             </span>
-            <span className="text-xs text-[#757780] font-mono">
+            <span className="text-xs text-[#c8a96b] font-mono font-bold">
               {userProfile?.name ? `Active Member: ${userProfile.name}` : 'No Profile Loaded'}
             </span>
           </div>
-          <h1 className={`font-bold text-[#4a1f2d] mt-1 ${easyMode ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
+          <h1 className={`font-black text-white mt-2 ${easyMode ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
             {userProfile ? 'Profile & Entitlement Questionnaire' : 'Create Citizen Profile'}
           </h1>
-          <p className="text-xs text-[#44464f] mt-0.5">
+          <p className="text-xs sm:text-sm text-[#ffd9e1] mt-1">
             Your demographic information deterministically checks official government gazette criteria.
           </p>
         </div>
 
         {familyMembers.length > 0 && (
-          <div className="flex items-center gap-1 bg-[#f2f4f6] p-1 rounded-2xl border border-[#c5c6d0]/60 text-xs">
+          <div className="flex items-center gap-1 bg-[#310a18] p-1.5 rounded-2xl border border-[#e8e1dc]/20 text-xs">
             {familyMembers.map((m) => (
               <button
                 key={m.id}
                 onClick={() => switchFamilyMember(m.id)}
                 className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
                   activeFamilyMemberId === m.id
-                    ? 'bg-[#092554] text-white shadow-xs'
-                    : 'text-[#44464f] hover:text-[#191c1e]'
+                    ? 'bg-[#c8a96b] text-[#310a18] shadow-xs'
+                    : 'text-[#ffd9e1] hover:text-white'
                 }`}
               >
                 {m.name}
@@ -221,13 +221,13 @@ export const ProfileView: React.FC = () => {
       </div>
 
       {/* Profile Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#c5c6d0]/60 pb-2 text-xs font-bold">
+      <div className="flex items-center gap-2 border-b border-[#e8e1dc] pb-2 text-xs font-bold">
         <button
           onClick={() => setActiveTab('DETAILS')}
           className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
             activeTab === 'DETAILS'
-              ? 'bg-[#092554] text-white shadow-xs'
-              : 'bg-white text-[#44464f] hover:bg-[#f2f4f6] border border-[#c5c6d0]/60'
+              ? 'bg-[#4a1f2d] text-white shadow-xs'
+              : 'bg-white text-[#514346] hover:bg-[#eedfe4] border border-[#e8e1dc]'
           }`}
         >
           <User className="w-3.5 h-3.5" />
@@ -238,8 +238,8 @@ export const ProfileView: React.FC = () => {
           onClick={() => setActiveTab('FAMILY')}
           className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
             activeTab === 'FAMILY'
-              ? 'bg-[#092554] text-white shadow-xs'
-              : 'bg-white text-[#44464f] hover:bg-[#f2f4f6] border border-[#c5c6d0]/60'
+              ? 'bg-[#4a1f2d] text-white shadow-xs'
+              : 'bg-white text-[#514346] hover:bg-[#eedfe4] border border-[#e8e1dc]'
           }`}
         >
           <Users className="w-3.5 h-3.5" />
@@ -250,8 +250,8 @@ export const ProfileView: React.FC = () => {
           onClick={() => setActiveTab('DOCUMENTS')}
           className={`px-4 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
             activeTab === 'DOCUMENTS'
-              ? 'bg-[#092554] text-white shadow-xs'
-              : 'bg-white text-[#44464f] hover:bg-[#f2f4f6] border border-[#c5c6d0]/60'
+              ? 'bg-[#4a1f2d] text-white shadow-xs'
+              : 'bg-white text-[#514346] hover:bg-[#eedfe4] border border-[#e8e1dc]'
           }`}
         >
           <FileText className="w-3.5 h-3.5" />
@@ -261,7 +261,7 @@ export const ProfileView: React.FC = () => {
 
       {/* Tab 1: Citizen Demographics Form (3-Step Adaptive) */}
       {activeTab === 'DETAILS' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#c5c6d0]/60 shadow-soft space-y-6">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e8e1dc] shadow-xs space-y-6">
           {/* Step Progress Indicator */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs font-bold text-[#4a1f2d]">
@@ -272,17 +272,17 @@ export const ProfileView: React.FC = () => {
                   ? `Step 2 of 3: ${professions.find((p) => p.id === selectedProfession)?.label} Specifics`
                   : 'Step 3 of 3: Verification & Privacy'}
               </span>
-              <span className="text-[#44464f] font-normal">{currentStep * 33}% Completed</span>
+              <span className="text-[#514346] font-normal">{currentStep * 33}% Completed</span>
             </div>
-            <div className="w-full bg-[#edeef0] h-2 rounded-full overflow-hidden">
+            <div className="w-full bg-[#faf8f3] border border-[#e8e1dc] h-2.5 rounded-full overflow-hidden p-0.5">
               <div
-                className="bg-[#092554] h-full transition-all duration-300 rounded-full"
+                className="bg-gradient-to-r from-[#4a1f2d] to-[#c8a96b] h-full transition-all duration-300 rounded-full"
                 style={{ width: `${(currentStep / 3) * 100}%` }}
               ></div>
             </div>
           </div>
 
-          <form onSubmit={handleSaveProfile} className="space-y-6 text-xs text-[#191c1e]">
+          <form onSubmit={handleSaveProfile} className="space-y-6 text-xs text-[#21191d]">
             {/* ==================================================== */}
             {/* STEP 1: SHARED ESSENTIALS */}
             {/* ==================================================== */}
@@ -419,14 +419,14 @@ export const ProfileView: React.FC = () => {
                           onClick={() => setSelectedProfession(p.id)}
                           className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex items-center gap-2.5 ${
                             isSelected
-                              ? 'bg-[#d9e2ff] border-[#092554] text-[#001944] font-bold'
-                              : 'bg-white border-[#c5c6d0] text-[#191c1e] hover:border-[#757780]'
+                              ? 'bg-[#eedfe4] border-[#4a1f2d] text-[#4a1f2d] font-bold shadow-xs'
+                              : 'bg-white border-[#e8e1dc] text-[#21191d] hover:border-[#4a1f2d]'
                           }`}
                         >
                           <span className="text-xl">{p.emoji}</span>
                           <div>
                             <span className="block text-xs font-bold leading-tight">{p.label}</span>
-                            <span className="text-[10px] text-[#44464f]">{p.tamil}</span>
+                            <span className="text-[10px] text-[#514346]">{p.tamil}</span>
                           </div>
                         </button>
                       );
@@ -944,19 +944,19 @@ export const ProfileView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setCurrentStep(currentStep + 1)}
-                  className="px-6 py-2.5 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors"
+                  className="px-6 py-2.5 rounded-xl bg-[#4a1f2d] hover:bg-[#310a18] text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
                 >
                   <span>
                     {currentStep === 1 ? 'CONTINUE TO QUESTIONS' : 'REVIEW SUMMARY'}
                   </span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 text-[#c8a96b]" />
                 </button>
               ) : (
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs shadow-md flex items-center gap-1.5 cursor-pointer transition-colors"
+                  className="px-6 py-2.5 rounded-xl bg-[#4a1f2d] hover:bg-[#310a18] text-white font-bold text-xs shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
-                  <Sparkles className="w-4 h-4 text-[#fea619]" />
+                  <Sparkles className="w-4 h-4 text-[#c8a96b]" />
                   <span>SAVE PROFILE & FIND SCHEMES</span>
                 </button>
               )}
@@ -967,17 +967,17 @@ export const ProfileView: React.FC = () => {
 
       {/* Tab 2: Family Members */}
       {activeTab === 'FAMILY' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#c5c6d0]/60 shadow-soft space-y-6">
-          <div className="flex items-center justify-between border-b border-[#edeef0] pb-4">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e8e1dc] shadow-xs space-y-6">
+          <div className="flex items-center justify-between border-b border-[#e8e1dc] pb-4">
             <div>
               <h3 className="font-bold text-base text-[#4a1f2d]">Family Member Profiles</h3>
-              <p className="text-xs text-[#44464f]">
+              <p className="text-xs text-[#514346]">
                 Add family members to discover welfare schemes for parents, spouses, or children.
               </p>
             </div>
             <button
               onClick={() => setShowAddFamilyModal(true)}
-              className="px-4 py-2 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-[#4a1f2d] hover:bg-[#310a18] text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
               <span>+ ADD MEMBER</span>
             </button>
@@ -987,11 +987,11 @@ export const ProfileView: React.FC = () => {
             {familyMembers.map((m) => (
               <div
                 key={m.id}
-                className="p-4 rounded-2xl bg-[#f8f9fb] border border-[#c5c6d0]/60 flex items-center justify-between"
+                className="p-4 rounded-2xl bg-[#faf8f3] border border-[#e8e1dc] flex items-center justify-between shadow-2xs"
               >
                 <div className="space-y-0.5">
                   <h4 className="font-bold text-sm text-[#4a1f2d]">{m.name}</h4>
-                  <p className="text-xs text-[#757780]">
+                  <p className="text-xs text-[#756a6f]">
                     Relation: {m.relation} • Age: {m.profile.age} years
                   </p>
                 </div>
@@ -999,8 +999,8 @@ export const ProfileView: React.FC = () => {
                   onClick={() => switchFamilyMember(m.id)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeFamilyMemberId === m.id
-                      ? 'bg-[#00462d] text-white'
-                      : 'bg-white text-[#4a1f2d] border border-[#c5c6d0]'
+                      ? 'bg-[#c8a96b] text-[#310a18] shadow-xs'
+                      : 'bg-white text-[#4a1f2d] border border-[#e8e1dc] hover:bg-[#eedfe4]'
                   }`}
                 >
                   {activeFamilyMemberId === m.id ? 'ACTIVE' : 'SWITCH'}
@@ -1013,10 +1013,10 @@ export const ProfileView: React.FC = () => {
 
       {/* Tab 3: Documents Checklist */}
       {activeTab === 'DOCUMENTS' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#c5c6d0]/60 shadow-soft space-y-6">
-          <div className="border-b border-[#edeef0] pb-4">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e8e1dc] shadow-xs space-y-6">
+          <div className="border-b border-[#e8e1dc] pb-4">
             <h3 className="font-bold text-base text-[#4a1f2d]">Civic Document Readiness Locker</h3>
-            <p className="text-xs text-[#44464f]">
+            <p className="text-xs text-[#514346]">
               Check off your ready documents to evaluate immediate application readiness.
             </p>
           </div>
@@ -1031,14 +1031,14 @@ export const ProfileView: React.FC = () => {
                   onClick={() => toggleUserDocument(docName)}
                   className={`p-3.5 rounded-2xl border flex items-center justify-between text-left transition-all cursor-pointer ${
                     hasDoc
-                      ? 'bg-[#94f6c4]/20 border-[#57b98c] text-[#002d1c] font-bold'
-                      : 'bg-white border-[#c5c6d0]/60 text-[#191c1e] hover:border-[#757780]'
+                      ? 'bg-[#eedfe4] border-[#4a1f2d] text-[#4a1f2d] font-bold'
+                      : 'bg-[#faf8f3] border-[#e8e1dc] text-[#21191d] hover:border-[#4a1f2d]'
                   }`}
                 >
                   <span className="text-xs">{docName}</span>
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                      hasDoc ? 'bg-[#94f6c4] text-[#002113]' : 'bg-[#edeef0] text-[#757780]'
+                      hasDoc ? 'bg-[#4a1f2d] text-white' : 'bg-white text-[#756a6f] border border-[#e8e1dc]'
                     }`}
                   >
                     {hasDoc ? 'READY' : 'PENDING'}
@@ -1052,8 +1052,8 @@ export const ProfileView: React.FC = () => {
 
       {/* Add Family Modal */}
       {showAddFamilyModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 border border-[#c5c6d0]/60 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#21191d]/60 backdrop-blur-xs">
+          <div className="bg-[#fff8f8] rounded-3xl max-w-md w-full p-6 border border-[#e8e1dc] shadow-2xl space-y-4">
             <h3 className="font-bold text-base text-[#4a1f2d]">Add Family Member</h3>
             <form onSubmit={handleCreateFamilyMember} className="space-y-4 text-xs">
               <div>
@@ -1061,7 +1061,7 @@ export const ProfileView: React.FC = () => {
                 <select
                   value={newFamilyRelation}
                   onChange={(e) => setNewFamilyRelation(e.target.value)}
-                  className="w-full p-3 rounded-xl border border-[#c5c6d0] text-[#191c1e] font-medium bg-white focus:border-[#092554]"
+                  className="w-full p-3 rounded-xl border border-[#e8e1dc] bg-[#faf8f3] text-[#21191d] font-medium focus:border-[#4a1f2d] outline-none"
                 >
                   <option>Spouse</option>
                   <option>Father</option>
@@ -1079,7 +1079,7 @@ export const ProfileView: React.FC = () => {
                   placeholder="e.g. Meenakshi"
                   value={newFamilyName}
                   onChange={(e) => setNewFamilyName(e.target.value)}
-                  className="w-full p-3 rounded-xl border border-[#c5c6d0] text-[#191c1e] placeholder-[#757780] font-medium bg-white focus:border-[#092554]"
+                  className="w-full p-3 rounded-xl border border-[#e8e1dc] bg-[#faf8f3] text-[#21191d] placeholder-[#6b7280] font-medium focus:border-[#4a1f2d] outline-none"
                   required
                 />
               </div>
@@ -1091,7 +1091,7 @@ export const ProfileView: React.FC = () => {
                   placeholder="e.g. 40"
                   value={newFamilyAge}
                   onChange={(e) => setNewFamilyAge(e.target.value === '' ? '' : Number(e.target.value))}
-                  className="w-full p-3 rounded-xl border border-[#c5c6d0] text-[#191c1e] placeholder-[#757780] font-medium bg-white focus:border-[#092554]"
+                  className="w-full p-3 rounded-xl border border-[#e8e1dc] bg-[#faf8f3] text-[#21191d] placeholder-[#6b7280] font-medium focus:border-[#4a1f2d] outline-none"
                   required
                 />
               </div>
@@ -1100,13 +1100,13 @@ export const ProfileView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddFamilyModal(false)}
-                  className="px-4 py-2 rounded-xl text-[#44464f] hover:bg-[#edeef0] font-bold cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-[#514346] hover:bg-[#eedfe4] font-bold cursor-pointer transition-colors"
                 >
                   CANCEL
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-[#4a1f2d] hover:bg-[#310a18] text-white font-bold cursor-pointer transition-colors shadow-xs"
                 >
                   ADD MEMBER
                 </button>

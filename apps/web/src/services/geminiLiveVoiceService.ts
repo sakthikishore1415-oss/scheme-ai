@@ -170,32 +170,28 @@ export class GeminiLiveVoiceService {
           this.setState('USER_SPEAKING');
         }
 
-        let interim = '';
-        let final = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            final += event.results[i][0].transcript;
-          } else {
-            interim += event.results[i][0].transcript;
+        let finalTranscript = '';
+        let interimTranscript = '';
+
+        for (let i = 0; i < event.results.length; ++i) {
+          const item = event.results[i];
+          if (item && item[0]) {
+            if (item.isFinal) {
+              finalTranscript += item[0].transcript + ' ';
+            } else {
+              interimTranscript += item[0].transcript;
+            }
           }
         }
 
-        if (final.trim()) {
-          this.accumulatedQueryText = (this.accumulatedQueryText ? this.accumulatedQueryText + ' ' : '') + final.trim();
-        }
-        this.currentInterimText = interim.trim();
+        const candidate = (finalTranscript + interimTranscript).trim();
 
-        const candidateText = [this.accumulatedQueryText, this.currentInterimText]
-          .filter(Boolean)
-          .join(' ')
-          .trim();
-
-        if (candidateText) {
+        if (candidate) {
           this.setState('USER_SPEAKING');
-          this.callbacks?.onInterimTranscript?.(candidateText);
+          this.currentInterimText = candidate;
+          this.callbacks?.onInterimTranscript?.(candidate);
 
           // Reset and start 2-second pause silence timer:
-          // When the user pauses for more than 2 seconds, automatically trigger a 'stop listening' event
           if (this.pauseSilenceTimer !== null) {
             clearTimeout(this.pauseSilenceTimer);
             this.pauseSilenceTimer = null;
@@ -218,12 +214,7 @@ export class GeminiLiveVoiceService {
       };
 
       this.recognition.onspeechend = () => {
-        // Speech ended in browser VAD; ensure the 2-second pause triggers 'stop listening'
-        const candidate = [this.accumulatedQueryText, this.currentInterimText]
-          .filter(Boolean)
-          .join(' ')
-          .trim();
-
+        const candidate = this.currentInterimText.trim();
         if (candidate.length >= 1) {
           if (this.pauseSilenceTimer !== null) {
             clearTimeout(this.pauseSilenceTimer);
@@ -293,12 +284,18 @@ export class GeminiLiveVoiceService {
       clearTimeout(this.pauseSilenceTimer);
       this.pauseSilenceTimer = null;
     }
-    this.accumulatedQueryText = '';
     this.currentInterimText = '';
 
     // Guard against duplicate triggers
     if (clean === this.lastProcessedText) return;
     this.lastProcessedText = clean;
+
+    // Stop current recognition turn to flush browser internal buffer
+    if (this.recognition) {
+      try {
+        this.recognition.abort();
+      } catch (_) {}
+    }
 
     this.callbacks?.onInterimTranscript?.('');
     this.callbacks?.onMessage({
@@ -312,10 +309,7 @@ export class GeminiLiveVoiceService {
   }
 
   public commitInterimNow() {
-    const candidate = [this.accumulatedQueryText, this.currentInterimText]
-      .filter(Boolean)
-      .join(' ')
-      .trim();
+    const candidate = this.currentInterimText.trim();
     if (candidate) {
       this.stopListening('manual');
       this.commitTurn(candidate);
@@ -332,10 +326,7 @@ export class GeminiLiveVoiceService {
       this.pauseSilenceTimer = null;
     }
 
-    const candidate = [this.accumulatedQueryText, this.currentInterimText]
-      .filter(Boolean)
-      .join(' ')
-      .trim();
+    const candidate = this.currentInterimText.trim();
 
     // 1. Automatically trigger 'stop listening' event
     this.stopListening('pause_timeout');
@@ -344,6 +335,29 @@ export class GeminiLiveVoiceService {
     if (candidate && candidate !== this.lastProcessedText) {
       this.commitTurn(candidate);
     }
+  }
+
+  /**
+   * Complete Stop: Immediately cancels audio playback, speech generation, and pauses listening.
+   */
+  public stopEverything(): void {
+    if (this.currentAbortController) {
+      try {
+        this.currentAbortController.abort();
+      } catch (_) {}
+      this.currentAbortController = null;
+    }
+    if (this.pauseSilenceTimer !== null) {
+      clearTimeout(this.pauseSilenceTimer);
+      this.pauseSilenceTimer = null;
+    }
+    this.speechQueue = [];
+    this.isProcessingSpeechQueue = false;
+    this.stopPlayback();
+    this.stopListening('manual');
+    this.currentInterimText = '';
+    this.callbacks?.onInterimTranscript?.('');
+    this.setState('IDLE');
   }
 
   private enqueueSpeech(sentence: string) {

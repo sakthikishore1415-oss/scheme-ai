@@ -11,36 +11,36 @@ import {
   Mic,
   MicOff,
   PhoneOff,
-  Sparkles,
-  Shield,
+  Square,
   Globe,
   Send,
   User,
   MessageSquare,
   Volume2,
   CheckCircle2,
-  ArrowRight,
   Radio,
   Waves,
   Keyboard,
   AlertCircle,
   ChevronDown,
   Zap,
+  X,
+  Sparkles,
 } from 'lucide-react';
 
 const BCP47_SPEECH_MAP: Record<string, string> = {
-  ta: 'ta-IN (தமிழ்)',
-  ml: 'ml-IN (മലയാളം)',
-  kn: 'kn-IN (ಕನ್ನಡ)',
-  te: 'te-IN (తెలుగు)',
-  hi: 'hi-IN (हिंदी)',
-  mr: 'mr-IN (मराठी)',
-  bn: 'bn-IN (বাংলা)',
-  gu: 'gu-IN (ગુજરાતી)',
-  or: 'or-IN (ଓଡ଼ିଆ)',
-  pa: 'pa-IN (ਪੰਜਾਬੀ)',
-  as: 'as-IN (অসমীয়া)',
-  en: 'en-IN (English)',
+  ta: 'தமிழ்',
+  ml: 'മലയാളം',
+  kn: 'ಕನ್ನಡ',
+  te: 'తెలుగు',
+  hi: 'हिंदी',
+  mr: 'मराठी',
+  bn: 'বাংলা',
+  gu: 'ગુજરાતી',
+  or: 'ଓଡ଼ିଆ',
+  pa: 'ਪੰਜਾਬੀ',
+  as: 'অসমীয়া',
+  en: 'English',
 };
 
 export const VoiceAssistantModal: React.FC = () => {
@@ -50,7 +50,6 @@ export const VoiceAssistantModal: React.FC = () => {
     selectedVoiceLanguageId,
     setSelectedVoiceLanguageId,
     currentStateConfig,
-    currentLanguageConfig,
     updateUserProfile,
     activeMatches,
     setActiveTab,
@@ -62,21 +61,12 @@ export const VoiceAssistantModal: React.FC = () => {
   const [audioLevel, setAudioLevel] = useState<number>(0);
   const [messages, setMessages] = useState<GeminiLiveMessage[]>([]);
   const [interimTranscript, setInterimTranscript] = useState<string>('');
-  const [isMuted, setIsMuted] = useState<boolean>(false);
   const [showTypingFallback, setShowTypingFallback] = useState<boolean>(false);
   const [typedInput, setTypedInput] = useState<string>('');
   const [voiceSpeed, setVoiceSpeed] = useState<number>(geminiLiveVoiceService.getSpeechRate());
-  const [voiceMode, setVoiceMode] = useState<'fast' | 'studio'>(geminiLiveVoiceService.getVoiceMode());
   const [lastError, setLastError] = useState<string | null>(null);
-  const [isWebSpeechSupported, setIsWebSpeechSupported] = useState<boolean>(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Check Web Speech API support on mount
-  useEffect(() => {
-    const supported = geminiLiveVoiceService.isSpeechRecognitionSupported();
-    setIsWebSpeechSupported(supported);
-  }, []);
 
   // Auto-scroll conversation transcript
   useEffect(() => {
@@ -117,7 +107,7 @@ export const VoiceAssistantModal: React.FC = () => {
           setLastError(err);
         },
         onStopListening: (_reason) => {
-          // Triggered when manual click or automatic 2-second pause triggers stop listening
+          // Triggered when turn completes or pauses
         },
       }
     );
@@ -127,18 +117,16 @@ export const VoiceAssistantModal: React.FC = () => {
     };
   }, [showVoiceModal, selectedVoiceLanguageId, currentStateConfig.name]);
 
-  const handleToggleMute = () => {
-    const muted = geminiLiveVoiceService.toggleMute();
-    setIsMuted(muted);
-  };
-
   const handleEndCall = () => {
     geminiLiveVoiceService.endSession();
     setShowVoiceModal(false);
   };
 
+  const handleStopEverything = () => {
+    geminiLiveVoiceService.stopEverything();
+  };
+
   const handleToggleListening = () => {
-    // Interruption Handler: If assistant is speaking or thinking, immediately halt audio and start listening
     if (voiceState === 'SPEAKING' || voiceState === 'THINKING') {
       geminiLiveVoiceService.interruptAndListen();
       return;
@@ -163,147 +151,130 @@ export const VoiceAssistantModal: React.FC = () => {
     geminiLiveVoiceService.setLanguage(langId);
   };
 
-  const handleSpeedChange = (newSpeed: number) => {
-    geminiLiveVoiceService.setSpeechRate(newSpeed);
-    setVoiceSpeed(newSpeed);
-  };
-
-  const handleVoiceModeChange = (mode: 'fast' | 'studio') => {
-    geminiLiveVoiceService.setVoiceMode(mode);
-    setVoiceMode(mode);
-  };
-
-  const handleCommitInterimNow = () => {
-    geminiLiveVoiceService.commitInterimNow();
+  const handleSpeedChange = () => {
+    const nextSpeed = voiceSpeed === 1.0 ? 1.25 : voiceSpeed === 1.25 ? 1.5 : 1.0;
+    geminiLiveVoiceService.setSpeechRate(nextSpeed);
+    setVoiceSpeed(nextSpeed);
   };
 
   const getStatusBadge = () => {
     switch (voiceState) {
       case 'CONNECTING':
-        return { label: 'CONNECTING...', color: 'bg-[#fef7ee] text-[#b45309] border-[#fde68a]' };
+        return { label: 'Connecting...', color: 'bg-[#fef7ee] text-[#b45309] border-[#fde68a]' };
       case 'LISTENING':
-        return voiceMode === 'fast'
-          ? { label: '⚡ FAST VOICE ACTIVE • LISTENING', color: 'bg-[#f0fdf4] text-[#15803d] border-[#bbf7d0]' }
-          : { label: 'WEB SPEECH ACTIVE • LISTENING', color: 'bg-[#f0fdf4] text-[#15803d] border-[#bbf7d0]' };
+        return { label: 'Listening...', color: 'bg-[#f0fdf4] text-[#15803d] border-[#bbf7d0]' };
       case 'USER_SPEAKING':
-        return { label: 'HEARING YOUR VOICE...', color: 'bg-[#ecfdf5] text-[#047857] border-[#a7f3d0]' };
+        return { label: 'Hearing you...', color: 'bg-[#ecfdf5] text-[#047857] border-[#a7f3d0]' };
       case 'THINKING':
-        return voiceMode === 'fast'
-          ? { label: '⚡ STREAMING FAST REPLY...', color: 'bg-[#faf5ff] text-[#7e22ce] border-[#e9d5ff]' }
-          : { label: 'GEMINI THINKING...', color: 'bg-[#faf5ff] text-[#7e22ce] border-[#e9d5ff]' };
+        return { label: 'Thinking...', color: 'bg-[#faf5ff] text-[#7e22ce] border-[#e9d5ff]' };
       case 'SPEAKING':
-        return voiceSpeed > 1.0
-          ? { label: `ARIVOM SPEAKING (${voiceSpeed}x) ⚡`, color: 'bg-[#fdf2f8] text-[#9d174d] border-[#fbcfe8]' }
-          : { label: 'ARIVOM SPEAKING...', color: 'bg-[#fdf2f8] text-[#9d174d] border-[#fbcfe8]' };
-      case 'INTERRUPTED':
-        return { label: 'INTERRUPTED (LISTENING)', color: 'bg-[#fff7ed] text-[#c2410c] border-[#fed7aa]' };
-      case 'ERROR':
-        return { label: 'MICROPHONE NOTICE', color: 'bg-[#fef2f2] text-[#b91c1c] border-[#fecaca]' };
+        return { label: `Speaking (${voiceSpeed}x)`, color: 'bg-[#fdf2f8] text-[#9d174d] border-[#fbcfe8]' };
+      case 'IDLE':
+        return { label: 'Paused / Idle', color: 'bg-[#f3f4f6] text-[#4b5563] border-[#e5e7eb]' };
       default:
-        return { label: 'READY TO SPEAK', color: 'bg-[#f8fafc] text-[#475569] border-[#e2e8f0]' };
+        return { label: 'Ready', color: 'bg-[#f8fafc] text-[#475569] border-[#e2e8f0]' };
     }
   };
 
   const starterSuggestions: Record<string, string[]> = {
     ta: [
-      'வணக்கம்! நீங்கள் எப்படி எனக்கு உதவ முடியும்?',
       'விவசாயிகளுக்கான உதவி திட்டங்கள் என்ன?',
       'மாணவர்களுக்கான கல்வி உதவித்தொகை பற்றி கூறுங்கள்.',
+      'மகளிர் உரிமைத்தொகை பெற என்ன தகுதி வேண்டும்?',
     ],
     ml: [
-      'നമസ്കാരം! എനിക്ക് എന്തൊക്കെ സഹായം ലഭിക്കും?',
       'കർഷകർക്കുള്ള പ്രധാന ആനുകൂല്യങ്ങൾ എന്തൊക്കെയാണ്?',
       'വിദ്യാർത്ഥികൾക്കുള്ള സ്കോളർഷിപ്പുകളെക്കുറിച്ച് പറയൂ.',
-    ],
-    kn: [
-      'ನಮಸ್ಕಾರ! ನೀವು ನನಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು?',
-      'ರೈತರಿಗೆ ಲಭ್ಯವಿರುವ ಪ್ರಮುಖ ಯೋಜನೆಗಳು ಯಾವುವು?',
-      'ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ವಿದ್ಯಾರ್ಥಿವೇತನದ ವಿವರಗಳನ್ನು ತಿಳಿಸಿ.',
-    ],
-    te: [
-      'నమస్కారం! మీరు నాకు ఎలా సహాయపడగలరు?',
-      'రైతుల కోసం ఉన్న ప్రభుత్వ పథకాలు ఏమిటి?',
-      'విద్యార్థుల స్కాలర్‌షిప్‌ల గురించి చెప్పండి.',
+      'വനിതാ സ്വയംതൊഴിൽ വായ്പകൾ എന്തൊക്കെയാണ്?',
     ],
     hi: [
-      'नमस्ते! आप मेरी कैसे मदद कर सकते हैं?',
       'किसानों के लिए प्रमुख सरकारी योजनाएं क्या हैं?',
       'उच्च शिक्षा के लिए छात्रवृत्ति कैसे मिलती है?',
+      'महिलाओं के लिए स्वरोजगार योजनाएं कौन सी हैं?',
+    ],
+    te: [
+      'రైతుల కోసం ఉన్న ప్రభుత్వ పథకాలు ఏమిటి?',
+      'విద్యార్థుల స్కాలర్‌షిప్‌ల గురించి చెప్పండి.',
+      'మహిళా సంక్షేమ పథకాలు ఏమిటి?',
+    ],
+    kn: [
+      'ರೈತರಿಗೆ ಲಭ್ಯವಿರುವ ಪ್ರಮುಖ ಯೋಜನೆಗಳು ಯಾವುವು?',
+      'ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ವಿದ್ಯಾರ್ಥಿವೇತನದ ವಿವರಗಳನ್ನು ತಿಳಿಸಿ.',
+      'ಮಹಿಳಾ ಸ್ವಯಂ ಉದ್ಯೋಗ ಯೋಜನೆಗಳು ಯಾವುವು?',
     ],
     mr: [
-      'नमस्कार! तुम्ही मला कशी मदत करू शकता?',
       'शेतकऱ्यांसाठी कोणत्या शासकीय योजना आहेत?',
       'विद्यार्थ्यांसाठी शिष्यवृत्तींची माहिती सांगा.',
+      'महिलांसाठी स्वयंरोजगार योजना कोणत्या आहेत?',
     ],
     bn: [
-      'নমস্কার! আপনি আমাকে কীভাবে সাহায্য করতে পারেন?',
       'কৃষকদের জন্য সরকারি প্রকল্পগুলো কী কী?',
       'ছাত্রছাত্রীদের স্কলারশিপের তথ্য জানান।',
+      'মহিলাদের জন্য স্বনির্ভর প্রকল্প কী কী আছে?',
     ],
     gu: [
-      'નમસ્તે! તમે મને કેવી રીતે મદદ કરી શકો છો?',
       'ખેડૂતો માટે કઈ સરકારી સહાય યોજનાઓ છે?',
       'વિદ્યાર્થીઓ માટે શિષ્યવૃત્તિની માહિતી આપો.',
+      'મહિલાઓ માટે સહાય યોજનાઓ કઈ છે?',
     ],
     or: [
-      'ନମସ୍କାର! ଆପଣ ମୋତେ କିପରି ସାହାଯ୍ୟ କରିପାରିବେ?',
       'କୃଷକମାନଙ୍କ ପାଇଁ କ’ଣ ସରକାରୀ ଯୋଜନା ଅଛି?',
       'ଛାତ୍ରବୃତ୍ତି ସମ୍ପର୍କରେ ସୂଚନା ଦିଅନ୍ତୁ।',
+      'ମହିଳାମାନଙ୍କ ପାଇଁ କଲ୍ୟାଣ ଯୋଜନା କ’ଣ?',
     ],
     pa: [
-      'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਤੁਸੀਂ ਮੇਰੀ ਕਿਵੇਂ ਮਦਦ ਕਰ ਸਕਦੇ ਹੋ?',
       'ਕਿਸਾਨਾਂ ਲਈ ਸਰਕਾਰੀ ਸਕੀਮਾਂ ਕਿਹੜੀਆਂ ਹਨ?',
       'ਵਿਦਿਆਰਥੀਆਂ ਲਈ ਵਜ਼ੀਫ਼ੇ ਦੀ ਜਾਣਕਾਰੀ ਦਿਓ।',
+      'ਔਰਤਾਂ ਲਈ ਸਵੈ-ਰੁਜ਼ਗਾਰ ਸਕੀਮਾਂ ਕਿਹੜੀਆਂ ਹਨ?',
     ],
     as: [
-      'নমস্কাৰ! আপুনি মোক কিদৰে সহায় কৰিব পাৰিব?',
       'কৃষকসকলৰ বাবে চৰকাৰী আঁচনি কি কি আছে?',
       'ছাত্ৰ-ছাত্ৰীৰ বাবে জলপানীৰ তথ্য দিয়ক।',
+      'মহিলাসকলৰ বাবে কি আঁচনি আছে?',
     ],
     en: [
-      'Hello! How can you help me today?',
-      'Tell me about welfare initiatives for farmers.',
-      'What scholarships are available for college students?',
+      'Tell me about welfare schemes for farmers.',
+      'What scholarships are available for students?',
+      'What are the pension schemes for seniors?',
     ],
   };
 
   const currentStarters = starterSuggestions[selectedVoiceLanguageId] || starterSuggestions.en;
   const status = getStatusBadge();
-  const speechLangLabel = BCP47_SPEECH_MAP[selectedVoiceLanguageId] || 'ta-IN';
   const currentLang = SUPPORTED_LANGUAGES[selectedVoiceLanguageId] || SUPPORTED_LANGUAGES['ta'];
 
   if (!showVoiceModal) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-[#21191d]/50 backdrop-blur-xs animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-[#21191d]/60 backdrop-blur-xs animate-fade-in">
       {/* Sovereign Light Mode Modal Container */}
-      <div className="bg-[#fff8f8] text-[#21191d] w-full h-full sm:h-[92vh] sm:max-w-5xl sm:rounded-3xl flex flex-col shadow-2xl border border-[#e8e1dc] overflow-hidden relative">
+      <div className="bg-[#fff8f8] text-[#21191d] w-full h-full sm:h-[90vh] sm:max-w-4xl sm:rounded-3xl flex flex-col shadow-2xl border border-[#e8e1dc] overflow-hidden relative">
+        
         {/* ========================================================= */}
-        {/* TOP BAR: Brand, Live Voice Status, Controls (Light Theme) */}
+        {/* COMPACT CLEAN HEADER */}
         {/* ========================================================= */}
-        <div className="p-4 sm:p-5 flex items-center justify-between border-b border-[#e8e1dc] bg-[#faf8f3]">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#4a1f2d] text-white flex items-center justify-center font-black text-base shadow-xs shrink-0">
+        <div className="px-4 py-3 sm:px-6 sm:py-3.5 flex items-center justify-between border-b border-[#e8e1dc] bg-[#faf8f3] shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-full bg-[#4a1f2d] text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
               {getLanguageInitial(selectedVoiceLanguageId)}
             </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-bold text-[#4a1f2d] tracking-wider uppercase flex items-center gap-1.5">
-                  <Radio className="w-3.5 h-3.5 text-[#4a1f2d] animate-pulse" />
-                  Web Speech Direct Voice
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-[#4a1f2d] truncate">
+                  Arivom Voice
                 </span>
-                <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold border ${status.color}`}>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${status.color}`}>
                   {status.label}
                 </span>
               </div>
-              <p className="text-[11px] text-[#756a6f]">
-                🎙️ Speech Locale: <strong className="text-[#21191d]">{speechLangLabel}</strong> • 📍 {currentStateConfig.name} • 🏛️ Civic Scheme Assistant • ⏱️ 2s Auto-Stop on Pause
+              <p className="text-[11px] text-[#756a6f] truncate hidden sm:block">
+                📍 {currentStateConfig.name} • 🌐 {currentLang.nativeName}
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Conversation Language Selector Dropdown (All 12 Indian Languages) */}
+          <div className="flex items-center gap-2">
+            {/* Language Selector Dropdown */}
             <div className="relative">
               <div className="flex items-center rounded-xl bg-white hover:bg-[#faf8f3] border border-[#e8e1dc] px-2.5 py-1.5 transition-colors text-xs font-bold shadow-xs">
                 <Globe className="w-3.5 h-3.5 text-[#4a1f2d] shrink-0 mr-1.5" />
@@ -312,7 +283,7 @@ export const VoiceAssistantModal: React.FC = () => {
                   value={selectedVoiceLanguageId}
                   onChange={(e) => handleLanguageSelect(e.target.value)}
                   className="bg-transparent text-[#21191d] font-bold text-xs outline-none cursor-pointer pr-4 appearance-none"
-                  title="Select voice conversation and universal website language"
+                  title="Select voice language"
                 >
                   {LANGUAGE_LIST.map((lang) => (
                     <option key={lang.id} value={lang.id} className="bg-white text-[#21191d]">
@@ -324,279 +295,124 @@ export const VoiceAssistantModal: React.FC = () => {
               </div>
             </div>
 
-            {/* Mute Toggle */}
+            {/* Voice Speed Toggle */}
             <button
               type="button"
-              id="voice-mute-toggle-btn"
-              onClick={handleToggleMute}
-              className={`p-2 rounded-xl transition-colors cursor-pointer border shadow-xs ${
-                isMuted
-                  ? 'bg-[#ffdad6] text-[#ba1a1a] border-[#ba1a1a]/40'
-                  : 'bg-white hover:bg-[#eedfe4] text-[#21191d] border-[#e8e1dc]'
-              }`}
-              title={isMuted ? 'Unmute Mic' : 'Mute Mic'}
+              id="voice-speed-pill-btn"
+              onClick={handleSpeedChange}
+              className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#eedfe4] border border-[#e8e1dc] text-xs font-bold text-[#4a1f2d] transition-colors cursor-pointer shadow-xs"
+              title="Toggle speech rate"
             >
-              {isMuted ? <MicOff className="w-4 h-4 text-[#ba1a1a]" /> : <Mic className="w-4 h-4 text-[#4a1f2d]" />}
+              {voiceSpeed}x
             </button>
 
-            {/* End Call Button */}
+            {/* Matches Quick Link */}
+            {activeMatches.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  geminiLiveVoiceService.endSession();
+                  setShowVoiceModal(false);
+                  setActiveTab('matches');
+                }}
+                className="hidden md:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#eedfe4] text-[#4a1f2d] hover:bg-[#e2cbd3] text-xs font-bold transition-colors cursor-pointer shadow-xs"
+              >
+                <Sparkles className="w-3 h-3" />
+                <span>{activeMatches.length} Matches</span>
+              </button>
+            )}
+
+            {/* Close Button */}
             <button
               type="button"
-              id="voice-end-call-btn"
+              id="voice-modal-close-icon-btn"
               onClick={handleEndCall}
-              className="p-2 rounded-xl bg-[#ba1a1a] hover:bg-[#93000a] text-white transition-colors cursor-pointer border border-[#ba1a1a] shadow-xs"
-              title="End Voice Conversation"
+              className="p-1.5 sm:p-2 rounded-xl bg-white hover:bg-[#ffdad6] text-[#756a6f] hover:text-[#ba1a1a] border border-[#e8e1dc] transition-colors cursor-pointer shadow-xs"
+              title="Close Voice Assistant"
             >
-              <PhoneOff className="w-4 h-4" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* ========================================================= */}
-        {/* MULTI-LANGUAGE SELECTOR STRIP: Displays all 12 Languages */}
-        {/* ========================================================= */}
-        <div className="px-4 py-2.5 bg-[#fbf9f5] border-b border-[#e8e1dc] flex flex-wrap items-center justify-between gap-2.5 text-xs">
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <span className="text-[10px] font-bold text-[#4a1f2d] uppercase tracking-wider flex items-center gap-1.5 shrink-0">
-              <Globe className="w-3.5 h-3.5 text-[#4a1f2d]" />
-              Languages ({LANGUAGE_LIST.length}):
-            </span>
-            {/* Scrollable pill container of all supported languages */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-              {LANGUAGE_LIST.map((lang) => {
-                const isSelected = selectedVoiceLanguageId === lang.id;
-                return (
-                  <button
-                    key={lang.id}
-                    type="button"
-                    id={`voice-lang-btn-${lang.id}`}
-                    onClick={() => handleLanguageSelect(lang.id)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-1 ${
-                      isSelected
-                        ? 'bg-[#4a1f2d] text-white shadow-xs'
-                        : 'bg-white text-[#514346] hover:text-[#21191d] hover:bg-[#eedfe4] border border-[#e8e1dc]'
-                    }`}
-                    title={`Switch voice conversation to ${lang.name} (${lang.nativeName})`}
-                  >
-                    <span>{lang.nativeName}</span>
-                    {isSelected && <CheckCircle2 className="w-3 h-3 text-white" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="text-[11px] text-[#756a6f] flex items-center gap-1.5 shrink-0 hidden sm:flex">
-            <span className="w-2 h-2 rounded-full bg-[#15803d] shrink-0 animate-pulse" />
-            <span>Universal Sync: applies to voice & entire site</span>
-          </div>
-        </div>
-
-        {/* Web Speech API browser compatibility notice if unsupported */}
-        {!isWebSpeechSupported && (
-          <div className="p-3 bg-[#fef2f2] border-b border-[#fecaca] text-[#b91c1c] text-xs flex items-center justify-between px-4">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-[#b91c1c] shrink-0" />
-              <span>
-                Web Speech API is not natively supported in this browser. Please use <strong>Google Chrome</strong> or <strong>Microsoft Edge</strong> for direct microphone speech, or use text typing below.
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowTypingFallback(true)}
-              className="px-2.5 py-1 rounded-lg bg-[#4a1f2d] text-white font-bold text-[11px]"
-            >
-              Switch to Typing
-            </button>
-          </div>
-        )}
-
-        {/* ========================================================= */}
-        {/* MAIN BODY: Split Voice Orb & Live Transcript Stream */}
+        {/* MAIN BODY: Spacious Visualizer + Conversational Feed */}
         {/* ========================================================= */}
         <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0 relative">
-          {/* LEFT: Living Animated Voice Visualizer Stage (Light Theme) */}
-          <div className="lg:col-span-5 p-3 sm:p-6 flex flex-col items-center justify-center text-center space-y-1.5 sm:space-y-4 border-b lg:border-b-0 lg:border-r border-[#e8e1dc] bg-[#faf8f3] relative max-h-[30vh] lg:max-h-none shrink-0 overflow-y-auto">
-            <VoiceOrbVisualizer
-              state={
-                voiceState === 'SPEAKING'
-                  ? 'SPEAKING'
-                  : voiceState === 'USER_SPEAKING' || voiceState === 'LISTENING'
-                  ? 'LISTENING'
-                  : voiceState === 'THINKING'
-                  ? 'THINKING'
-                  : 'READY'
-              }
-              soundLevel={audioLevel}
-              onClick={handleToggleListening}
-              size={typeof window !== 'undefined' && window.innerWidth < 640 ? 100 : 160}
-              langInitial={getLanguageInitial(selectedVoiceLanguageId)}
-            />
+          
+          {/* LEFT: Compact Live Orb Stage (Visible on Desktop / Compact on Mobile) */}
+          <div className="lg:col-span-4 p-3 sm:p-6 flex flex-col items-center justify-center text-center border-b lg:border-b-0 lg:border-r border-[#e8e1dc] bg-[#faf8f3] shrink-0">
+            <div className="my-auto py-2 flex flex-col items-center">
+              <VoiceOrbVisualizer
+                state={
+                  voiceState === 'SPEAKING'
+                    ? 'SPEAKING'
+                    : voiceState === 'USER_SPEAKING' || voiceState === 'LISTENING'
+                    ? 'LISTENING'
+                    : voiceState === 'THINKING'
+                    ? 'THINKING'
+                    : 'READY'
+                }
+                soundLevel={audioLevel}
+                onClick={handleToggleListening}
+                size={typeof window !== 'undefined' && window.innerWidth < 1024 ? 90 : 150}
+                langInitial={getLanguageInitial(selectedVoiceLanguageId)}
+              />
 
-            <div className="space-y-0.5 sm:space-y-1">
-              <span className="text-xs font-bold text-[#4a1f2d] tracking-wider uppercase block">
-                {voiceState === 'SPEAKING'
-                  ? 'Arivom Speaking'
-                  : voiceState === 'USER_SPEAKING'
-                  ? 'Hearing Your Voice...'
-                  : voiceState === 'THINKING'
-                  ? 'Gemini Thinking...'
-                  : 'Speak Directly to AI'}
-              </span>
-              <p className="text-[11px] sm:text-xs text-[#514346] max-w-xs leading-tight sm:leading-relaxed hidden sm:block">
-                No typing required. Speak aloud in <strong>{currentLang.nativeName} ({currentLang.name})</strong>—pausing for 2 seconds automatically stops listening and asks your query.
-              </p>
+              <div className="mt-3 space-y-1">
+                <p className="text-xs font-bold text-[#4a1f2d]">
+                  {voiceState === 'SPEAKING'
+                    ? 'Arivom Speaking'
+                    : voiceState === 'USER_SPEAKING'
+                    ? 'Hearing you...'
+                    : voiceState === 'THINKING'
+                    ? 'Thinking...'
+                    : voiceState === 'LISTENING'
+                    ? 'Listening... Speak now'
+                    : 'Tap Mic to Speak'}
+                </p>
+                <p className="text-[11px] text-[#756a6f] max-w-[220px] hidden lg:block leading-tight">
+                  Speak in <strong>{currentLang.nativeName}</strong>. 2-second pause automatically answers.
+                </p>
+              </div>
             </div>
 
-            {/* Direct Speech Recognition Action Button */}
-            <button
-              type="button"
-              id="voice-visualizer-main-action-btn"
-              onClick={handleToggleListening}
-              className={`px-5 py-2.5 rounded-full font-bold text-xs transition-all cursor-pointer flex items-center gap-2 border shadow-sm ${
-                voiceState === 'SPEAKING' || voiceState === 'THINKING'
-                  ? 'bg-[#fef2f2] text-[#b91c1c] border-[#fecaca] hover:bg-[#fee2e2] active:scale-95 shadow-md'
-                  : voiceState === 'LISTENING' || voiceState === 'USER_SPEAKING'
-                  ? 'bg-[#15803d] text-white border-[#15803d] hover:bg-[#166534] animate-pulse'
-                  : 'bg-[#4a1f2d] hover:bg-[#310a18] text-white border-[#4a1f2d]'
-              }`}
-              title={
-                voiceState === 'SPEAKING' || voiceState === 'THINKING'
-                  ? 'Click to stop assistant playback immediately and start listening'
-                  : 'Toggle microphone'
-              }
-            >
-              {voiceState === 'SPEAKING' ? (
-                <>
-                  <MicOff className="w-4 h-4 text-[#b91c1c] animate-pulse" />
-                  <span>Tap to Interrupt & Speak</span>
-                </>
-              ) : voiceState === 'THINKING' ? (
-                <>
-                  <Mic className="w-4 h-4 text-[#b91c1c]" />
-                  <span>Thinking... Tap to Interrupt</span>
-                </>
-              ) : voiceState === 'USER_SPEAKING' ? (
-                <>
-                  <Waves className="w-4 h-4 text-white animate-pulse" />
-                  <span>Hearing voice • Auto-stops after 2s pause</span>
-                </>
-              ) : voiceState === 'LISTENING' ? (
-                <>
-                  <Waves className="w-4 h-4 text-white animate-pulse" />
-                  <span>Microphone Active • Speak Now</span>
-                </>
-              ) : (
-                <>
-                  <Mic className="w-4 h-4 text-white" />
-                  <span>Tap to Speak to AI</span>
-                </>
-              )}
-            </button>
-
             {lastError && (
-              <p className="text-[11px] text-[#b91c1c] bg-[#fef2f2] border border-[#fecaca] px-3 py-1.5 rounded-xl max-w-xs">
+              <p className="text-[11px] text-[#b91c1c] bg-[#fef2f2] border border-[#fecaca] px-3 py-1 rounded-xl max-w-xs mt-2">
                 {lastError}
               </p>
             )}
           </div>
 
-          {/* RIGHT: Real-time Live Conversational Transcript (Light Theme) */}
-          <div className="lg:col-span-7 flex flex-col h-full bg-white overflow-hidden">
-            <div className="p-2.5 px-4 border-b border-[#e8e1dc] flex flex-wrap items-center justify-between gap-2 text-xs bg-[#faf8f3]">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-[#21191d] flex items-center gap-1.5">
-                  <MessageSquare className="w-3.5 h-3.5 text-[#4a1f2d]" />
-                  Live Conversation
-                </span>
-                <span className="text-[10px] text-[#4a1f2d] font-mono font-bold bg-[#eedfe4] px-2 py-0.5 rounded-md">
-                  {messages.length} turns
-                </span>
-              </div>
-
-              {/* Fast Reply & Speech Speed Controls */}
-              <div className="flex items-center gap-1.5 ml-auto">
-                <div className="flex items-center bg-white border border-[#e8e1dc] rounded-lg p-0.5 shadow-2xs text-[11px]">
-                  <button
-                    type="button"
-                    id="speed-opt-normal"
-                    onClick={() => handleSpeedChange(1.0)}
-                    className={`px-2 py-0.5 rounded-md font-semibold transition-colors cursor-pointer ${
-                      voiceSpeed === 1.0 ? 'bg-[#4a1f2d] text-white' : 'text-[#756a6f] hover:text-[#21191d]'
-                    }`}
-                    title="Normal 1.0x Voice Cadence"
-                  >
-                    1.0x
-                  </button>
-                  <button
-                    type="button"
-                    id="speed-opt-fast"
-                    onClick={() => handleSpeedChange(1.15)}
-                    className={`px-2 py-0.5 rounded-md font-semibold transition-colors cursor-pointer flex items-center gap-1 ${
-                      voiceSpeed === 1.15 ? 'bg-[#15803d] text-white' : 'text-[#756a6f] hover:text-[#15803d]'
-                    }`}
-                    title="Fast 1.15x Instant Voice Cadence"
-                  >
-                    ⚡ Fast
-                  </button>
-                  <button
-                    type="button"
-                    id="speed-opt-turbo"
-                    onClick={() => handleSpeedChange(1.35)}
-                    className={`px-2 py-0.5 rounded-md font-semibold transition-colors cursor-pointer flex items-center gap-0.5 ${
-                      voiceSpeed === 1.35 ? 'bg-[#b45309] text-white' : 'text-[#756a6f] hover:text-[#b45309]'
-                    }`}
-                    title="Turbo 1.35x Rapid Voice Cadence"
-                  >
-                    🚀 Turbo
-                  </button>
-                </div>
-
-                {/* Instant Stream vs Studio Mode */}
-                <button
-                  type="button"
-                  id="voice-engine-mode-toggle"
-                  onClick={() => handleVoiceModeChange(voiceMode === 'fast' ? 'studio' : 'fast')}
-                  className={`px-2 py-1 rounded-lg text-[11px] font-bold border transition-colors cursor-pointer flex items-center gap-1 ${
-                    voiceMode === 'fast'
-                      ? 'bg-[#ecfdf5] text-[#15803d] border-[#86efac]'
-                      : 'bg-white text-[#756a6f] border-[#e8e1dc] hover:bg-[#faf8f3]'
-                  }`}
-                  title={voiceMode === 'fast' ? 'Instant Streaming Reply Active (Sub-second)' : 'Studio TTS Active'}
-                >
-                  {voiceMode === 'fast' ? '⚡ Instant Reply' : '🎙️ Studio Voice'}
-                </button>
-              </div>
-            </div>
-
-            {/* Scrollable Message List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-white">
+          {/* RIGHT: Live Conversational Transcript (Spacious & Clean) */}
+          <div className="lg:col-span-8 flex flex-col h-full bg-white overflow-hidden">
+            
+            {/* Scrollable Message Feed */}
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3.5 bg-white">
               {messages.length === 0 && !interimTranscript ? (
-                <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4 text-[#756a6f]">
-                  <div className="w-14 h-14 rounded-full bg-[#faf8f3] border border-[#e8e1dc] flex items-center justify-center text-[#4a1f2d]">
-                    <Mic className="w-7 h-7 animate-pulse" />
+                <div className="h-full flex flex-col items-center justify-center text-center p-4 space-y-4 text-[#756a6f] my-auto">
+                  <div className="w-12 h-12 rounded-full bg-[#faf8f3] border border-[#e8e1dc] flex items-center justify-center text-[#4a1f2d]">
+                    <Mic className="w-6 h-6 animate-pulse" />
                   </div>
                   <div className="space-y-1 max-w-sm">
                     <p className="text-sm font-bold text-[#21191d]">Speak directly to Arivom</p>
                     <p className="text-xs text-[#514346] leading-relaxed">
-                      Powered by the browser's Web Speech API. Ask anything in <strong>{currentLang.nativeName}</strong> without typing.
+                      Ask any government scheme question in <strong>{currentLang.nativeName}</strong>.
                     </p>
                   </div>
 
                   <div className="w-full space-y-1.5 pt-2 max-w-md">
                     <span className="text-[10px] font-bold text-[#4a1f2d] uppercase tracking-wider block text-left">
-                      Suggested Voice Questions (Tap to Speak):
+                      Suggested Questions (Tap to Ask):
                     </span>
                     {currentStarters.map((starter, i) => (
                       <button
                         key={i}
                         type="button"
-                        id={`voice-starter-btn-${i}`}
                         onClick={() => geminiLiveVoiceService.sendTextMessage(starter)}
-                        className="w-full p-2.5 px-3.5 rounded-xl bg-[#faf8f3] hover:bg-[#eedfe4] border border-[#e8e1dc] text-left text-xs text-[#21191d] transition-colors cursor-pointer flex items-center justify-between group shadow-2xs"
+                        className="w-full p-2.5 px-3.5 rounded-xl bg-[#faf8f3] hover:bg-[#eedfe4] border border-[#e8e1dc] text-left text-xs font-medium text-[#21191d] transition-colors cursor-pointer shadow-2xs"
                       >
-                        <span className="line-clamp-1">{starter}</span>
-                        <ArrowRight className="w-3.5 h-3.5 text-[#4a1f2d] opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2" />
+                        💬 {starter}
                       </button>
                     ))}
                   </div>
@@ -631,24 +447,17 @@ export const VoiceAssistantModal: React.FC = () => {
                                 isUser ? 'text-white/90' : 'text-[#4a1f2d]'
                               }`}
                             >
-                              {isUser ? (
-                                <>
-                                  <Mic className="w-3 h-3" />
-                                  Citizen Voice
-                                </>
-                              ) : (
-                                'Arivom Scheme Advisor'
-                              )}
+                              {isUser ? 'Citizen' : 'Arivom AI'}
                             </span>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5">
                               {!isUser && (
                                 <button
                                   type="button"
                                   onClick={() => geminiLiveVoiceService.speak(msg.text)}
                                   className="opacity-80 hover:opacity-100 transition-opacity p-0.5 cursor-pointer text-[#4a1f2d]"
-                                  title="Replay voice"
+                                  title="Replay audio"
                                 >
-                                  <Volume2 className="w-3 h-3" />
+                                  <Volume2 className="w-3.5 h-3.5" />
                                 </button>
                               )}
                               <span className={`text-[9px] font-mono ${isUser ? 'text-white/70' : 'text-[#756a6f]'}`}>
@@ -677,33 +486,17 @@ export const VoiceAssistantModal: React.FC = () => {
                     );
                   })}
 
-                  {/* Real-time Web Speech Interim Transcription Bubble */}
+                  {/* Real-time Interim Transcription Bubble */}
                   {interimTranscript && (
                     <div className="flex items-start gap-2.5 justify-end animate-fade-in">
-                      <div className="max-w-[85%] p-3 rounded-2xl bg-[#f0fdf4] border border-[#86efac] text-[#166534] rounded-tr-xs shadow-xs ml-auto space-y-2">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-1.5 text-[10px] text-[#15803d] font-bold uppercase tracking-wider">
-                            <Waves className="w-3 h-3 text-[#15803d] animate-pulse" />
-                            <span>Hearing your voice...</span>
-                            <span className="text-[9px] bg-[#dcfce7] text-[#166534] px-1.5 py-0.5 rounded-full font-mono font-medium">Auto-stops on 2s pause</span>
-                          </div>
-                          <button
-                            type="button"
-                            id="interim-send-now-btn"
-                            onClick={handleCommitInterimNow}
-                            className="px-2 py-0.5 rounded-full bg-[#15803d] text-white text-[10px] font-bold hover:bg-[#166534] transition-colors cursor-pointer flex items-center gap-1 shadow-2xs"
-                            title="Reply immediately without 2-second pause"
-                          >
-                            <span>Reply Now</span>
-                            <Zap className="w-2.5 h-2.5" />
-                          </button>
+                      <div className="max-w-[85%] p-3 rounded-2xl bg-[#f0fdf4] border border-[#86efac] text-[#166534] rounded-tr-xs shadow-xs ml-auto space-y-1">
+                        <div className="flex items-center gap-1.5 text-[10px] text-[#15803d] font-bold uppercase tracking-wider">
+                          <Waves className="w-3 h-3 text-[#15803d] animate-pulse" />
+                          <span>Hearing you...</span>
                         </div>
                         <p className="text-xs sm:text-sm font-medium italic text-[#166534]">
                           "{interimTranscript}"
                         </p>
-                      </div>
-                      <div className="w-7 h-7 rounded-full bg-[#bbf7d0] text-[#15803d] flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 animate-pulse">
-                        <Mic className="w-3.5 h-3.5" />
                       </div>
                     </div>
                   )}
@@ -714,142 +507,104 @@ export const VoiceAssistantModal: React.FC = () => {
             </div>
 
             {/* ===================================================== */}
-            {/* VOICE-FIRST PRIMARY CONTROL BAR (Bypasses Typing) */}
+            {/* UNIFIED STREAMLINED CONTROL DOCK WITH STOP BUTTON */}
             {/* ===================================================== */}
-            <div className="p-3.5 bg-[#faf8f3] border-t border-[#e8e1dc] space-y-2">
-              {/* Active Voice Input Action Bar */}
-              <div className="flex items-center justify-between gap-3">
+            <div className="p-3 sm:p-4 bg-[#faf8f3] border-t border-[#e8e1dc] space-y-2 shrink-0">
+              <div className="flex items-center gap-2">
+                
+                {/* 1. Main Mic / Speak Button */}
                 <button
                   type="button"
-                  id="voice-main-input-bar-btn"
+                  id="voice-main-toggle-btn"
                   onClick={handleToggleListening}
-                  className={`flex-1 p-3 rounded-2xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2.5 border shadow-sm ${
+                  className={`flex-1 py-3 px-4 rounded-2xl font-bold text-xs transition-all cursor-pointer flex items-center justify-center gap-2 border shadow-sm ${
                     voiceState === 'SPEAKING' || voiceState === 'THINKING'
-                      ? 'bg-[#fef2f2] text-[#b91c1c] border-[#fecaca] hover:bg-[#fee2e2] active:scale-95 shadow-md'
-                      : voiceState === 'USER_SPEAKING'
-                      ? 'bg-[#15803d] text-white border-[#15803d] shadow-sm animate-pulse'
-                      : voiceState === 'LISTENING'
-                      ? 'bg-[#15803d] hover:bg-[#166534] text-white border-[#15803d] shadow-sm'
+                      ? 'bg-[#ecfdf5] text-[#15803d] border-[#86efac] hover:bg-[#dcfce7]'
+                      : voiceState === 'USER_SPEAKING' || voiceState === 'LISTENING'
+                      ? 'bg-[#15803d] hover:bg-[#166534] text-white border-[#15803d] animate-pulse'
                       : 'bg-[#4a1f2d] hover:bg-[#310a18] text-white border-[#4a1f2d]'
                   }`}
-                  title={
-                    voiceState === 'SPEAKING' || voiceState === 'THINKING'
-                      ? 'Click to interrupt assistant immediately and start speaking'
-                      : 'Toggle microphone'
-                  }
+                  title="Toggle Microphone"
                 >
                   {voiceState === 'SPEAKING' ? (
                     <>
-                      <MicOff className="w-4 h-4 text-[#b91c1c] animate-pulse" />
-                      <span>Speaking now — Tap to interrupt & speak</span>
+                      <Waves className="w-4 h-4 text-[#15803d] animate-pulse" />
+                      <span>Speaking... Tap to interrupt</span>
                     </>
                   ) : voiceState === 'THINKING' ? (
                     <>
-                      <Mic className="w-4 h-4 text-[#b91c1c]" />
-                      <span>Generating answer — Tap to cancel & speak</span>
+                      <Mic className="w-4 h-4 text-[#7e22ce] animate-pulse" />
+                      <span>Thinking... Tap to interrupt</span>
                     </>
-                  ) : voiceState === 'USER_SPEAKING' ? (
-                    <>
-                      <Waves className="w-4 h-4 text-white animate-pulse" />
-                      <span>Hearing your voice — Pausing 2s will automatically stop & answer</span>
-                    </>
-                  ) : voiceState === 'LISTENING' ? (
+                  ) : voiceState === 'USER_SPEAKING' || voiceState === 'LISTENING' ? (
                     <>
                       <Mic className="w-4 h-4 text-white animate-pulse" />
-                      <span>Listening... Speak your query (auto-stops on 2s pause)</span>
+                      <span>Listening... (Speak query)</span>
                     </>
                   ) : (
                     <>
-                      <Mic className="w-4 h-4" />
-                      <span>Tap to Speak (Web Speech API)</span>
+                      <Mic className="w-4 h-4 text-white" />
+                      <span>Tap to Speak</span>
                     </>
                   )}
                 </button>
 
-                {/* Secondary Fallback Toggle for Typing */}
+                {/* 2. DEDICATED STOP BUTTON (Instant Halt) */}
                 <button
                   type="button"
-                  id="toggle-typing-fallback-btn"
+                  id="voice-stop-everything-btn"
+                  onClick={handleStopEverything}
+                  className="py-3 px-4 rounded-2xl bg-[#ba1a1a] hover:bg-[#991b1b] active:scale-95 text-white font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 border border-[#ba1a1a] shadow-sm shrink-0"
+                  title="Stop AI speech and cancel listening immediately"
+                >
+                  <Square className="w-4 h-4 fill-white" />
+                  <span>Stop</span>
+                </button>
+
+                {/* 3. Keyboard Toggle Button */}
+                <button
+                  type="button"
+                  id="voice-keyboard-toggle-btn"
                   onClick={() => setShowTypingFallback(!showTypingFallback)}
-                  className={`p-3 px-3.5 rounded-2xl border text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  className={`p-3 rounded-2xl border text-xs font-bold transition-colors cursor-pointer flex items-center gap-1 shrink-0 ${
                     showTypingFallback
                       ? 'bg-[#eedfe4] text-[#4a1f2d] border-[#4a1f2d]/30'
                       : 'bg-white hover:bg-[#eedfe4] text-[#514346] border-[#e8e1dc]'
                   }`}
-                  title="Toggle keyboard input fallback"
+                  title="Toggle typing input"
                 >
                   <Keyboard className="w-4 h-4 text-[#4a1f2d]" />
-                  <span className="hidden sm:inline">Type</span>
                 </button>
               </div>
 
-              {/* Collapsible Typing Fallback (for quiet environments) */}
+              {/* Expandable Text Input (Collapsible) */}
               {showTypingFallback && (
                 <form
                   onSubmit={handleSendText}
-                  className="pt-2 flex items-center gap-2 animate-fade-in"
+                  className="pt-1 flex items-center gap-2 animate-fade-in"
                 >
                   <input
                     type="text"
                     id="voice-assistant-typing-input"
                     value={typedInput}
                     onChange={(e) => setTypedInput(e.target.value)}
-                    placeholder={`Type your question in ${currentLang.nativeName} or English...`}
-                    className="flex-1 p-3 px-3.5 rounded-xl bg-white border-2 border-[#4a1f2d]/40 text-sm font-semibold text-[#111827] placeholder-[#6b7280] focus:border-[#4a1f2d] focus:ring-2 focus:ring-[#4a1f2d]/20 outline-none shadow-sm"
+                    placeholder={`Type question in ${currentLang.nativeName} or English...`}
+                    className="flex-1 p-2.5 px-3.5 rounded-xl bg-white border border-[#4a1f2d]/40 text-xs font-semibold text-[#111827] placeholder-[#6b7280] focus:border-[#4a1f2d] focus:ring-1 focus:ring-[#4a1f2d] outline-none shadow-xs"
                   />
                   <button
                     type="submit"
-                    id="voice-assistant-typing-send-btn"
                     disabled={!typedInput.trim()}
-                    className="p-2.5 px-4 rounded-xl bg-[#4a1f2d] hover:bg-[#6b3548] disabled:opacity-40 text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1 shrink-0 shadow-xs"
+                    className="p-2.5 px-3.5 rounded-xl bg-[#4a1f2d] hover:bg-[#6b3548] disabled:opacity-40 text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1 shrink-0 shadow-xs"
                   >
                     <Send className="w-3.5 h-3.5" />
-                    <span>Send</span>
                   </button>
                 </form>
               )}
             </div>
+
           </div>
         </div>
 
-        {/* ========================================================= */}
-        {/* BOTTOM ACTION BAR & CIVIC PRIVACY NOTE */}
-        {/* ========================================================= */}
-        <div className="p-3 sm:p-4 bg-[#faf8f3] border-t border-[#e8e1dc] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-[#514346] text-[11px]">
-            <Shield className="w-4 h-4 text-[#4a1f2d] shrink-0" />
-            <span>
-              <strong>Web Speech API:</strong> Direct in-browser speech recognition in {speechLangLabel}. Voice stays on your device.
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-            {activeMatches.length > 0 && (
-              <button
-                type="button"
-                id="voice-view-matches-btn"
-                onClick={() => {
-                  geminiLiveVoiceService.endSession();
-                  setShowVoiceModal(false);
-                  setActiveTab('matches');
-                }}
-                className="px-3.5 py-2 rounded-xl bg-white hover:bg-[#eedfe4] text-[#4a1f2d] font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5 border border-[#e8e1dc] shadow-xs"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#4a1f2d]" />
-                <span>View {activeMatches.length} Matches in App</span>
-              </button>
-            )}
-
-            <button
-              type="button"
-              id="voice-modal-close-btn"
-              onClick={handleEndCall}
-              className="px-5 py-2 rounded-xl bg-white hover:bg-[#eedfe4] text-[#21191d] font-bold text-xs transition-colors cursor-pointer border border-[#e8e1dc] shadow-xs"
-            >
-              {t('common.close')}
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
