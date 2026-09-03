@@ -23,6 +23,10 @@ import {
   AlertTriangle,
   ExternalLink,
   Bookmark,
+  Check,
+  FileText,
+  Gift,
+  HelpCircle,
 } from 'lucide-react';
 
 export const VoiceAssistantModal: React.FC = () => {
@@ -39,7 +43,6 @@ export const VoiceAssistantModal: React.FC = () => {
     schemes,
     savedSchemeIds,
     toggleSaveScheme,
-    setActiveTab,
     t,
   } = useApp();
 
@@ -53,13 +56,14 @@ export const VoiceAssistantModal: React.FC = () => {
   const [showLangPicker, setShowLangPicker] = useState<boolean>(false);
   const [lastError, setLastError] = useState<string | null>(null);
   const [activeComparison, setActiveComparison] = useState<ComparisonReport | null>(null);
+  const [displayedSchemeCards, setDisplayedSchemeCards] = useState<any[]>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll conversation transcript
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, displayedSchemeCards]);
 
   // Connect to Gemini 2.5 Flash Live Session
   useEffect(() => {
@@ -68,6 +72,7 @@ export const VoiceAssistantModal: React.FC = () => {
     setLastError(null);
     setMessages([]);
     setActiveComparison(null);
+    setDisplayedSchemeCards([]);
 
     geminiLiveVoiceService.startSession(
       selectedVoiceLanguageId,
@@ -95,7 +100,7 @@ export const VoiceAssistantModal: React.FC = () => {
           updateUserProfile(data);
         },
         onToolCall: async (name, args) => {
-          // 1. User Profile Management
+          // 1. User Profile Management (Non-blocking, conversation stays open)
           if (name === 'getUserProfile') {
             return userProfile;
           }
@@ -104,7 +109,7 @@ export const VoiceAssistantModal: React.FC = () => {
             return { status: 'success', updatedProfile: args };
           }
 
-          // 2. Search & Deterministic Matching
+          // 2. Search & Deterministic Matching (Render non-blocking card inside voice chat)
           if (name === 'searchSchemes') {
             const query = (args.query || '').toLowerCase();
             const results = schemes
@@ -115,16 +120,21 @@ export const VoiceAssistantModal: React.FC = () => {
           }
 
           if (name === 'findEligibleSchemes') {
+            const topMatches = activeMatches.slice(0, 3).map((m) => ({
+              id: m.scheme.id,
+              name: m.scheme.name,
+              matchScore: m.score,
+              matchedCriteria: m.matchedPoints || [],
+              department: m.scheme.department || m.scheme.authority,
+              benefits: m.scheme.benefits?.amount || m.scheme.benefits?.shortSummary,
+            }));
+
+            // Display non-blocking cards inside chat stream
+            setDisplayedSchemeCards(topMatches);
+
             return {
               count: activeMatches.length,
-              schemes: activeMatches.slice(0, 4).map((m) => ({
-                id: m.scheme.id,
-                name: m.scheme.name,
-                matchScore: m.score,
-                matchedCriteria: m.matchedPoints || [],
-                department: m.scheme.department || m.scheme.authority,
-                benefits: m.scheme.benefits?.amount || m.scheme.benefits?.shortSummary,
-              })),
+              schemes: topMatches,
             };
           }
 
@@ -150,7 +160,7 @@ export const VoiceAssistantModal: React.FC = () => {
             };
           }
 
-          // 3. Scheme Details & Documents
+          // 3. Scheme Details & Documents (Non-blocking)
           if (name === 'getSchemeDetails') {
             const target = schemes.find((s) => s.id === args.schemeId) || schemes[0];
             return {
@@ -191,7 +201,7 @@ export const VoiceAssistantModal: React.FC = () => {
             };
           }
 
-          // 4. Online Verification & Comparison
+          // 4. Online Verification & Comparison (Non-blocking)
           if (name === 'verifySchemeOnline') {
             const target = schemes.find((s) => s.id === args.schemeId) || schemes[0];
             const ver = await verificationService.verifySchemeOnline(target);
@@ -209,7 +219,7 @@ export const VoiceAssistantModal: React.FC = () => {
             return await verificationService.searchOfficialGovernmentSources(args.query || '', schemes);
           }
 
-          // 5. Bookmarks / Saved
+          // 5. Bookmarks / Saved (Non-blocking)
           if (name === 'saveScheme') {
             toggleSaveScheme(args.schemeId);
             return { status: 'success', saved: true };
@@ -280,7 +290,7 @@ export const VoiceAssistantModal: React.FC = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in">
       <div className="bg-[#092554] text-white w-full h-full sm:h-[92vh] sm:max-w-4xl sm:rounded-3xl flex flex-col shadow-2xl border border-white/10 overflow-hidden relative">
         {/* ========================================================= */}
-        {/* TOP BAR: Brand, Realtime Call Status, Controls */}
+        {/* TOP BAR: Brand, Live Call Status, Mode Switcher */}
         {/* ========================================================= */}
         <div className="p-4 sm:p-5 flex items-center justify-between border-b border-white/10 bg-[#001944]">
           <div className="flex items-center gap-3">
@@ -291,7 +301,7 @@ export const VoiceAssistantModal: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-[#94f6c4] tracking-wider uppercase flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-[#fea619]" />
-                  Arivom Gemini Live Voice
+                  Arivom Voice Assistant
                 </span>
                 <span className={`text-[9px] px-2 py-0.5 rounded-full font-bold border ${status.color}`}>
                   {status.label}
@@ -438,10 +448,10 @@ export const VoiceAssistantModal: React.FC = () => {
                   ? 'Tap Orb to Interrupt'
                   : voiceState === 'LISTENING'
                   ? 'Listening Continuously...'
-                  : 'Arivom AI Voice'}
+                  : 'Arivom Conversational Voice'}
               </span>
               <p className="text-xs text-[#d9e2ff]/80 max-w-xs">
-                Speak naturally like a phone call. Arivom retrieves verified schemes from gazettes.
+                Talk naturally like a phone call. The conversation stays active while Arivom finds and explains schemes.
               </p>
             </div>
 
@@ -463,7 +473,7 @@ export const VoiceAssistantModal: React.FC = () => {
                 Live Conversation Stream
               </span>
               <span className="text-[10px] text-[#94f6c4] font-mono">
-                {messages.length} messages
+                {messages.length} turns
               </span>
             </div>
 
@@ -532,6 +542,54 @@ export const VoiceAssistantModal: React.FC = () => {
                   );
                 })
               )}
+
+              {/* Non-blocking in-conversation scheme visual support cards */}
+              {displayedSchemeCards.length > 0 && (
+                <div className="pt-2 space-y-2 animate-fade-in">
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#94f6c4]">
+                    <Sparkles className="w-3.5 h-3.5 text-[#fea619]" />
+                    <span>Matching Schemes Found (Conversation Remains Active)</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {displayedSchemeCards.map((sc) => {
+                      const isSaved = savedSchemeIds.includes(sc.id);
+                      return (
+                        <div
+                          key={sc.id}
+                          className="p-3 rounded-xl bg-white/10 border border-white/20 text-left space-y-1.5 shadow-sm hover:border-[#fea619]/60 transition-colors"
+                        >
+                          <div className="flex items-start justify-between gap-1.5">
+                            <span className="text-xs font-bold text-white line-clamp-1">{sc.name}</span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleSaveScheme(sc.id);
+                              }}
+                              className={`p-1 rounded-lg transition-colors cursor-pointer ${
+                                isSaved ? 'bg-[#fea619] text-[#092554]' : 'bg-white/10 text-white/80 hover:bg-white/20'
+                              }`}
+                              title={isSaved ? 'Saved' : 'Save scheme'}
+                            >
+                              <Bookmark className="w-3 h-3" />
+                            </button>
+                          </div>
+                          {sc.benefits && (
+                            <p className="text-[11px] text-[#94f6c4] font-medium line-clamp-1 flex items-center gap-1">
+                              <Gift className="w-3 h-3 shrink-0" />
+                              <span>{sc.benefits}</span>
+                            </p>
+                          )}
+                          <div className="flex items-center gap-1 text-[10px] text-emerald-300 font-semibold pt-1 border-t border-white/10">
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>Verified Eligible</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <div ref={messagesEndRef} />
             </div>
 
@@ -571,20 +629,6 @@ export const VoiceAssistantModal: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-            {activeMatches.length > 0 && (
-              <button
-                onClick={() => {
-                  geminiLiveVoiceService.endSession();
-                  setShowVoiceModal(false);
-                  setActiveTab('matches');
-                }}
-                className="px-5 py-2.5 rounded-2xl bg-[#fea619] hover:bg-[#ffb94f] text-[#092554] font-black text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-md"
-              >
-                <span>VIEW {activeMatches.length} MATCHES</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
-
             <button
               onClick={handleEndCall}
               className="px-5 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-colors cursor-pointer"
