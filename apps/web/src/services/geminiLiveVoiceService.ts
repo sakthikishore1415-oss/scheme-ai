@@ -360,6 +360,60 @@ export class GeminiLiveVoiceService {
     }
   }
 
+  private async generateGeminiReply(spokenText: string, matchingSchemes: any[]): Promise<string> {
+    const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || (import.meta as any).env?.GEMINI_API_KEY || '';
+    if (!apiKey) return '';
+
+    try {
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+      const systemInstruction =
+        this.currentLanguageId === 'ml'
+          ? 'നിങ്ങൾ അറിവോം (Arivom) എന്ന സർക്കാർ പദ്ധതി ശബ്ദ സഹായിയാണ്. സ്വാഭാവിക മലയാളത്തിൽ മാത്രം സംസാരിക്കുക. തമിഴ് വാക്കുകൾ ഒരിക്കലും ഉപയോഗിക്കരുത്. പദ്ധതി അർഹതകൾ നിർബന്ധമായും നൽകിയ വിവരങ്ങളിൽ നിന്ന് മാത്രം പറയുക.'
+          : this.currentLanguageId === 'ta'
+          ? 'நீங்கள் அறிவோம் (Arivom) அரசு நலத்திட்ட குரல் வழிகாட்டி. இயல்பான தமிழில் மட்டும் பேசவும். அரசு திட்ட தகவல்களை எப்போதும் துல்லியமாக விளக்குங்கள்.'
+          : `You are Arivom, a friendly government scheme discovery assistant for India (${this.currentStateName}). Keep responses concise, warm, conversational, and strictly grounded in the provided verified schemes.`;
+
+      const schemeSummary = matchingSchemes
+        .slice(0, 3)
+        .map((s) => `${s.name} (${s.benefits || s.shortSummary || 'Welfare'})`)
+        .join('; ');
+
+      const prompt = `
+Citizen Spoke: "${spokenText}"
+State: ${this.currentStateName}
+Verified Matching Schemes: ${schemeSummary || 'None currently matched'}
+
+Respond in 1-2 natural spoken sentences directly answering the user in the selected language (${this.currentLanguageId}).
+`;
+
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: `${systemInstruction}\n\n${prompt}` }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.4,
+            maxOutputTokens: 150,
+          },
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (candidate) return candidate.trim();
+      }
+    } catch (e) {
+      console.warn('Direct Gemini API request failed, using local rule reply:', e);
+    }
+    return '';
+  }
+
   private async processFallbackTurn(text: string) {
     this.setState('THINKING');
     const extracted = extractProfileFromSpokenText(text, this.currentLanguageId);
@@ -367,24 +421,32 @@ export class GeminiLiveVoiceService {
       this.callbacks?.onProfileExtracted?.(extracted);
     }
 
-    let responseText = '';
+    let topSchemes: any[] = [];
     if (this.callbacks?.onToolCall) {
       const matchResult = await this.callbacks.onToolCall('findEligibleSchemes', {});
-      if (matchResult && matchResult.count > 0) {
-        const top = matchResult.schemes[0];
-        if (this.currentLanguageId === 'ta') {
-          responseText = `உங்கள் தகுதியின்படி ${matchResult.count} அரசு திட்டங்கள் கண்டறியப்பட்டன. முதன்மை திட்டம்: ${top.name}. இதன் பலன்களை விளக்கவா?`;
-        } else if (this.currentLanguageId === 'ml') {
-          responseText = `താങ്കളുടെ യോഗ്യത പ്രകാരം ${matchResult.count} സർക്കാർ പദ്ധതികൾ കണ്ടെത്തി. പ്രധാന പദ്ധതി: ${top.name}. കൂടുതൽ അറിയണോ?`;
-        } else {
-          responseText = `Based on your verified profile, ${matchResult.count} schemes match your criteria, including ${top.name}. Would you like to hear the benefits?`;
-        }
+      if (matchResult && matchResult.schemes) {
+        topSchemes = matchResult.schemes;
       }
     }
 
+    // Generate intelligent reply via Gemini (same as Android)
+    let responseText = await this.generateGeminiReply(text, topSchemes);
+
+    // If Gemini offline, use deterministic template
     if (!responseText) {
-      const voicePack = getVoicePack(this.currentLanguageId);
-      responseText = voicePack.heardConfirmation(text);
+      if (topSchemes.length > 0) {
+        const top = topSchemes[0];
+        if (this.currentLanguageId === 'ta') {
+          responseText = `உங்கள் தகுதியின்படி ${topSchemes.length} அரசு திட்டங்கள் கண்டறியப்பட்டன. முதன்மை திட்டம்: ${top.name}. இதன் பலன்களை அறிய விரும்புகிறீர்களா?`;
+        } else if (this.currentLanguageId === 'ml') {
+          responseText = `താങ്കളുടെ വിവരങ്ങൾ പ്രകാരം ${topSchemes.length} സർക്കാർ പദ്ധതികൾ കണ്ടെത്തി. പ്രധാന പദ്ധതി: ${top.name}. കൂടുതൽ അറിയണമെന്നുണ്ടോ?`;
+        } else {
+          responseText = `Based on your profile, ${topSchemes.length} schemes match your criteria, including ${top.name}. Would you like to hear the benefits?`;
+        }
+      } else {
+        const voicePack = getVoicePack(this.currentLanguageId);
+        responseText = voicePack.heardConfirmation(text);
+      }
     }
 
     this.speakFallback(responseText);
