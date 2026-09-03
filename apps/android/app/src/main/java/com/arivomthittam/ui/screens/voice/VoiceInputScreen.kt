@@ -17,6 +17,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -133,6 +134,8 @@ fun VoiceInputScreen(
         }
     }
 
+    val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
+
     val recognitionListener = remember {
         object : RecognitionListener {
             override fun onReadyForSpeech(params: Bundle?) {
@@ -168,12 +171,23 @@ fun VoiceInputScreen(
                         else -> "farmer"
                     }
 
-                    val reply = when (currentLanguage) {
-                        "ml" -> "നിങ്ങൾ $occupation മേഖലയിലാണെന്ന് മനസ്സിലായി. നിങ്ങൾക്ക് അനുയോജ്യമായ സർക്കാർ പദ്ധതികൾ കണ്ടെത്തുന്നു..."
-                        "ta" -> "நீங்கள் $occupation பிரிவில் உள்ளீர்கள் என்று புரிந்துகொண்டேன். உங்களுக்கான திட்டங்களை தேடுகிறோம்..."
-                        else -> "Understood. Searching matching government welfare schemes for $occupation..."
+                    val profile = CitizenProfile(
+                        age = 45,
+                        occupation = occupation,
+                        state = currentState,
+                        voiceLanguage = detectedLanguage ?: currentLanguage
+                    )
+
+                    coroutineScope.launch {
+                        val reply = com.arivomthittam.domain.ai.GeminiVoiceService.generateConversationalReply(
+                            spokenText = spoken,
+                            language = currentLanguage,
+                            stateName = currentState,
+                            profile = profile,
+                            matchingSchemes = emptyList()
+                        )
+                        speakAloud(reply)
                     }
-                    speakAloud(reply)
                 }
             }
             override fun onPartialResults(partialResults: Bundle?) {
