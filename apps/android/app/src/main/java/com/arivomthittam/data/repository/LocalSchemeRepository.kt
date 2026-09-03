@@ -3,7 +3,7 @@ package com.arivomthittam.data.repository
 import com.arivomthittam.data.model.Scheme
 
 class LocalSchemeRepository(
-    private var initialSchemes: List<Scheme> = emptyList()
+    private var initialSchemes: List<Scheme> = DefaultSchemes.ALL
 ) : SchemeRepository {
 
     private val savedSchemeIds = mutableSetOf<String>()

@@ -6,7 +6,8 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
-    "clean": "turbo run clean"
+    "clean": "turbo run clean",
+    "fetch-schemes": "python3 scripts/fetch_all_india_schemes.py"
   },
   "devDependencies": {
     "turbo": "^2.4.4",

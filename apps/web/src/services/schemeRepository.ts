@@ -57,5 +57,7 @@ export class ProductionSchemeRepository implements SchemeRepository {
   }
 }
 
-export const defaultSchemeRepository: SchemeRepository = new ProductionSchemeRepository([]);
+import { ALL_INDIA_SCHEMES } from '../data/schemesData';
+
+export const defaultSchemeRepository: SchemeRepository = new ProductionSchemeRepository(ALL_INDIA_SCHEMES);
 
