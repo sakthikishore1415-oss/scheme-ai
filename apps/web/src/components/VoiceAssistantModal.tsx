@@ -63,7 +63,6 @@ export const VoiceAssistantModal: React.FC = () => {
   const [interimTranscript, setInterimTranscript] = useState<string>('');
   const [showTypingFallback, setShowTypingFallback] = useState<boolean>(false);
   const [typedInput, setTypedInput] = useState<string>('');
-  const [voiceSpeed, setVoiceSpeed] = useState<number>(geminiLiveVoiceService.getSpeechRate());
   const [lastError, setLastError] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -162,12 +161,6 @@ export const VoiceAssistantModal: React.FC = () => {
     geminiLiveVoiceService.setLanguage(langId);
   };
 
-  const handleSpeedChange = () => {
-    const nextSpeed = voiceSpeed === 1.0 ? 1.25 : voiceSpeed === 1.25 ? 1.5 : 1.0;
-    geminiLiveVoiceService.setSpeechRate(nextSpeed);
-    setVoiceSpeed(nextSpeed);
-  };
-
   const getStatusBadge = () => {
     switch (voiceState) {
       case 'CONNECTING':
@@ -179,7 +172,7 @@ export const VoiceAssistantModal: React.FC = () => {
       case 'THINKING':
         return { label: 'Thinking...', color: 'bg-[#faf5ff] text-[#7e22ce] border-[#e9d5ff]' };
       case 'SPEAKING':
-        return { label: `Speaking (${voiceSpeed}x)`, color: 'bg-[#fdf2f8] text-[#9d174d] border-[#fbcfe8]' };
+        return { label: 'Arivom Speaking...', color: 'bg-[#fdf2f8] text-[#9d174d] border-[#fbcfe8]' };
       case 'IDLE':
         return { label: 'Paused / Idle', color: 'bg-[#f3f4f6] text-[#4b5563] border-[#e5e7eb]' };
       default:
@@ -305,17 +298,6 @@ export const VoiceAssistantModal: React.FC = () => {
                 <ChevronDown className="w-3 h-3 text-[#756a6f] -ml-3 pointer-events-none shrink-0" />
               </div>
             </div>
-
-            {/* Voice Speed Toggle */}
-            <button
-              type="button"
-              id="voice-speed-pill-btn"
-              onClick={handleSpeedChange}
-              className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#eedfe4] border border-[#e8e1dc] text-xs font-bold text-[#4a1f2d] transition-colors cursor-pointer shadow-xs"
-              title="Toggle speech rate"
-            >
-              {voiceSpeed}x
-            </button>
 
             {/* Matches Quick Link */}
             {activeMatches.length > 0 && (
