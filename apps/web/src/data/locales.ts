@@ -1,8 +1,12 @@
 export interface RegionalVoicePack {
   langId: string;
-  greetingPrompt: string; // e.g. "உங்களுக்கு என்ன உதவி தேவை?"
+  greetingPrompt: string; // e.g. "வணக்கம்! உங்கள் தேவையை சொல்லுங்கள்."
   listeningPrompt: string;
   understandingPrompt: string;
+  heardConfirmation: (transcript: string) => string;
+  professionFollowUp: (profession: string) => string;
+  eligibilitySummary: (count: number) => string;
+  documentExplanation: (docs: string[]) => string;
   ageQuestion: string;
   occupationQuestion: string;
   incomeQuestion: string;
@@ -26,9 +30,34 @@ export interface RegionalVoicePack {
 export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
   ta: {
     langId: 'ta',
-    greetingPrompt: 'வணக்கம்! அறிவோம் திட்டம் உங்களை வரவேற்கிறது. உங்களுக்கு என்ன அரசு உதவி தேவை?',
+    greetingPrompt: 'வணக்கம்! அறிவோம் திட்டம் உங்களை வரவேற்கிறது. உங்கள் தேவையை சொல்லுங்கள்.',
     listeningPrompt: 'உங்கள் குரலை கவனிக்கிறோம்... பேசுங்கள்.',
     understandingPrompt: 'உங்கள் தேவையை புரிந்து கொள்கிறோம்...',
+    heardConfirmation: (transcript) => `நீங்கள் கூறியதை கேட்டேன்: "${transcript}".`,
+    professionFollowUp: (prof) => {
+      const p = prof.toLowerCase();
+      if (p.includes('farmer') || p.includes('விவசாய')) {
+        return 'நீங்கள் விவசாயி என்று புரிந்துகொண்டேன். உங்களிடம் எவ்வளவு நிலம் உள்ளது?';
+      }
+      if (p.includes('student') || p.includes('மாணவ')) {
+        return 'நீங்கள் மாணவர் என்று புரிந்துகொண்டேன். எந்த வகுப்பில் அல்லது படிப்பில் உள்ளீர்கள்?';
+      }
+      if (p.includes('worker') || p.includes('தொழிலாள')) {
+        return 'நீங்கள் தொழிலாளி என்று புரிந்துகொண்டேன். அமைப்புசாரா வாரியத்தில் பதிவு செய்துள்ளீர்களா?';
+      }
+      if (p.includes('business') || p.includes('வியாபார')) {
+        return 'நீங்கள் வியாபாரம் செய்கிறீர்கள் என்று புரிந்துகொண்டேன். உங்களுக்கு சிறுதொழில் கடன் தேவையா?';
+      }
+      if (p.includes('homemaker') || p.includes('குடும்ப')) {
+        return 'நீங்கள் குடும்பத்தலைவி என்று புரிந்துகொண்டேன். மகளிர் சுயஉதவிக்குழுவில் இணைந்துள்ளீர்களா?';
+      }
+      if (p.includes('senior') || p.includes('முதியோ')) {
+        return 'நீங்கள் மூத்த குடிமக்கள் என்று புரிந்துகொண்டேன். முதியோர் ஓய்வூதியம் பெறுகிறீர்களா?';
+      }
+      return 'உங்கள் தொழிலை புரிந்துகொண்டேன். மேலும் தகுதி விவரங்களை சரிபார்க்கவும்.';
+    },
+    eligibilitySummary: (count) => `உங்கள் விவரங்களின் அடிப்படையில், ${count} திட்டங்கள் உங்களுக்கு பொருந்தக்கூடும்.`,
+    documentExplanation: (_docs) => 'இந்த திட்டத்திற்கு ஆதார் அட்டை, வருமானச் சான்று மற்றும் வங்கி கணக்கு விவரங்கள் தேவை.',
     ageQuestion: 'உங்கள் வயது என்ன?',
     occupationQuestion: 'உங்கள் தொழில் என்ன? (எ.கா: விவசாயி, மாணவர், கூலித்தொழிலாளி, வியாபாரி)',
     incomeQuestion: 'உங்கள் குடும்பத்தின் தோராயமான ஆண்டு வருமானம் என்ன?',
@@ -46,85 +75,29 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     smsWelcome: 'அறிவோம் திட்டம்: அரசு திட்டங்களை அறிய 1 அழுத்தி உங்கள் தேவையை தேர்வு செய்யவும்.',
     smsCategoryMenu: '1 கல்வி | 2 விவசாயம் | 3 வீடு | 4 மகளிர் | 5 மருத்துவம் | 6 மற்றவை',
     smsResultIntro: (count) => `உங்கள் விவரங்களுக்கு ${count} திட்டங்கள் உள்ளன. விவரங்களுக்கு எண்ணை அனுப்பவும்.`,
-    errorVoicePrompt: 'மன்னிக்கவும், உங்கள் குரல் தெளிவாக இல்லை. மீண்டும் பேசவும் அல்லது திரையில் தேர்ந்தெடுக்கவும்.',
-  },
-  ml: {
-    langId: 'ml',
-    greetingPrompt: 'നമസ്കാരം! അറിവോം തിട്ടം. നിങ്ങൾക്ക് എന്ത് സർക്കാർ സഹായമാണ് വേണ്ടത്?',
-    listeningPrompt: 'കേൾക്കുന്നു... സംസാരിക്കൂ.',
-    understandingPrompt: 'താങ്കളുടെ ആവശ്യം പരിശോധിക്കുന്നു...',
-    ageQuestion: 'നിങ്ങളുടെ പ്രായം എത്രയാണ്?',
-    occupationQuestion: 'നിങ്ങളുടെ തൊഴിൽ എന്താണ്? (കർഷകൻ, വിദ്യാർത്ഥി, തൊഴിലാളി, കച്ചവടക്കാരൻ)',
-    incomeQuestion: 'കുടുംബത്തിന്റെ ഏകദേശ വാർഷിക വരുമാനം എത്രയാണ്?',
-    districtQuestion: 'ഏത് ജില്ലയിലാണ് താമസം?',
-    needQuestion: 'ഏത് മേഖലയിലാണ് സഹായം ആവശ്യം? (കൃഷി, വിദ്യാഭ്യാസം, വീട്, ആരോഗ്യം)',
-    evaluatingPrompt: 'നിങ്ങൾക്ക് അനുയോജ്യമായ പദ്ധതികൾ കണ്ടെത്തുന്നു...',
-    matchedHeading: (count) => `അഭിനന്ദനങ്ങൾ! താങ്കൾക്ക് അനുയോജ്യമായ ${count} പദ്ധതികൾ ലഭ്യമാണ്.`,
-    whyMeHeading: 'ഈ പദ്ധതി താങ്കൾക്ക് എന്തുകൊണ്ട് അനുയോജ്യമാണ്?',
-    explainSimplyIntro: 'ലളിതമായ വിശദീകരണം:',
-    ivrWelcome: 'അറിവോം തിട്ടത്തിലേക്ക് സ്വാഗതം.',
-    ivrLanguagePrompt: 'മലയാളത്തിന് 1 അമർത്തുക. For English press 2. தமிழுக்கு 3 அழுத்தவும்.',
-    ivrSchemeIntro: (idx, name) => `പദ്ധതി ${idx}: ${name}.`,
-    ivrSchemeDetailsPrompt: 'ഈ പദ്ധതി നിങ്ങളുടെ പ്രായവും വരുമാനവുമായി യോജിക്കുന്നു. കൂടുതൽ വിവരങ്ങൾക്ക് 1 അമർത്തുക.',
-    ivrSchemeNavigation: 'അടുത്ത പദ്ധതിക്ക് 2, വീണ്ടും കേൾക്കാൻ 4 അമർത്തുക.',
-    smsWelcome: 'അറിവോം തിട്ടം: സഹായം ലഭിക്കാൻ നമ്പർ മറുപടി നൽകുക.',
-    smsCategoryMenu: '1 വിദ്യാഭ്യാസം | 2 കൃഷി | 3 വീട് | 4 ആരോഗ്യം | 5 പെൻഷൻ',
-    smsResultIntro: (count) => `താങ്കളുടെ വിവരങ്ങൾ പ്രകാരം ${count} പദ്ധതികൾ ലഭ്യമാണ്.`,
-    errorVoicePrompt: 'ക്ഷമിക്കണം, ശബ്ദം വ്യക്തമായില്ല. ദയവായി വീണ്ടും പറയുക.',
-  },
-  kn: {
-    langId: 'kn',
-    greetingPrompt: 'ನಮಸ್ಕಾರ! ಅರಿವೋಮ್ ತಿಟ್ಟಂ ಗೆ ಸ್ವಾಗತ. ನಿಮಗೆ ಯಾವ ಸರ್ಕಾರದ ಸಹಾಯ ಬೇಕು?',
-    listeningPrompt: 'ಕೇಳಿಸಿಕೊಳ್ಳುತ್ತಿದ್ದೇವೆ... ಮಾತನಾಡಿ.',
-    understandingPrompt: 'ನಿಮ್ಮ ವಿವರಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತಿದ್ದೇವೆ...',
-    ageQuestion: 'ನಿಮ್ಮ ವಯಸ್ಸು ಎಷ್ಟು?',
-    occupationQuestion: 'ನಿಮ್ಮ ಉದ್ಯೋಗವೇನು? (ರೈತ, ವಿದ್ಯಾರ್ಥಿ, ವ್ಯಾಪಾರಿ, ಕಾರ್ಮಿಕ)',
-    incomeQuestion: 'ನಿಮ್ಮ ಕುಟುಂಬದ ವಾರ್ಷಿಕ ಆದಾಯ ಎಷ್ಟು?',
-    districtQuestion: 'ನೀವು ಯಾವ ಜಿಲ್ಲೆಯವರು?',
-    needQuestion: 'ಯಾವ ಕ್ಷೇತ್ರದಲ್ಲಿ ನೆರವು ಬೇಕು? (ಕೃಷಿ, ಶಿಕ್ಷಣ, ವಸತಿ, ಮಹಿಳಾ ಕಲ್ಯಾಣ)',
-    evaluatingPrompt: 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್‌ಗೆ ಸೂಕ್ತವಾದ ಯೋಜನೆಗಳನ್ನು ಹುಡುಕಲಾಗುತ್ತಿದೆ...',
-    matchedHeading: (count) => `ಅಭಿನಂದನೆಗಳು! ನಿಮ್ಮ ಅರ್ಹತೆಗೆ ತಕ್ಕಂತೆ ${count} ಯೋಜನೆಗಳು ಲಭ್ಯವಿದೆ.`,
-    whyMeHeading: 'ಈ ಯೋಜನೆ ನಿಮಗೆ ಏಕೆ ಸೂಕ್ತವಾಗಿದೆ?',
-    explainSimplyIntro: 'ಸರಳ ವಿವರಣೆ:',
-    ivrWelcome: 'ಅರಿವೋಮ್ ತಿಟ್ಟಂ ಯೋಜನೆಗಳ ವೇದಿಕೆಗೆ ಸ್ವಾಗತ.',
-    ivrLanguagePrompt: 'ಕನ್ನಡಕ್ಕೆ 1 ಒತ್ತಿ. For English press 2.',
-    ivrSchemeIntro: (idx, name) => `ಯೋಜನೆ ${idx}: ${name}.`,
-    ivrSchemeDetailsPrompt: 'ಹೆಚ್ಚಿನ ವಿವರಗಳಿಗಾಗಿ 1 ಒತ್ತಿ.',
-    ivrSchemeNavigation: 'ಮುಂದಿನ ಯೋಜನೆಗೆ 2, ಪುನಃ ಕೇಳಲು 4 ಒತ್ತಿ.',
-    smsWelcome: 'ಅರಿವೋಮ್ ತಿಟ್ಟಂ: ಸರ್ಕಾರದ ಯೋಜನೆಗಳನ್ನು ತಿಳಿಯಲು ಸಂಖ್ಯೆ ಕಳುಹಿಸಿ.',
-    smsCategoryMenu: '1 ಕೃಷಿ | 2 ಶಿಕ್ಷಣ | 3 ವಸತಿ | 4 ಮಹಿಳಾ ಯೋಜನೆ | 5 ಆರೋಗ್ಯ',
-    smsResultIntro: (count) => `ನಿಮ್ಮ ವಿವರಗಳಿಗೆ ${count} ಯೋಜನೆಗಳು ಹೊಂದಾಣಿಕೆಯಾಗುತ್ತವೆ.`,
-    errorVoicePrompt: 'ಕ್ಷಮಿಸಿ, ಧ್ವನಿ ಸ್ಪಷ್ಟವಾಗಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ಮಾತನಾಡಿ.',
-  },
-  te: {
-    langId: 'te',
-    greetingPrompt: 'నమస్కారం! అరివోమ్ తిట్టం కు స్వాగతం. మీకు ఏ ప్రభుత్వ పథకం సహాయం కావాలి?',
-    listeningPrompt: 'వింటున్నాము... మాట్లాడండి.',
-    understandingPrompt: 'మీ అభ్యర్థనను పరిశీలిస్తున్నాము...',
-    ageQuestion: 'మీ వయస్సు ఎంత?',
-    occupationQuestion: 'మీ వృత్తి ఏమిటి? (రైతు, విద్యార్థి, మహిళా పారిశ్రామికవేత్త, కూలీ)',
-    incomeQuestion: 'మీ కుటుంబ వార్షిక ఆదాయం సుమారుగా ఎంత?',
-    districtQuestion: 'మీ జిల్లా ఏది?',
-    needQuestion: 'మీకు ఏ రంగంలో సహాయం కావాలి? (వ్యవసాయం, చదువు, ఇల్లు, మహిళా సంక్షేమం)',
-    evaluatingPrompt: 'మీ అర్హతకు తగిన ప్రభుత్వ పథకాలను వెతుకుతున్నాము...',
-    matchedHeading: (count) => `అభినందనలు! మీ వివరాలకు సంబంధించి ${count} పథకాలు లభించాయి.`,
-    whyMeHeading: 'ఈ పథకం మీకు ఎందుకు సరిపోతుంది?',
-    explainSimplyIntro: 'సులభమైన వివరణ:',
-    ivrWelcome: 'అరివోమ్ తిట్టం కు స్వాగతం.',
-    ivrLanguagePrompt: 'తెలుగు కోసం 1 నొక్కండి. For English press 2.',
-    ivrSchemeIntro: (idx, name) => `పథకం ${idx}: ${name}.`,
-    ivrSchemeDetailsPrompt: 'ఈ పథకం వివరాలు వినడానికి 1 నొక్కండి.',
-    ivrSchemeNavigation: 'తరువాతి పథకం కోసం 2, మళ్లీ వినడానికి 4 నొక్కండి.',
-    smsWelcome: 'అరివోమ్ తిట్టం: ప్రభుత్వ పథకాల సమాచారం కోసం నంబర్ పంపండి.',
-    smsCategoryMenu: '1 చదువు | 2 వ్యవసాయం | 3 ఇల్లు | 4 మహిళ | 5 ఆరోగ్యం',
-    smsResultIntro: (count) => `మీ వివరాల ఆధారంగా ${count} పథకాలు ఉన్నాయి.`,
-    errorVoicePrompt: 'క్షమించండి, మీ స్వరం స్పష్టంగా లేదు. దయచేసి మళ్ళీ చెప్పండి.',
+    errorVoicePrompt: 'என்னால் தெளிவாகக் கேட்க முடியவில்லை. மீண்டும் சொல்லுங்கள் அல்லது தட்டச்சு செய்யுங்கள்.',
   },
   hi: {
     langId: 'hi',
-    greetingPrompt: 'नमस्ते! अरिवोम थित्तम में आपका स्वागत है। आपको किस सरकारी योजना की सहायता चाहिए?',
-    listeningPrompt: 'सुन रहे हैं... बोलिए।',
+    greetingPrompt: 'नमस्ते! अरिवोम थित्तम में आपका स्वागत है। कृपया अपनी आवश्यकता बताएं।',
+    listeningPrompt: 'सुन रहे हैं... कृपया बोलिए।',
     understandingPrompt: 'आपकी आवश्यकता का विश्लेषण किया जा रहा है...',
+    heardConfirmation: (transcript) => `मैंने सुना: "${transcript}".`,
+    professionFollowUp: (prof) => {
+      const p = prof.toLowerCase();
+      if (p.includes('farmer') || p.includes('किसान')) {
+        return 'मैं समझ गया कि आप किसान हैं। आपके पास कितनी कृषि भूमि है?';
+      }
+      if (p.includes('student') || p.includes('छात्र')) {
+        return 'मैं समझ गया कि आप छात्र हैं। आप किस कक्षा या कोर्स में पढ़ रहे हैं?';
+      }
+      if (p.includes('business') || p.includes('व्यापारी')) {
+        return 'मैं समझ गया कि आप छोटा व्यवसाय करते हैं। क्या आपको मुद्रा लोन की आवश्यकता है?';
+      }
+      return 'आपकी जानकारी समझ आ गई है। कृपया पात्रता विवरण जांचें।';
+    },
+    eligibilitySummary: (count) => `आपकी जानकारी के आधार पर, ${count} सरकारी योजनाएं आपके लिए उपयुक्त हो सकती हैं।`,
+    documentExplanation: (_docs) => 'इस योजना के लिए आधार कार्ड, आय प्रमाण पत्र और बैंक खाता पासबुक आवश्यक हैं।',
     ageQuestion: 'आपकी आयु क्या है?',
     occupationQuestion: 'आपका व्यवसाय क्या है? (किसान, छात्र, व्यापारी, श्रमिक, गृहिणी)',
     incomeQuestion: 'आपके परिवार की अनुमानित वार्षिक आय कितनी है?',
@@ -142,13 +115,122 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     smsWelcome: 'अरिवोम थित्तम: सरकारी योजनाओं की जानकारी के लिए श्रेणी चुनें।',
     smsCategoryMenu: '1 कृषि | 2 शिक्षा | 3 आवास | 4 महिला कल्याण | 5 स्वास्थ्य',
     smsResultIntro: (count) => `आपकी प्रोफाइल के अनुसार ${count} योजनाएं उपलब्ध हैं।`,
-    errorVoicePrompt: 'माफ़ कीजिए, आवाज स्पष्ट नहीं थी। कृपया पुनः बोलें या स्क्रीन पर चुनें।',
+    errorVoicePrompt: 'माफ़ कीजिए, स्पष्ट सुनाई नहीं दिया। कृपया पुनः बोलें या टाइप करें।',
+  },
+  ml: {
+    langId: 'ml',
+    greetingPrompt: 'നമസ്കാരം! അറിവോം തിട്ടം. നിങ്ങൾക്ക് എന്ത് സർക്കാർ സഹായമാണ് വേണ്ടത്?',
+    listeningPrompt: 'കേൾക്കുന്നു... സംസാരിക്കൂ.',
+    understandingPrompt: 'താങ്കളുടെ ആവശ്യം പരിശോധിക്കുന്നു...',
+    heardConfirmation: (transcript) => `താങ്കൾ പറഞ്ഞത് കേട്ടു: "${transcript}".`,
+    professionFollowUp: (prof) => {
+      const p = prof.toLowerCase();
+      if (p.includes('farmer') || p.includes('കർഷക')) {
+        return 'താങ്കൾ കർഷകനാണെന്ന് മനസ്സിലായി. എത്ര ഏക്കർ കൃഷിഭൂമിയുണ്ട്?';
+      }
+      if (p.includes('student') || p.includes('വിദ്യാർത്ഥി')) {
+        return 'താങ്കൾ വിദ്യാർത്ഥിയാണെന്ന് മനസ്സിലായി. ഏത് ക്ലാസ്സിലാണ് പഠിക്കുന്നത്?';
+      }
+      return 'താങ്കളുടെ തൊഴിൽ വിവരങ്ങൾ മനസ്സിലായി.';
+    },
+    eligibilitySummary: (count) => `നിങ്ങളുടെ വിവരങ്ങൾ അനുസരിച്ച് ${count} പദ്ധതികൾ ലഭ്യമായേക്കാം.`,
+    documentExplanation: (_docs) => 'ഈ പദ്ധതിക്ക് ആധാർ കാർഡ്, വരുമാന സർട്ടിഫിക്കറ്റ്, ബാങ്ക് പാസ്ബുക്ക് എന്നിവ ആവശ്യമാണ്.',
+    ageQuestion: 'നിങ്ങളുടെ പ്രായം എത്രയാണ്?',
+    occupationQuestion: 'നിങ്ങളുടെ തൊഴിൽ എന്താണ്? (കർഷകൻ, വിദ്യാർത്ഥി, തൊഴിലാളി, കച്ചവടക്കാരൻ)',
+    incomeQuestion: 'കുടുംബത്തിന്റെ ഏകദേശ വാർഷിക വരുമാനം എത്രയാണ്?',
+    districtQuestion: 'ഏത് ജില്ലയിലാണ് താമസം?',
+    needQuestion: 'ഏത് മേഖലയിലാണ് സഹായം ആവശ്യം? (കൃഷി, വിദ്യാഭ്യാസം, വീട്, ആരോഗ്യം)',
+    evaluatingPrompt: 'നിങ്ങൾക്ക് അനുയോജ്യമായ പദ്ധതികൾ കണ്ടെത്തുന്നു...',
+    matchedHeading: (count) => `അഭിനന്ദനങ്ങൾ! താങ്കൾക്ക് അനുയോജ്യമായ ${count} പദ്ധതികൾ ലഭ്യമാണ്.`,
+    whyMeHeading: 'ഈ പദ്ധതി താങ്കൾക്ക് എന്തുകൊണ്ട് അനുയോജ്യമാണ്?',
+    explainSimplyIntro: 'ലളിതമായ വിശദീകരണം:',
+    ivrWelcome: 'അറിവോം തിട്ടത്തിലേക്ക് സ്വാഗതം.',
+    ivrLanguagePrompt: 'മലയാളത്തിന് 1 അമർത്തുക. For English press 2. தமிழுக்கு 3 அழுத்தவும்.',
+    ivrSchemeIntro: (idx, name) => `പദ്ധതി ${idx}: ${name}.`,
+    ivrSchemeDetailsPrompt: 'ഈ പദ്ധതി നിങ്ങളുടെ പ്രായവും വരുമാനവുമായി യോജിക്കുന്നു. കൂടുതൽ വിവരങ്ങൾക്ക് 1 അമർത്തുക.',
+    ivrSchemeNavigation: 'അടുത്ത പദ്ധതിക്ക് 2, വീണ്ടും കേൾക്കാൻ 4 അമർത്തുക.',
+    smsWelcome: 'അറിവോം തിട്ടം: സഹായം ലഭിക്കാൻ നമ്പർ മറുപടി നൽകുക.',
+    smsCategoryMenu: '1 വിദ്യാഭ്യാസം | 2 കൃഷി | 3 വീട് | 4 ആരോഗ്യം | 5 പെൻഷൻ',
+    smsResultIntro: (count) => `താങ്കളുടെ വിവരങ്ങൾ പ്രകാരം ${count} പദ്ധതികൾ ലഭ്യമാണ്.`,
+    errorVoicePrompt: 'ക്ഷമിക്കണം, ശബ്ദം വ്യക്തമായില്ല. ദയവായി വീണ്ടും പറയുക അല്ലെങ്കിൽ ടൈപ്പ് ചെയ്യുക.',
+  },
+  kn: {
+    langId: 'kn',
+    greetingPrompt: 'ನಮಸ್ಕಾರ! ಅರಿವೋಮ್ ತಿಟ್ಟಂ ಗೆ ಸ್ವಾಗತ. ನಿಮಗೆ ಯಾವ ಸರ್ಕಾರದ ಸಹಾಯ ಬೇಕು?',
+    listeningPrompt: 'ಕೇಳಿಸಿಕೊಳ್ಳುತ್ತಿದ್ದೇವೆ... ಮಾತನಾಡಿ.',
+    understandingPrompt: 'ನಿಮ್ಮ ವಿವರಗಳನ್ನು ಪರಿಶೀಲಿಸುತ್ತಿದ್ದೇವೆ...',
+    heardConfirmation: (transcript) => `ನೀವು ಹೇಳಿದ್ದು ಕೇಳಿಸಿತು: "${transcript}".`,
+    professionFollowUp: (prof) => {
+      const p = prof.toLowerCase();
+      if (p.includes('farmer') || p.includes('ರೈತ')) {
+        return 'ನೀವು ರೈತರು ಎಂದು ತಿಳಿಯಿತು. ನಿಮ್ಮ ಬಳಿ ಎಷ್ಟು ಜಮೀನಿದೆ?';
+      }
+      return 'ನಿಮ್ಮ ವಿವರಗಳನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲಾಗಿದೆ.';
+    },
+    eligibilitySummary: (count) => `ನಿಮ್ಮ ವಿವರಗಳ ಪ್ರಕಾರ ${count} ಯೋಜನೆಗಳು ನಿಮಗೆ ಲಭ್ಯವಾಗಬಹುದು.`,
+    documentExplanation: (_docs) => 'ಈ ಯೋಜನೆಗೆ ಆಧಾರ್ ಕಾರ್ಡ್, ಆದಾಯ ಪ್ರಮಾಣಪತ್ರ ಮತ್ತು ಬ್ಯಾಂಕ್ ವಿವರಗಳು ಅಗತ್ಯವಿದೆ.',
+    ageQuestion: 'ನಿಮ್ಮ ವಯಸ್ಸು ಎಷ್ಟು?',
+    occupationQuestion: 'ನಿಮ್ಮ ಉದ್ಯೋಗವೇನು? (ರೈತ, ವಿದ್ಯಾರ್ಥಿ, ವ್ಯಾಪಾರಿ, ಕಾರ್ಮಿಕ)',
+    incomeQuestion: 'ನಿಮ್ಮ ಕುಟುಂಬದ ವಾರ್ಷಿಕ ಆದಾಯ ಎಷ್ಟು?',
+    districtQuestion: 'ನೀವು ಯಾವ ಜಿಲ್ಲೆಯವರು?',
+    needQuestion: 'ಯಾವ ಕ್ಷೇತ್ರದಲ್ಲಿ ನೆರವು ಬೇಕು? (ಕೃಷಿ, ಶಿಕ್ಷಣ, ವಸತಿ, ಮಹಿಳಾ ಕಲ್ಯಾಣ)',
+    evaluatingPrompt: 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್‌ಗೆ ಸೂಕ್ತವಾದ ಯೋಜನೆಗಳನ್ನು ಹುಡುಕಲಾಗುತ್ತಿದೆ...',
+    matchedHeading: (count) => `ಅಭಿನಂದನೆಗಳು! ನಿಮ್ಮ ಅರ್ಹತೆಗೆ ತಕ್ಕಂತೆ ${count} ಯೋಜನೆಗಳು ಲಭ್ಯವಿದೆ.`,
+    whyMeHeading: 'ಈ ಯೋಜನೆ ನಿಮಗೆ ಏಕೆ ಸೂಕ್ತವಾಗಿದೆ?',
+    explainSimplyIntro: 'ಸರಳ ವಿವರಣೆ:',
+    ivrWelcome: 'ಅರಿವೋಮ್ ತಿಟ್ಟಂ ಯೋಜನೆಗಳ ವೇದಿಕೆಗೆ ಸ್ವಾಗತ.',
+    ivrLanguagePrompt: 'ಕನ್ನಡಕ್ಕೆ 1 ಒತ್ತಿ. For English press 2.',
+    ivrSchemeIntro: (idx, name) => `ಯೋಜನೆ ${idx}: ${name}.`,
+    ivrSchemeDetailsPrompt: 'ಹೆಚ್ಚಿನ ವಿವರಗಳಿಗಾಗಿ 1 ಒತ್ತಿ.',
+    ivrSchemeNavigation: 'ಮುಂದಿನ ಯೋಜನೆಗೆ 2, ಪುನಃ ಕೇಳಲು 4 ಒತ್ತಿ.',
+    smsWelcome: 'ಅರಿವೋಮ್ ತಿಟ್ಟಂ: ಸರ್ಕಾರದ ಯೋಜನೆಗಳನ್ನು ತಿಳಿಯಲು ಸಂಖ್ಯೆ ಕಳುಹಿಸಿ.',
+    smsCategoryMenu: '1 ಕೃಷಿ | 2 ಶಿಕ್ಷಣ | 3 ವಸತಿ | 4 ಮಹಿಳಾ ಯೋಜನೆ | 5 ಆರೋಗ್ಯ',
+    smsResultIntro: (count) => `ನಿಮ್ಮ ವಿವರಗಳಿಗೆ ${count} ಯೋಜನೆಗಳು ಹೊಂದಾಣಿಕೆಯಾಗುತ್ತವೆ.`,
+    errorVoicePrompt: 'ಕ್ಷಮಿಸಿ, ಧ್ವನಿ ಸ್ಪಷ್ಟವಾಗಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ಮಾತನಾಡಿ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ.',
+  },
+  te: {
+    langId: 'te',
+    greetingPrompt: 'నమస్కారం! అరివోమ్ తిట్టం కు స్వాగతం. మీకు ఏ ప్రభుత్వ పథకం సహాయం కావాలి?',
+    listeningPrompt: 'వింటున్నాము... మాట్లాడండి.',
+    understandingPrompt: 'మీ అభ్యర్థనను పరిశీలిస్తున్నాము...',
+    heardConfirmation: (transcript) => `మీరు చెప్పింది విన్నాను: "${transcript}".`,
+    professionFollowUp: (prof) => {
+      const p = prof.toLowerCase();
+      if (p.includes('farmer') || p.includes('రైతు')) {
+        return 'మీరు రైతు అని అర్థమైంది. మీకు ఎంత వ్యవసాయ భూమి ఉంది?';
+      }
+      return 'మీ వివరాలను అర్థం చేసుకున్నాము.';
+    },
+    eligibilitySummary: (count) => `మీ వివరాల ఆధారంగా ${count} పథకాలు మీకు వర్తించవచ్చు.`,
+    documentExplanation: (_docs) => 'ఈ పథకానికి ఆధార్ కార్డు, ఆదాయ ధృవీకరణ పత్రం మరియు బ్యాంక్ వివరాలు అవసరం.',
+    ageQuestion: 'మీ వయస్సు ఎంత?',
+    occupationQuestion: 'మీ వృత్తి ఏమిటి? (రైతు, విద్యార్థి, మహిళా పారిశ్రామికవేత్త, కూలీ)',
+    incomeQuestion: 'మీ కుటుంబ వార్షిక ఆదాయం సుమారుగా ఎంత?',
+    districtQuestion: 'మీ జిల్లా ఏది?',
+    needQuestion: 'మీకు ఏ రంగంలో సహాయం కావాలి? (వ్యవసాయం, చదువు, ఇల్లు, మహిళా సంక్షేమం)',
+    evaluatingPrompt: 'మీ అర్హతకు తగిన ప్రభుత్వ పథకాలను వెతుకుతున్నాము...',
+    matchedHeading: (count) => `అభినందనలు! మీ వివరాలకు సంబంధించి ${count} పథకాలు లభించాయి.`,
+    whyMeHeading: 'ఈ పథకం మీకు ఎందుకు సరిపోతుంది?',
+    explainSimplyIntro: 'సులభమైన వివరణ:',
+    ivrWelcome: 'అరివోమ్ తిట్టం కు స్వాగతం.',
+    ivrLanguagePrompt: 'తెలుగు కోసం 1 నొక్కండి. For English press 2.',
+    ivrSchemeIntro: (idx, name) => `పథకం ${idx}: ${name}.`,
+    ivrSchemeDetailsPrompt: 'ఈ పథకం వివరాలు వినడానికి 1 నొక్కండి.',
+    ivrSchemeNavigation: 'తరువాతి పథకం కోసం 2, మళ్లీ వినడానికి 4 నొక్కండి.',
+    smsWelcome: 'అరివోమ్ తిట్టం: ప్రభుత్వ పథకాల సమాచారం కోసం నంబర్ పంపండి.',
+    smsCategoryMenu: '1 చదువు | 2 వ్యవసాయం | 3 ఇల్లు | 4 మహిళ | 5 ఆరోగ్యం',
+    smsResultIntro: (count) => `మీ వివరాల ఆధారంగా ${count} పథకాలు ఉన్నాయి.`,
+    errorVoicePrompt: 'క్షమించండి, మీ స్వరం స్పష్టంగా లేదు. దయచేసి మళ్ళీ చెప్పండి లేదా టైప్ చేయండి.',
   },
   bn: {
     langId: 'bn',
     greetingPrompt: 'নমস্কার! অরিভোম থিত্তমে আপনাকে স্বাগতম। আপনার কি ধরণের সরকারি সাহায্য প্রয়োজন?',
     listeningPrompt: 'শুনছি... বলুন।',
     understandingPrompt: 'আপনার প্রয়োজন যাচাই করা হচ্ছে...',
+    heardConfirmation: (transcript) => `আমি শুনেছি: "${transcript}".`,
+    professionFollowUp: (_prof) => 'আপনার পেশা বুঝতে পেরেছি। কত জমি বা যোগ্যতা আছে?',
+    eligibilitySummary: (count) => `আপনার তথ্যের ভিত্তিতে ${count}টি প্রকল্প আপনার জন্য প্রযোজ্য হতে পারে।`,
+    documentExplanation: (_docs) => 'এই প্রকল্পের জন্য আধার কার্ড, আয়ের শংসাপত্র এবং ব্যাঙ্ক পাসবুক প্রয়োজন।',
     ageQuestion: 'আপনার বয়স কত?',
     occupationQuestion: 'আপনার পেশা কি? (কৃষক, ছাত্র, দিনমজুর, ক্ষুদ্র ব্যবসায়ী)',
     incomeQuestion: 'আপনার পরিবারের আনুমানিক বার্ষিক আয় কত?',
@@ -166,13 +248,17 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     smsWelcome: 'অরিভোম থিত্তম: সরকারি প্রকল্প জানতে মেসেজ করুন।',
     smsCategoryMenu: '1 শিক্ষা | 2 কৃষি | 3 বাড়ি | 4 নারী কল্যাণ | 5 স্বাস্থ্য',
     smsResultIntro: (count) => `আপনার তথ্যের ভিত্তিতে ${count}টি প্রকল্প পাওয়া গেছে।`,
-    errorVoicePrompt: 'দুঃখিত, আওয়াজ পরিষ্কার বোঝা যায়নি। অনুগ্রহ করে আবার বলুন।',
+    errorVoicePrompt: 'দুঃখিত, আওয়াজ পরিষ্কার বোঝা যায়নি। অনুগ্রহ করে আবার বলুন বা টাইপ করুন।',
   },
   mr: {
     langId: 'mr',
     greetingPrompt: 'नमस्कार! अरिवोम थित्तम मध्ये आपले स्वागत आहे. आपणास कोणत्या सरकारी मदतीची गरज आहे?',
     listeningPrompt: 'ऐकत आहोत... बोला.',
     understandingPrompt: 'तुमची माहिती तपासत आहोत...',
+    heardConfirmation: (transcript) => `मी ऐकले: "${transcript}".`,
+    professionFollowUp: (_prof) => 'तुमचा व्यवसाय समजला. तुमच्याकडे किती शेतजमीन आहे?',
+    eligibilitySummary: (count) => `तुमच्या माहितीनुसार ${count} योजना तुमच्यासाठी योग्य असू शकतात.`,
+    documentExplanation: (_docs) => 'या योजनेसाठी आधार कार्ड, उत्पन्न प्रमाणपत्र आणि बँक खाते आवश्यक आहे.',
     ageQuestion: 'आपले वय किती आहे?',
     occupationQuestion: 'आपला व्यवसाय काय आहे? (शेतकरी, विद्यार्थी, कामगार, महिला उद्योजक)',
     incomeQuestion: 'कुटुंबाचे अंदाजे वार्षिक उत्पन्न किती आहे?',
@@ -190,13 +276,17 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     smsWelcome: 'अरिवोम थित्तम: योजना माहितीसाठी पर्याय निवडा.',
     smsCategoryMenu: '1 शेती | 2 शिक्षण | 3 घरकुल | 4 महिला | 5 आरोग्य',
     smsResultIntro: (count) => `आपल्यासाठी ${count} योजना उपलब्ध आहेत.`,
-    errorVoicePrompt: 'माफ करा, आवाज स्पष्ट आला नाही. कृपया पुन्हा बोला.',
+    errorVoicePrompt: 'माफ करा, आवाज स्पष्ट आला नाही. कृपया पुन्हा बोला किंवा टाइप करा.',
   },
   gu: {
     langId: 'gu',
     greetingPrompt: 'નમસ્તે! અરિવોમ થિત્તમમાં તમારું સ્વાગત છે. તમને કઈ સરકારી યોજનાની મદદ જોઈએ છે?',
     listeningPrompt: 'સાંભળી રહ્યા છીએ... બોલો.',
     understandingPrompt: 'તમારી વિગતો ચકાસી રહ્યા છીએ...',
+    heardConfirmation: (transcript) => `મેં સાંભળ્યું: "${transcript}".`,
+    professionFollowUp: (_prof) => 'તમારો વ્યવસાય સમજાયો. તમારી પાસે કેટલી જમીન છે?',
+    eligibilitySummary: (count) => `તમારી વિગતો મુજબ ${count} યોજનાઓ તમારા માટે યોગ્ય હોઈ શકે છે.`,
+    documentExplanation: (_docs) => 'આ યોજના માટે આધાર કાર્ડ, આવકનું પ્રમાણપત્ર અને બેંક પાસબુક જરૂરી છે.',
     ageQuestion: 'તમારી ઉંમર કેટલી છે?',
     occupationQuestion: 'તમારો વ્યવસાય શું છે? (ખેડૂત, વિદ્યાર્થી, વેપારી, કારીગર)',
     incomeQuestion: 'તમારા કુટુંબની અંદાજિત વાર્ષિક આવક કેટલી છે?',
@@ -214,13 +304,17 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     smsWelcome: 'અરિવોમ થિત્તમ: સરકારી યોજનાઓ જાણવા માટે નંબર મોકલો.',
     smsCategoryMenu: '1 ખેતી | 2 શિક્ષણ | 3 આવાસ | 4 મહિલા | 5 સ્વાસ્થ્ય',
     smsResultIntro: (count) => `તમારી વિગતો મુજબ ${count} યોજનાઓ ઉપલબ્ધ છે.`,
-    errorVoicePrompt: 'માફ કરશો, અવાજ સ્પષ્ટ નહોતો. કૃપા કરીને ફરી બોલો.',
+    errorVoicePrompt: 'માફ કરશો, અવાજ સ્પષ્ટ નહોતો. કૃપા કરીને ફરી બોલો અથવા ટાઈપ કરો.',
   },
   or: {
     langId: 'or',
     greetingPrompt: 'ନମସ୍କାର! ଅରିଭୋମ୍ ଥିତ୍ତମକୁ ଆପଣଙ୍କୁ ସ୍ୱାଗତ। ଆପଣଙ୍କୁ କେଉଁ ସରକାରୀ ଯୋଜନା ସାହାଯ୍ୟ ଦରକାର?',
     listeningPrompt: 'ଶୁଣୁଛୁ... କୁହନ୍ତୁ।',
     understandingPrompt: 'ଆପଣଙ୍କର ଆବଶ୍ୟକତା ଯାଞ୍ଚ ହେଉଛି...',
+    heardConfirmation: (transcript) => `ମୁଁ ଶୁଣିଲି: "${transcript}".`,
+    professionFollowUp: (_prof) => 'ଆପଣଙ୍କ ବୃତ୍ତି ବୁଝିପାରିଲି।',
+    eligibilitySummary: (count) => `ଆପଣଙ୍କ ବିବରଣୀ ଅନୁଯାୟୀ ${count}ଟି ଯୋଜନା ଉପଲବ୍ଧ ହୋଇପାରେ।`,
+    documentExplanation: (_docs) => 'ଏହି ଯୋଜନା ପାଇଁ ଆଧାର କାର୍ଡ, ଆୟ ପ୍ରମାଣପତ୍ର ଏବଂ ବ୍ୟାଙ୍କ ପାସବୁକ୍ ଆବଶ୍ୟକ।',
     ageQuestion: 'ଆପଣଙ୍କ ବୟସ କେତେ?',
     occupationQuestion: 'ଆପଣଙ୍କ ବୃତ୍ତି କ’ଣ? (ଚାଷୀ, ଛାତ୍ର, ଶ୍ରମିକ, ବ୍ୟବସାୟୀ)',
     incomeQuestion: 'ପରିବାରର ଆନୁମାନିକ ବାର୍ଷିକ ଆୟ କେତେ?',
@@ -238,13 +332,17 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     smsWelcome: 'ଅରିଭୋମ୍ ଥିତ୍ତମ: ଯୋଜନା ଜାଣିବା ପାଇଁ ନମ୍ବର ପଠାନ୍ତୁ।',
     smsCategoryMenu: '1 କୃଷି | 2 ଶିକ୍ଷା | 3 ଘର | 4 ମହିଳା | 5 ସ୍ୱାସ୍ଥ୍ୟ',
     smsResultIntro: (count) => `ଆପଣଙ୍କ ପାଇଁ ${count}ଟି ଯୋଜନା ଉପଲବ୍ଧ।`,
-    errorVoicePrompt: 'କ୍ଷମା କରିବେ, ସ୍ୱର ସ୍ପଷ୍ଟ ହେଲାନାହିଁ। ଦୟାକରି ପୁଣି କୁହନ୍ତୁ।',
+    errorVoicePrompt: 'କ୍ଷମା କରିବେ, ସ୍ୱର ସ୍ପଷ୍ଟ ହେଲାନାହିଁ। ଦୟାକରି ପୁଣି କୁହନ୍ତୁ କିମ୍ବା ଟାଇପ୍ କରନ୍ତୁ।',
   },
   pa: {
     langId: 'pa',
     greetingPrompt: 'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਅਰੀਵੋਮ ਥਿੱਤਮ ਵਿੱਚ ਤੁਹਾਡਾ ਸਵਾਗਤ ਹੈ। ਤੁਹਾਨੂੰ ਕਿਹੜੀ ਸਰਕਾਰੀ ਸਹਾਇਤਾ ਚਾਹੀਦੀ ਹੈ?',
     listeningPrompt: 'ਸੁਣ ਰਹੇ ਹਾਂ... ਬੋਲੋ।',
     understandingPrompt: 'ਤੁਹਾਡੀ ਜਾਣਕਾਰੀ ਦੀ ਜਾਂਚ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ...',
+    heardConfirmation: (transcript) => `ਮੈਂ ਸੁਣਿਆ: "${transcript}".`,
+    professionFollowUp: (_prof) => 'ਮੈਨੂੰ ਤੁਹਾਡਾ ਕੰਮ ਸਮਝ ਆ ਗਿਆ ਹੈ। ਤੁਹਾਡੇ ਕੋਲ ਕਿੰਨੀ ਜ਼ਮੀਨ ਹੈ?',
+    eligibilitySummary: (count) => `ਤੁਹਾਡੀ ਜਾਣਕਾਰੀ ਅਨੁਸਾਰ ${count} ਯੋਜਨਾਵਾਂ ਤੁਹਾਡੇ ਲਈ ਢੁਕਵੀਆਂ ਹੋ ਸਕਦੀਆਂ ਹਨ।`,
+    documentExplanation: (_docs) => 'ਇਸ ਸਕੀਮ ਲਈ ਆਧਾਰ ਕਾਰਡ, ਆਮਦਨ ਸਰਟੀਫਿਕੇਟ ਅਤੇ ਬੈਂਕ ਖਾਤਾ ਜ਼ਰੂਰੀ ਹੈ।',
     ageQuestion: 'ਤੁਹਾਡੀ ਉਮਰ ਕਿੰਨੀ ਹੈ?',
     occupationQuestion: 'ਤੁਹਾਡਾ ਕੰਮ ਕੀ ਹੈ? (ਕਿਸਾਨ, ਵਿਦਿਆਰਥੀ, ਕਾਰੀਗਰ, ਮਜ਼ਦੂਰ)',
     incomeQuestion: 'ਤੁਹਾਡੀ ਸਾਲਾਨਾ ਪਰਿਵਾਰਕ ਆਮਦਨ ਕਿੰਨੀ ਹੈ?',
@@ -262,13 +360,17 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     smsWelcome: 'ਅਰੀਵੋਮ ਥਿੱਤਮ: ਸਰਕਾਰੀ ਸਕੀਮਾਂ ਜਾਣਨ ਲਈ ਨੰਬਰ ਚੁਣੋ।',
     smsCategoryMenu: '1 ਖੇਤੀਬਾੜੀ | 2 ਸਿੱਖਿਆ | 3 ਮਕਾਨ | 4 ਔਰਤਾਂ | 5 ਸਿਹਤ',
     smsResultIntro: (count) => `ਤੁਹਾਡੇ ਲਈ ${count} ਸਕੀਮਾਂ ਉਪਲਬਧ ਹਨ।`,
-    errorVoicePrompt: 'ਮਾਫ਼ ਕਰਨਾ, ਆਵਾਜ਼ ਸਾਫ਼ ਨਹੀਂ ਸੀ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਬੋਲੋ।',
+    errorVoicePrompt: 'ਮਾਫ਼ ਕਰਨਾ, ਆਵਾਜ਼ ਸਾਫ਼ ਨਹੀਂ ਸੀ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਬੋਲੋ ਜਾਂ ਟਾਈਪ ਕਰੋ।',
   },
   as: {
     langId: 'as',
     greetingPrompt: 'নমস্কাৰ! অৰিভোম থিত্তমলৈ আপোনাক স্বাগতম। আপোনাক কি চৰকাৰী আঁচনিৰ সাহায্য লাগে?',
     listeningPrompt: 'শুনি আছোঁ... কওক।',
     understandingPrompt: 'আপোনাৰ প্ৰয়োজন চালিজাৰি চোৱা হৈছে...',
+    heardConfirmation: (transcript) => `মই শুনিলোঁ: "${transcript}".`,
+    professionFollowUp: (_prof) => 'আপোনাৰ বৃত্তি বুজি পালোঁ।',
+    eligibilitySummary: (count) => `আপোনাৰ তথ্যৰ ভিত্তিত ${count}খন আঁচনি আপোনাৰ বাবে প্ৰযোজ্য হব পাৰে।`,
+    documentExplanation: (_docs) => 'এই আঁচনিৰ বাবে আধাৰ কাৰ্ড, আয়ৰ প্ৰমাণপত্ৰ আৰু বেংক পাছবুক প্ৰয়োজন।',
     ageQuestion: 'আপোনাৰ বয়স কিমান?',
     occupationQuestion: 'আপোনাৰ বৃত্তি কি? (কৃষক, ছাত্ৰ, হস্তশিল্পী, শ্ৰমিক)',
     incomeQuestion: 'আপোনাৰ পৰিয়ালৰ আনুমানিক বাৰ্ষিক আয় কিমান?',
@@ -286,13 +388,26 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     smsWelcome: 'অৰিভোম থিত্তম: চৰকাৰী আঁচনি জানিবলৈ উত্তৰ দিয়ক।',
     smsCategoryMenu: '1 কৃষি | 2 শিক্ষা | 3 ঘৰ | 4 মহিলা | 5 স্বাস্থ্য',
     smsResultIntro: (count) => `আপোনাৰ বাবে ${count}খন আঁচনি উপলব্ধ।`,
-    errorVoicePrompt: 'ক্ষমা কৰিব, স্পষ্টকৈ শুনা নগল। অনুগ্ৰহ কৰি পুনৰ কওক।',
+    errorVoicePrompt: 'ক্ষমা কৰিব, স্পষ্টকৈ শুনা নগল। অনুগ্ৰহ কৰি পুনৰ কওক বা টাইপ কৰক।',
   },
   en: {
     langId: 'en',
     greetingPrompt: 'Welcome to Arivom Thittam. What government assistance do you need today?',
     listeningPrompt: 'Listening carefully... please speak.',
     understandingPrompt: 'Analyzing your situation and intent...',
+    heardConfirmation: (transcript) => `I heard: "${transcript}".`,
+    professionFollowUp: (prof) => {
+      const p = prof.toLowerCase();
+      if (p.includes('farmer')) return 'I understand you are a farmer. How many acres of land do you hold?';
+      if (p.includes('student')) return 'I understand you are a student. Which course or year of study are you in?';
+      if (p.includes('worker')) return 'I understand you are a worker. Are you registered with the unorganized welfare board?';
+      if (p.includes('business')) return 'I understand you run a small business. Do you require a MUDRA micro-loan?';
+      if (p.includes('homemaker')) return 'I understand you are a homemaker. Are you part of a Self-Help Group (SHG)?';
+      if (p.includes('senior')) return 'I understand you are a senior citizen. Do you currently receive an Old Age Pension?';
+      return 'I have recorded your profession. Let us check your eligible schemes.';
+    },
+    eligibilitySummary: (count) => `Based on your details, ${count} government schemes may match your eligibility.`,
+    documentExplanation: (_docs) => 'This scheme typically requires Aadhaar Card, Income Certificate, and Bank Passbook.',
     ageQuestion: 'What is your age?',
     occupationQuestion: 'What is your occupation? (e.g. Farmer, Student, Artisan, Street Vendor, Homemaker)',
     incomeQuestion: 'What is your approximate annual family income?',
@@ -310,7 +425,7 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     smsWelcome: 'Arivom Thittam: Reply with a number to discover schemes for your family.',
     smsCategoryMenu: '1 Education | 2 Agriculture | 3 Housing | 4 Women | 5 Health | 6 Business',
     smsResultIntro: (count) => `Found ${count} matching schemes for your profile. Reply with scheme number for details.`,
-    errorVoicePrompt: 'Sorry, we could not clearly understand. Please try speaking again or select on screen.',
+    errorVoicePrompt: 'Sorry, we could not hear clearly. Please speak again or type your details.',
   },
 };
 
