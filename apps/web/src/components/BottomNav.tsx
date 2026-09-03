@@ -102,84 +102,150 @@ export const BottomNav: React.FC = () => {
 export const DesktopSidebar: React.FC = () => {
   const { activeTab, setActiveTab, setShowVoiceModal, activeMatches, savedSchemeIds, t } =
     useApp();
+  const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
 
   const strongMatchesCount = activeMatches.filter((m) => m.matchLevel !== 'MORE_INFO').length;
 
-  const desktopTabs: { id: ViewTab; label: string; icon: React.ReactNode; badge?: number }[] = [
-    { id: 'home', label: t('nav.home'), icon: <Home className="w-4 h-4" /> },
+  const desktopTabs: { id: ViewTab; label: string; icon: React.ReactNode; badge?: number; description?: string }[] = [
+    { id: 'home', label: t('nav.home'), icon: <Home className="w-4 h-4 shrink-0" />, description: 'Overview' },
     {
       id: 'matches',
       label: t('nav.matches'),
-      icon: <Sparkles className="w-4 h-4" />,
+      icon: <Sparkles className="w-4 h-4 shrink-0" />,
       badge: strongMatchesCount,
+      description: 'Eligible Schemes',
     },
     {
       id: 'saved',
       label: t('nav.saved'),
-      icon: <Bookmark className="w-4 h-4" />,
+      icon: <Bookmark className="w-4 h-4 shrink-0" />,
       badge: savedSchemeIds.length > 0 ? savedSchemeIds.length : undefined,
+      description: 'Bookmarks Locker',
     },
-    { id: 'profile', label: t('nav.profile'), icon: <User className="w-4 h-4" /> },
-    { id: 'button_phone', label: '1800 IVR', icon: <PhoneCall className="w-4 h-4" /> },
-    { id: 'assisted', label: 'Assisted CSC', icon: <Handshake className="w-4 h-4" /> },
-    { id: 'architecture', label: 'Architecture', icon: <Cpu className="w-4 h-4" /> },
+    { id: 'profile', label: t('nav.profile'), icon: <User className="w-4 h-4 shrink-0" />, description: 'Demographics' },
+    { id: 'button_phone', label: '1800 IVR Flow', icon: <PhoneCall className="w-4 h-4 shrink-0" />, description: 'Feature Phone' },
+    { id: 'assisted', label: 'Assisted CSC', icon: <Handshake className="w-4 h-4 shrink-0" />, description: 'Operator Portal' },
+    { id: 'architecture', label: 'Architecture', icon: <Cpu className="w-4 h-4 shrink-0" />, description: 'System Pipeline' },
   ];
 
   return (
     <aside
-      aria-label="Desktop Sidebar Navigation"
-      className="hidden md:flex flex-col items-center gap-1.5 py-4 px-2 bg-white rounded-3xl border border-[#e8e1dc] shadow-xs w-16 shrink-0 sticky top-24 self-start my-6 ml-3"
+      aria-label="Desktop Dynamic Sidebar Navigation"
+      className={`hidden md:flex flex-col gap-1.5 p-2.5 bg-white rounded-3xl border border-[#e8e1dc] shadow-xs sticky top-24 self-start my-6 ml-3 transition-all duration-300 ease-in-out shrink-0 z-30 ${
+        isExpanded ? 'w-56' : 'w-16 items-center'
+      }`}
     >
-      {/* Voice Assistant Minimized Action Pill */}
+      {/* Dynamic Expand / Collapse Header */}
+      <div className="flex items-center justify-between w-full px-1.5 py-1 mb-1">
+        {isExpanded && (
+          <span className="text-[10px] font-black tracking-widest text-[#756a6f] uppercase truncate animate-fade-in">
+            Navigation
+          </span>
+        )}
+        <button
+          type="button"
+          id="sidebar-dynamic-toggle-btn"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className={`p-1.5 rounded-xl hover:bg-[#faf8f3] text-[#756a6f] hover:text-[#21191d] transition-colors cursor-pointer ${
+            !isExpanded ? 'mx-auto' : ''
+          }`}
+          title={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
+        >
+          <span className="text-xs font-bold">{isExpanded ? '◀' : '▶'}</span>
+        </button>
+      </div>
+
+      {/* Voice Assistant Action Button */}
       <button
         type="button"
         id="desktop-sidebar-voice-btn"
         onClick={() => setShowVoiceModal(true)}
-        className="w-11 h-11 rounded-2xl bg-[#4a1f2d] hover:bg-[#6b3548] text-white flex items-center justify-center shadow-xs transition-transform active:scale-95 cursor-pointer mb-2 group relative"
+        className={`rounded-2xl bg-[#4a1f2d] hover:bg-[#6b3548] text-white flex items-center transition-all active:scale-95 cursor-pointer shadow-xs group relative ${
+          isExpanded
+            ? 'w-full p-2.5 px-3 justify-start gap-2.5'
+            : 'w-11 h-11 justify-center mb-1'
+        }`}
         title="Open Voice Assistant"
       >
-        <Mic className="w-5 h-5 text-[#c8a96b]" />
-        <span className="absolute left-full ml-3 px-2 py-1 bg-[#21191d] text-white text-[10px] font-bold rounded-lg shadow-md whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50">
-          Voice Assistant
-        </span>
+        <Mic className="w-5 h-5 text-[#c8a96b] shrink-0" />
+        {isExpanded ? (
+          <div className="text-left leading-tight truncate animate-fade-in">
+            <span className="block text-xs font-bold text-white">Voice Assistant</span>
+            <span className="block text-[9px] text-[#ffd9e1]">Tap to Speak</span>
+          </div>
+        ) : (
+          <span className="absolute left-full ml-3 px-2 py-1 bg-[#21191d] text-white text-[10px] font-bold rounded-lg shadow-md whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50">
+            Voice Assistant
+          </span>
+        )}
       </button>
 
-      <div className="w-8 h-px bg-[#e8e1dc] mb-1"></div>
+      <div className={`h-px bg-[#e8e1dc] my-1 ${isExpanded ? 'w-full' : 'w-8'}`}></div>
 
-      {/* Minimized Icon Navigation Rail */}
-      {desktopTabs.map((tab) => {
-        const isActive = activeTab === tab.id;
-        return (
-          <button
-            key={tab.id}
-            type="button"
-            id={`desktop-sidebar-${tab.id}-btn`}
-            onClick={() => setActiveTab(tab.id)}
-            className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all cursor-pointer relative group ${
-              isActive
-                ? 'bg-[#4a1f2d] text-white shadow-xs'
-                : 'text-[#756a6f] hover:text-[#21191d] hover:bg-[#faf8f3]'
-            }`}
-            title={tab.label}
-          >
-            <span className={isActive ? 'text-[#c8a96b]' : 'text-[#756a6f]'}>
-              {tab.icon}
-            </span>
+      {/* Dynamic Nav Items */}
+      <div className="flex flex-col gap-1 w-full">
+        {desktopTabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              id={`desktop-sidebar-${tab.id}-btn`}
+              onClick={() => setActiveTab(tab.id)}
+              className={`rounded-2xl flex items-center transition-all cursor-pointer relative group ${
+                isExpanded
+                  ? `w-full p-2 px-3 justify-between ${
+                      isActive
+                        ? 'bg-[#4a1f2d] text-white shadow-xs font-bold'
+                        : 'text-[#514346] hover:bg-[#faf8f3] hover:text-[#21191d]'
+                    }`
+                  : `w-11 h-11 justify-center ${
+                      isActive
+                        ? 'bg-[#4a1f2d] text-white shadow-xs'
+                        : 'text-[#756a6f] hover:text-[#21191d] hover:bg-[#faf8f3]'
+                    }`
+              }`}
+              title={tab.label}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className={isActive ? 'text-[#c8a96b]' : 'text-[#756a6f]'}>
+                  {tab.icon}
+                </span>
+                {isExpanded && (
+                  <div className="text-left leading-tight truncate animate-fade-in">
+                    <span className="block text-xs font-bold truncate">{tab.label}</span>
+                    <span className={`block text-[9px] truncate ${isActive ? 'text-[#ffd9e1]' : 'text-[#756a6f]'}`}>
+                      {tab.description}
+                    </span>
+                  </div>
+                )}
+              </div>
 
-            {/* Badge Indicator */}
-            {tab.badge !== undefined && tab.badge > 0 && (
-              <span className="absolute top-1.5 right-1.5 bg-[#c8a96b] text-[#310a18] text-[9px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center">
-                {tab.badge}
-              </span>
-            )}
+              {/* Badge Indicator */}
+              {tab.badge !== undefined && tab.badge > 0 && (
+                <span
+                  className={`${
+                    isExpanded
+                      ? `text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          isActive ? 'bg-[#c8a96b] text-[#310a18]' : 'bg-[#faf8f3] text-[#756a6f] border border-[#e8e1dc]'
+                        }`
+                      : 'absolute top-1.5 right-1.5 bg-[#c8a96b] text-[#310a18] text-[9px] font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center'
+                  }`}
+                >
+                  {tab.badge}
+                </span>
+              )}
 
-            {/* Hover Tooltip (Appears to the right, never overlaps navigation) */}
-            <span className="absolute left-full ml-3 px-2.5 py-1 bg-[#21191d] text-white text-xs font-bold rounded-lg shadow-md whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50">
-              {tab.label}
-            </span>
-          </button>
-        );
-      })}
+              {/* Hover Tooltip (Only when collapsed) */}
+              {!isExpanded && (
+                <span className="absolute left-full ml-3 px-2.5 py-1 bg-[#21191d] text-white text-xs font-bold rounded-lg shadow-md whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50">
+                  {tab.label}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
     </aside>
   );
 };
