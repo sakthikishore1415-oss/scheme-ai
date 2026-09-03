@@ -116,21 +116,7 @@ export class GeminiLiveVoiceService {
     this.stopPlayback();
     this.setState('CONNECTING');
 
-    // 1. Initialize microphone stream for audio visualizer
-    try {
-      this.localStream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
-      });
-      this.setupAudioAnalyser(this.localStream);
-    } catch (err: any) {
-      console.warn('Microphone stream access notice:', err);
-    }
-
-    // 2. Initialize Continuous Speech Recognition
+    // 1. Initialize Continuous Speech Recognition (direct, non-blocking microphone access)
     const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRec) {
@@ -817,14 +803,16 @@ CRITICAL VOICE RULES:
       () => this.setState('SPEAKING'),
       () => {
         this.stopSpeechWaveSimulation();
-        if (this.state !== 'DISCONNECTED' && this.state !== 'IDLE') {
+        if (this.state !== 'DISCONNECTED' && this.state !== 'IDLE' && this.state !== 'MUTED') {
           this.setState('LISTENING');
+          this.startListening();
         }
       },
       () => {
         this.stopSpeechWaveSimulation();
-        if (this.state !== 'DISCONNECTED') {
+        if (this.state !== 'DISCONNECTED' && this.state !== 'IDLE' && this.state !== 'MUTED') {
           this.setState('LISTENING');
+          this.startListening();
         }
       }
     );
@@ -846,8 +834,9 @@ CRITICAL VOICE RULES:
       audio.onended = () => {
         this.stopSpeechWaveSimulation();
         this.currentAudioElement = null;
-        if (this.state !== 'DISCONNECTED' && this.state !== 'IDLE') {
+        if (this.state !== 'DISCONNECTED' && this.state !== 'IDLE' && this.state !== 'MUTED') {
           this.setState('LISTENING');
+          this.startListening();
         }
         resolve();
       };
@@ -856,8 +845,9 @@ CRITICAL VOICE RULES:
         console.warn('Gemini voice audio element error:', e);
         this.stopSpeechWaveSimulation();
         this.currentAudioElement = null;
-        if (this.state !== 'DISCONNECTED') {
+        if (this.state !== 'DISCONNECTED' && this.state !== 'IDLE' && this.state !== 'MUTED') {
           this.setState('LISTENING');
+          this.startListening();
         }
         resolve();
       };
@@ -866,8 +856,9 @@ CRITICAL VOICE RULES:
         console.warn('Audio play notice:', err);
         this.stopSpeechWaveSimulation();
         this.currentAudioElement = null;
-        if (this.state !== 'DISCONNECTED') {
+        if (this.state !== 'DISCONNECTED' && this.state !== 'IDLE' && this.state !== 'MUTED') {
           this.setState('LISTENING');
+          this.startListening();
         }
         resolve();
       });
