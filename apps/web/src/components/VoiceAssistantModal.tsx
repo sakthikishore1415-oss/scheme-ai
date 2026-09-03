@@ -50,6 +50,7 @@ export const VoiceAssistantModal: React.FC = () => {
     selectedVoiceLanguageId,
     setSelectedVoiceLanguageId,
     currentStateConfig,
+    currentLanguageConfig,
     updateUserProfile,
     activeMatches,
     setActiveTab,
@@ -149,7 +150,7 @@ export const VoiceAssistantModal: React.FC = () => {
     }
   };
 
-  const handleSendText = (e: React.SubmitEvent) => {
+  const handleSendText = (e: React.FormEvent) => {
     e.preventDefault();
     if (!typedInput.trim()) return;
     const txt = typedInput;
@@ -383,7 +384,7 @@ export const VoiceAssistantModal: React.FC = () => {
             </div>
           </div>
 
-          <div className="text-[11px] text-[#756a6f] items-center gap-1.5 shrink-0 max-sm:hidden sm:flex">
+          <div className="text-[11px] text-[#756a6f] flex items-center gap-1.5 shrink-0 hidden sm:flex">
             <span className="w-2 h-2 rounded-full bg-[#15803d] shrink-0 animate-pulse" />
             <span>Universal Sync: applies to voice & entire site</span>
           </div>
