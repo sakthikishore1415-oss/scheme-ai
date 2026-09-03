@@ -15,3 +15,4 @@ export function getTranslation(langId: string, key: TranslationKey): string {
 }
 
 export * from './types';
+

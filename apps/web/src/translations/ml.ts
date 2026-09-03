@@ -124,3 +124,4 @@ export const ml: TranslationDictionary = {
   'common.error': 'തടസ്സം നേരിട്ടു. വീണ്ടും ശ്രമിക്കുക.',
   'common.retry': 'വീണ്ടും ശ്രമിക്കുക',
 };
+

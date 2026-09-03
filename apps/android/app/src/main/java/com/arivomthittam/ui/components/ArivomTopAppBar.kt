@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,9 +28,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.arivomthittam.ui.theme.OnSurface
-import com.arivomthittam.ui.theme.OnSurfaceVariant
-import com.arivomthittam.ui.theme.OutlineVariant
 import com.arivomthittam.ui.theme.PrimaryIndigo
 import com.arivomthittam.ui.theme.Surface
 import com.arivomthittam.ui.theme.SurfaceContainerLow
@@ -39,6 +35,7 @@ import com.arivomthittam.ui.theme.SurfaceContainerLow
 @Composable
 fun ArivomTopAppBar(
     title: String,
+    logoLetter: String = "A",
     tamilTitle: String? = null,
     canNavigateBack: Boolean = false,
     onNavigateBack: () -> Unit = {},
@@ -72,7 +69,7 @@ fun ArivomTopAppBar(
                     Spacer(modifier = Modifier.width(8.dp))
                 }
 
-                // Logo emblem
+                // Dynamic Logo emblem
                 Box(
                     modifier = Modifier
                         .size(32.dp)
@@ -81,7 +78,7 @@ fun ArivomTopAppBar(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "அ",
+                        text = logoLetter,
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
@@ -98,14 +95,6 @@ fun ArivomTopAppBar(
                         color = PrimaryIndigo,
                         letterSpacing = (-0.01).sp
                     )
-                    if (!tamilTitle.isNullOrBlank()) {
-                        Text(
-                            text = tamilTitle,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = OnSurfaceVariant
-                        )
-                    }
                 }
             }
 

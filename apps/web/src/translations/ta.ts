@@ -124,3 +124,4 @@ export const ta: TranslationDictionary = {
   'common.error': 'பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.',
   'common.retry': 'மீண்டும் முயற்சிக்கவும்',
 };
+

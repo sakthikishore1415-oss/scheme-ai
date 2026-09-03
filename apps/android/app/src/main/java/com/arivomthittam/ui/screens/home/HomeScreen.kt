@@ -88,18 +88,24 @@ fun HomeScreen(
     onWhyMeClick: (String) -> Unit,
     onSaveToggle: (String) -> Unit
 ) {
+    val lang = uiState.selectedLanguage
+    val appTitle = com.arivomthittam.domain.language.AndroidTranslations.getString("app.name", lang)
+    val logoLetter = com.arivomthittam.domain.language.AndroidTranslations.getLogoLetter(lang)
+    val langDisplayName = com.arivomthittam.domain.language.AndroidTranslations.getLanguageDisplayName(lang)
+
     Scaffold(
         topBar = {
             ArivomTopAppBar(
-                title = "Arivom Thittam",
-                tamilTitle = "அறிவோம் திட்டம்",
-                currentLanguageName = if (uiState.selectedLanguage == "ta") "தமிழ்" else "English",
+                title = appTitle,
+                logoLetter = logoLetter,
+                currentLanguageName = langDisplayName,
                 onLanguageClick = { onNavigate(Screen.Language.route) }
             )
         },
         bottomBar = {
             ArivomBottomBar(
                 currentRoute = Screen.Home.route,
+                selectedLanguage = lang,
                 onNavigate = onNavigate
             )
         }
@@ -121,7 +127,7 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "அரசு திட்டங்கள்",
+                        text = com.arivomthittam.domain.language.AndroidTranslations.getString("home.tagline", lang),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = PrimaryIndigo,
@@ -131,7 +137,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
-                        text = "உங்களுக்கு என்ன கிடைக்கும்?",
+                        text = com.arivomthittam.domain.language.AndroidTranslations.getString("home.heroTitle", lang),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = OnSurface,
@@ -139,7 +145,7 @@ fun HomeScreen(
                     )
 
                     Text(
-                        text = "Find government schemes you may qualify for.",
+                        text = com.arivomthittam.domain.language.AndroidTranslations.getString("home.heroSubtitle", lang),
                         fontSize = 14.sp,
                         color = OnSurfaceVariant,
                         textAlign = TextAlign.Center,

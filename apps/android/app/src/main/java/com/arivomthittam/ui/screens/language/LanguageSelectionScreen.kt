@@ -85,7 +85,7 @@ fun LanguageSelectionScreen(
         topBar = {
             ArivomTopAppBar(
                 title = "Arivom Thittam",
-                tamilTitle = currentLangOption.nativeName
+                logoLetter = com.arivomthittam.domain.language.AndroidTranslations.getLogoLetter(selectedLang)
             )
         },
         bottomBar = {

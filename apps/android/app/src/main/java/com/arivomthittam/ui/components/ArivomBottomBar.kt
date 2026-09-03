@@ -25,29 +25,30 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.arivomthittam.domain.language.AndroidTranslations
 import com.arivomthittam.ui.navigation.Screen
 import com.arivomthittam.ui.theme.OnSecondaryContainer
 import com.arivomthittam.ui.theme.OnSurfaceVariant
-import com.arivomthittam.ui.theme.OutlineVariant
 import com.arivomthittam.ui.theme.SecondaryContainer
 import com.arivomthittam.ui.theme.Surface
 
 data class NavigationItem(
     val route: String,
-    val title: String,
+    val titleKey: String,
     val icon: ImageVector
 )
 
 val NAV_ITEMS = listOf(
-    NavigationItem(Screen.Home.route, "Home", Icons.Default.Home),
-    NavigationItem(Screen.Matches.route, "Matches", Icons.Default.Repeat),
-    NavigationItem(Screen.Saved.route, "Saved", Icons.Default.Bookmark),
-    NavigationItem(Screen.Profile.route, "Profile", Icons.Default.Person)
+    NavigationItem(Screen.Home.route, "nav.home", Icons.Default.Home),
+    NavigationItem(Screen.Matches.route, "nav.matches", Icons.Default.Repeat),
+    NavigationItem(Screen.Saved.route, "nav.saved", Icons.Default.Bookmark),
+    NavigationItem(Screen.Profile.route, "nav.profile", Icons.Default.Person)
 )
 
 @Composable
 fun ArivomBottomBar(
     currentRoute: String,
+    selectedLanguage: String = "en",
     onNavigate: (String) -> Unit
 ) {
     Surface(
@@ -65,6 +66,7 @@ fun ArivomBottomBar(
         ) {
             NAV_ITEMS.forEach { item ->
                 val isSelected = currentRoute == item.route
+                val label = AndroidTranslations.getString(item.titleKey, selectedLanguage)
                 val pillModifier = if (isSelected) {
                     Modifier
                         .clip(RoundedCornerShape(20.dp))
@@ -84,12 +86,12 @@ fun ArivomBottomBar(
                 ) {
                     Icon(
                         imageVector = item.icon,
-                        contentDescription = item.title,
+                        contentDescription = label,
                         tint = if (isSelected) OnSecondaryContainer else OnSurfaceVariant,
                         modifier = Modifier.size(22.dp)
                     )
                     Text(
-                        text = item.title,
+                        text = label,
                         fontSize = 11.sp,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                         color = if (isSelected) OnSecondaryContainer else OnSurfaceVariant

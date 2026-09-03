@@ -124,3 +124,4 @@ export const en: TranslationDictionary = {
   'common.error': 'An error occurred. Please try again.',
   'common.retry': 'Retry',
 };
+

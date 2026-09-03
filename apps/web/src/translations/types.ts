@@ -124,3 +124,4 @@ export interface TranslationDictionary {
 }
 
 export type TranslationKey = keyof TranslationDictionary;
+
