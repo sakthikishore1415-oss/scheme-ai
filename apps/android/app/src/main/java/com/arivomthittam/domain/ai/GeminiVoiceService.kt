@@ -74,7 +74,7 @@ object GeminiVoiceService {
         isFastMode: Boolean = true,
         history: List<Pair<String, String>> = emptyList()
     ): String = withContext(Dispatchers.IO) {
-        val xaiKey = "xai-HGfw0p7ZC3kABWgf29QA7wfqDQvNFQqfu8H336JL5auLBZFI0t1R5ll1DFmTGBPLU025MzsIhhqvhENP"
+        val xaiKey = if (BuildConfig.XAI_API_KEY.isNotBlank()) BuildConfig.XAI_API_KEY else "xai-HGfw0p7ZC3kABWgf29QA7wfqDQvNFQqfu8H336JL5auLBZFI0t1R5ll1DFmTGBPLU025MzsIhhqvhENP"
         val apiKey = if (BuildConfig.GEMINI_API_KEY.isNotBlank()) BuildConfig.GEMINI_API_KEY else "AQ.Ab8RN6JSV7z-KRN41yTnI3bUKbzFOGsw5ekHPVh5zSeoMt7DqA"
 
         val systemInstruction = when (language) {

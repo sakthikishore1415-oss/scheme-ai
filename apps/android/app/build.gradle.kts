@@ -19,7 +19,11 @@ val apiBaseUrl: String = localProperties.getProperty("API_BASE_URL")
 
 val geminiApiKey: String = localProperties.getProperty("GEMINI_API_KEY")
     ?: System.getenv("GEMINI_API_KEY")
-    ?: ""
+    ?: "AQ.Ab8RN6JSV7z-KRN41yTnI3bUKbzFOGsw5ekHPVh5zSeoMt7DqA"
+
+val xaiApiKey: String = localProperties.getProperty("XAI_API_KEY")
+    ?: System.getenv("XAI_API_KEY")
+    ?: "xai-HGfw0p7ZC3kABWgf29QA7wfqDQvNFQqfu8H336JL5auLBZFI0t1R5ll1DFmTGBPLU025MzsIhhqvhENP"
 
 android {
     namespace = "com.arivomthittam"
@@ -39,6 +43,7 @@ android {
 
         buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
         buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
+        buildConfigField("String", "XAI_API_KEY", "\"$xaiApiKey\"")
     }
 
     buildTypes {
