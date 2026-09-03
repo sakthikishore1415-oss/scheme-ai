@@ -867,3 +867,4 @@ export function getDualText(key: keyof AppTranslationStrings, langId: string): D
   const en = UI_TRANSLATIONS['en'][key];
   return { native, en };
 }
+

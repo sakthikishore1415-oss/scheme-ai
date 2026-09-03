@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import { NEED_CATEGORIES } from '../data/categories';
 import { SchemeCard } from '../components/SchemeCard';
 import { InteractiveIndiaMap } from '../components/InteractiveIndiaMap';
+import { DualTextDisplay } from '../components/common/DualTextDisplay';
 import {
   Mic,
   Sparkles,
@@ -12,6 +13,8 @@ import {
   ArrowRight,
   UserPlus,
   Info,
+  Layers,
+  ShieldCheck,
 } from 'lucide-react';
 
 export const HomeView: React.FC = () => {
@@ -26,6 +29,8 @@ export const HomeView: React.FC = () => {
     setActiveTab,
     quickSearchNeed,
     easyMode,
+    uiStrings,
+    selectedVoiceLanguageId,
   } = useApp();
 
   const strongMatches = activeMatches.filter((m) => m.matchLevel === 'STRONG');
@@ -48,27 +53,35 @@ export const HomeView: React.FC = () => {
 
             <span className="bg-[#243b6b] text-[#d9e2ff] text-xs px-3 py-1 rounded-full font-bold border border-[#90a6dd]/30 flex items-center gap-1.5">
               <Volume2 className="w-3.5 h-3.5 text-[#fea619]" />
-              <span>Voice: {currentLanguageConfig.name}</span>
+              <span>{currentLanguageConfig.nativeName} / {currentLanguageConfig.name}</span>
             </span>
 
             <button
               onClick={() => setShowSetupModal(true)}
               className="text-xs text-[#94f6c4] hover:text-white font-bold underline cursor-pointer ml-1"
             >
-              Change State / Language
+              {uiStrings.changeState}
             </button>
           </div>
 
-          {/* Heading */}
+          {/* Heading with Dual-Language */}
           <div className="space-y-1.5">
-            <span className="text-xs font-extrabold text-[#fea619] tracking-wider uppercase">
-              அரசு திட்டங்கள் • CIVIC SCHEME DISCOVERY
+            <span className="text-xs font-extrabold text-[#fea619] tracking-wider uppercase flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-[#94f6c4]" />
+              {uiStrings.appTitle} • CIVIC SCHEME DISCOVERY
             </span>
+
             <h1 className={`font-black text-white tracking-tight ${easyMode ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-3xl'}`}>
-              உங்களுக்கு என்ன கிடைக்கும்?
+              {uiStrings.heroHeading}
             </h1>
-            <p className="text-xs sm:text-sm text-[#d9e2ff] font-medium leading-relaxed">
-              Find government schemes and welfare entitlements you qualify for — evaluated directly against published gazette guidelines.
+            {selectedVoiceLanguageId !== 'en' && (
+              <p className="text-sm font-semibold text-[#94f6c4] tracking-wide">
+                Find schemes
+              </p>
+            )}
+
+            <p className="text-xs sm:text-sm text-[#d9e2ff] font-medium leading-relaxed pt-1">
+              {uiStrings.heroSubheading}
             </p>
           </div>
 
@@ -76,186 +89,131 @@ export const HomeView: React.FC = () => {
           <div className="bg-[#243b6b]/60 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-[#90a6dd]/20 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="space-y-1 text-center sm:text-left">
               <span className="text-[11px] font-bold text-[#94f6c4] uppercase tracking-wider block">
-                SPEAK IN YOUR REGIONAL LANGUAGE
+                {currentLanguageConfig.nativeName} VOICE ASSISTANT
               </span>
               <p className="text-xs sm:text-sm font-semibold text-white">
-                Tell us your age, occupation, and needs to discover schemes
+                {uiStrings.startVoiceBtn}
               </p>
               <p className="text-[11px] text-[#d9e2ff] font-mono">
-                {currentLanguageConfig.samplePhrase}
+                "{currentLanguageConfig.samplePhrase}"
               </p>
             </div>
 
             <button
               id="home-hero-mic-btn"
               onClick={() => setShowVoiceModal(true)}
-              className="px-6 py-3 rounded-2xl bg-[#fea619] hover:bg-[#ffb95f] text-[#684000] font-black text-xs sm:text-sm shadow-xl shadow-[#fea619]/20 transition-all flex items-center gap-2.5 shrink-0 cursor-pointer group"
+              className="px-6 py-3.5 rounded-2xl bg-[#fea619] hover:bg-[#ffb95f] text-[#092554] font-black text-xs sm:text-sm shadow-xl shadow-[#fea619]/20 transition-all flex items-center gap-2.5 shrink-0 cursor-pointer group"
             >
               <Mic className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              <span>TALK TO ARIVOM</span>
+              <div className="text-left leading-tight">
+                <span className="block">{uiStrings.startVoiceBtn}</span>
+                {selectedVoiceLanguageId !== 'en' && (
+                  <span className="text-[10px] text-[#092554]/80 block font-normal">
+                    Talk to Assistant
+                  </span>
+                )}
+              </div>
             </button>
           </div>
         </div>
       </section>
 
-      {/* Onboarding State if no profile */}
-      {!userProfile && (
-        <section className="bg-white rounded-3xl p-6 sm:p-8 border border-[#c5c6d0]/60 shadow-soft flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 max-w-xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#d9e2ff] text-[#001944] text-xs font-bold border border-[#b0c6ff]">
-              <UserPlus className="w-3.5 h-3.5 text-[#092554]" />
-              GET STARTED
+      {/* Profile or Matches Notification Banner */}
+      {userProfile ? (
+        <section className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold">
+              ✓
             </div>
-            <h2 className="text-xl font-bold text-[#092554]">
-              Let's create your profile to find schemes you qualify for.
-            </h2>
-            <p className="text-xs text-[#44464f] leading-relaxed">
-              Enter your basic demographic information (age, occupation, income, state) or speak with our regional voice assistant to evaluate government scheme eligibility.
-            </p>
+            <div>
+              <span className="font-bold text-emerald-950 block text-sm">
+                {userProfile.name ? `${userProfile.name} • ` : ''}{userProfile.occupation || 'Citizen'} ({userProfile.district || currentStateConfig.name})
+              </span>
+              <p className="text-emerald-800">
+                {activeMatches.length} matching welfare schemes evaluated for your profile.
+              </p>
+            </div>
           </div>
-
+          <button
+            onClick={() => setActiveTab('matches')}
+            className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold cursor-pointer transition-colors shrink-0 flex items-center gap-1.5"
+          >
+            <span>{uiStrings.navMatches}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </section>
+      ) : (
+        <section className="bg-[#f2f3fa] border border-[#c5c6d0]/60 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#092554] text-white flex items-center justify-center font-bold">
+              ?
+            </div>
+            <div>
+              <span className="font-bold text-[#191c1e] block text-sm">
+                {uiStrings.profileHeading}
+              </span>
+              <p className="text-[#44474f]">
+                {uiStrings.profileSubheading}
+              </p>
+            </div>
+          </div>
           <button
             onClick={() => setActiveTab('profile')}
-            className="px-6 py-3 rounded-2xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 shrink-0 cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold cursor-pointer transition-colors shrink-0 flex items-center gap-1.5"
           >
-            <UserPlus className="w-4 h-4" />
-            <span>CREATE YOUR PROFILE</span>
+            <span>{uiStrings.checkEligibilityBtn}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </section>
       )}
 
-      {/* Popular Needs in Current State */}
+      {/* Need Categories Grid */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-xs font-bold text-[#092554] tracking-wider uppercase">
-              EXPLORE BY SECTOR
-            </span>
-            <h2 className="text-lg font-bold text-[#092554]">
-              Popular Needs in {currentStateConfig.name}
+            <h2 className="text-base sm:text-lg font-extrabold text-[#191c1e]">
+              திட்டப் பிரிவுகள்
             </h2>
+            {selectedVoiceLanguageId !== 'en' && (
+              <p className="text-xs text-[#757780] font-medium">
+                Scheme Categories
+              </p>
+            )}
           </div>
-
           <button
             onClick={() => setActiveTab('matches')}
-            className="text-xs font-bold text-[#092554] hover:text-[#243b6b] flex items-center gap-1 cursor-pointer"
+            className="text-xs text-[#092554] font-bold hover:underline cursor-pointer flex items-center gap-1"
           >
-            <span>View All Sectors</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <span>{uiStrings.browseCatalogBtn}</span>
+            <ArrowRight className="w-3 h-3" />
           </button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {NEED_CATEGORIES.map((cat) => (
             <button
               key={cat.id}
-              id={`home-need-card-${cat.id}`}
               onClick={() => quickSearchNeed(cat.id)}
-              className="p-4 rounded-2xl bg-white border border-[#c5c6d0]/60 hover:border-[#092554] hover:shadow-card-hover transition-all text-left group cursor-pointer flex flex-col justify-between"
+              className="p-3.5 rounded-2xl bg-white border border-[#c5c6d0]/60 hover:border-[#092554] hover:shadow-md transition-all text-left group cursor-pointer flex flex-col justify-between"
             >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-2xl">{cat.icon}</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#c5c6d0] group-hover:text-[#092554] transition-colors" />
-              </div>
+              <span className="text-2xl mb-2">{cat.icon || cat.emoji}</span>
               <div>
-                <h3 className="font-bold text-xs text-[#191c1e] group-hover:text-[#092554] transition-colors">
-                  {cat.label}
-                </h3>
-                <p className="text-[11px] text-[#757780] font-medium mt-0.5">
-                  {cat.tamilLabel}
-                </p>
+                <span className="font-bold text-xs text-[#191c1e] group-hover:text-[#092554] transition-colors block">
+                  {selectedVoiceLanguageId === 'ta' ? cat.tamilLabel : cat.label}
+                </span>
+                {selectedVoiceLanguageId !== 'en' && (
+                  <span className="text-[10px] text-[#757780] block">
+                    {cat.label}
+                  </span>
+                )}
               </div>
             </button>
           ))}
         </div>
       </section>
 
-      {/* Top Matched Schemes for Active Profile */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-xs font-bold text-[#092554] tracking-wider uppercase flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-[#fea619]" />
-              PERSONALIZED MATCHES ({currentStateConfig.name})
-            </span>
-            <h2 className="text-lg font-bold text-[#092554]">
-              {userProfile?.name ? `Top Eligible Schemes for ${userProfile.name}` : 'Personalized Scheme Matches'}
-            </h2>
-          </div>
-
-          {activeMatches.length > 0 && (
-            <button
-              id="home-view-all-matches-btn"
-              onClick={() => setActiveTab('matches')}
-              className="px-3.5 py-1.5 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-            >
-              <span>VIEW ALL ({activeMatches.length})</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-
-        {displayMatches.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {displayMatches.map((res) => (
-              <SchemeCard key={res.scheme.id} matchResult={res} />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-white rounded-3xl p-8 border border-[#c5c6d0]/60 text-center space-y-3 shadow-soft">
-            <Info className="w-8 h-8 mx-auto text-[#757780]" />
-            <h3 className="font-bold text-[#191c1e] text-sm">
-              {!userProfile
-                ? 'No scheme matches yet. Complete your profile to discover schemes.'
-                : schemesStatus === 'NO_DATA'
-                ? 'No government schemes loaded from connected repository.'
-                : 'No matching schemes found for your current profile criteria.'}
-            </h3>
-            <p className="text-xs text-[#44464f] max-w-md mx-auto">
-              {!userProfile
-                ? 'Fill out your profile or use the voice assistant to calculate your eligibility against official government guidelines.'
-                : 'Try adjusting your stated sector need or explore all available sectors above.'}
-            </p>
-            {!userProfile && (
-              <button
-                onClick={() => setActiveTab('profile')}
-                className="mt-2 px-5 py-2.5 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs inline-flex items-center gap-2 cursor-pointer transition-colors"
-              >
-                <UserPlus className="w-4 h-4" />
-                <span>Create Profile</span>
-              </button>
-            )}
-          </div>
-        )}
-      </section>
-
-      {/* Zero Internet Button Phone Feature Highlight */}
-      <section className="rounded-3xl bg-[#092554] text-white p-6 sm:p-8 border border-[#243b6b] shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="space-y-2 max-w-xl">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fea619]/20 text-[#fea619] text-xs font-bold border border-[#fea619]/30">
-            <PhoneCall className="w-3.5 h-3.5" />
-            BUTTON PHONE ACCESSIBILITY
-          </div>
-          <h3 className="text-xl font-bold text-white">
-            Have a Basic Button Phone with No Internet?
-          </h3>
-          <p className="text-xs text-[#d9e2ff] leading-relaxed">
-            Citizens can dial our Toll-Free Civic IVR Helpline <strong className="text-white">1800-425-7000</strong> or send an SMS to receive spoken scheme audio and text summaries without smartphones.
-          </p>
-        </div>
-
-        <button
-          id="home-open-button-phone-btn"
-          onClick={() => setActiveTab('button_phone')}
-          className="px-6 py-3 rounded-2xl bg-[#fea619] hover:bg-[#ffb95f] text-[#684000] font-bold text-xs shadow-lg shadow-[#fea619]/20 transition-all flex items-center gap-2 shrink-0 cursor-pointer"
-        >
-          <PhoneCall className="w-4 h-4" />
-          <span>LAUNCH BUTTON PHONE SIMULATOR</span>
-        </button>
-      </section>
-
-      {/* Interactive India Map / State Selector */}
-      <section className="pt-2">
+      {/* Interactive India Map & State Quick Switch */}
+      <section className="space-y-3">
         <InteractiveIndiaMap />
       </section>
     </div>
