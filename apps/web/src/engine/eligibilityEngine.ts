@@ -249,7 +249,18 @@ export function matchUserSchemes(profile: UserProfile | null, schemes: Scheme[] 
     return [];
   }
 
-  const results = schemes.map((scheme) => evaluateSchemeEligibility(scheme, profile));
+  // Filter schemes to only those that apply to the user's selected state or are All-India Central schemes
+  const applicableSchemes = schemes.filter((scheme) => {
+    if (!profile.state || profile.state === 'ALL') return true;
+    return (
+      scheme.stateId === 'ALL' ||
+      scheme.stateId === profile.state ||
+      scheme.state === 'ALL' ||
+      scheme.state === profile.state
+    );
+  });
+
+  const results = applicableSchemes.map((scheme) => evaluateSchemeEligibility(scheme, profile));
 
   results.sort((a, b) => {
     if (b.score !== a.score) {

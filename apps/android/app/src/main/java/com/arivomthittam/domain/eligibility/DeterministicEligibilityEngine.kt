@@ -194,7 +194,12 @@ object DeterministicEligibilityEngine {
     }
 
     fun evaluateAll(profile: CitizenProfile?, schemes: List<Scheme>): List<EligibilityResult> {
-        return schemes.map { evaluate(profile, it) }
+        val applicableSchemes = if (profile?.state != null && profile.state != "ALL") {
+            schemes.filter { it.stateId == "ALL" || it.stateId.equals(profile.state, ignoreCase = true) }
+        } else {
+            schemes
+        }
+        return applicableSchemes.map { evaluate(profile, it) }
             .sortedByDescending { it.score }
     }
 }

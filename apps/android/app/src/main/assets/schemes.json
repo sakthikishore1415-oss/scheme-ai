@@ -800,68 +800,381 @@
     "verifiedStatus": "VERIFIED_OFFICIAL"
   },
   {
-    "id": "kl-aaswasakiranam",
-    "name": "Aaswasakiranam Caregiver Financial Support",
-    "nativeName": "ആശ്വാസകിരണം പദ്ധതി",
-    "authority": "Kerala Social Security Mission (KSSM)",
-    "department": "Social Justice Kerala",
+    "id": "ka-gruha-lakshmi",
+    "name": "Gruha Lakshmi Scheme",
+    "nativeName": "ಗೃಹಲಕ್ಷ್ಮಿ ಯೋಜನೆ",
+    "authority": "Women and Child Development Department, Karnataka",
+    "department": "Women & Child Development",
     "schemeType": "state",
-    "stateId": "KL",
-    "state": "Kerala",
-    "category": "disability",
-    "summarySimple": "Monthly financial assistance of ₹600 for primary caregivers of bedridden and severely mentally/physically challenged patients who cannot undertake employment.",
+    "stateId": "KA",
+    "state": "Karnataka",
+    "category": "women",
+    "summarySimple": "Monthly financial assistance of ₹2,000 transferred directly to the bank accounts of women heads of households in Karnataka.",
     "benefits": {
-      "amount": "₹600 / month",
-      "frequency": "Monthly pension assistance to designated caregiver",
-      "type": "pension",
-      "shortSummary": "₹600 monthly pension for caregivers of bedridden and disabled persons",
-      "detailedBenefit": "Provides financial relief to selfless caregivers who have to forego outside employment to take full-time care of critically ill or severely disabled family members."
+      "amount": "₹2,000 / month (₹24,000 / year)",
+      "frequency": "Monthly direct benefit transfer",
+      "type": "cash_transfer",
+      "shortSummary": "₹2,000 monthly direct financial assistance to woman head of family",
+      "detailedBenefit": "Aims to support women homemakers and empower female heads of households across Karnataka."
     },
     "eligibility": {
-      "requiresDisability": true,
-      "maxAnnualIncome": 100000,
+      "targetGenders": [
+        "female"
+      ],
       "applicableStates": [
-        "KL"
+        "KA"
       ],
       "targetCategories": [
-        "disability",
+        "women",
         "financial"
       ]
     },
     "documents": [
       {
-        "id": "doc-med-cert",
-        "name": "Medical Board Disability Certificate",
-        "isMandatory": true,
-        "description": "Certificate showing 40%+ permanent disability or bedridden medical state"
-      },
-      {
         "id": "doc-ration",
-        "name": "BPL Ration Card / Income Certificate",
+        "name": "Ration Card (BPL / APL / AAY)",
         "isMandatory": true,
-        "description": "Proof of economic status"
+        "description": "Karnataka Ration card identifying woman as family head"
       },
       {
         "id": "doc-aadhaar",
-        "name": "Aadhaar Card of Patient & Caregiver",
+        "name": "Aadhaar Card",
         "isMandatory": true,
-        "description": "Identification of both caregiver and beneficiary"
+        "description": "Aadhaar card of woman head and husband"
       },
       {
         "id": "doc-bank",
-        "name": "Caregiver Bank Passbook",
+        "name": "Aadhaar Seeded Bank Account",
         "isMandatory": true,
-        "description": "Bank account where monthly pension will be credited"
+        "description": "Bank account linked with NPCI mapper"
       }
     ],
     "applicationSteps": [
-      "Download application form from Kerala Social Security Mission (http://socialsecuritymission.gov.in).",
-      "Get medical endorsement from Government Medical Officer.",
-      "Submit to the Child Development Project Officer (CDPO) or District Social Justice Officer."
+      "Visit Grama One, Karnataka One, or Bangalore One centers.",
+      "Submit Ration Card number and Aadhaar authentication.",
+      "Receive SMS confirmation upon successful registration."
     ],
-    "applicationUrl": "http://socialsecuritymission.gov.in",
-    "offlineApplicationCenter": "CDPO Office / ICDS Project Office / Akshaya Centre",
-    "officialSource": "http://socialsecuritymission.gov.in",
+    "applicationUrl": "https://sevasindhugs.karnataka.gov.in",
+    "offlineApplicationCenter": "Grama One / Karnataka One / Bangalore One / Bapuji Seva Kendra",
+    "officialSource": "https://sevasindhugs.karnataka.gov.in",
+    "lastVerified": "2026-09-01",
+    "verifiedStatus": "VERIFIED_OFFICIAL"
+  },
+  {
+    "id": "ka-yuva-nidhi",
+    "name": "Yuva Nidhi Scheme",
+    "nativeName": "ಯುವ ನಿಧಿ ಯೋಜನೆ",
+    "authority": "Department of Skill Development, Entrepreneurship and Livelihood",
+    "department": "Skill Development Karnataka",
+    "schemeType": "state",
+    "stateId": "KA",
+    "state": "Karnataka",
+    "category": "employment",
+    "summarySimple": "Monthly unemployment allowance of ₹3,000 for degree holders and ₹1,500 for diploma holders for up to 2 years.",
+    "benefits": {
+      "amount": "₹3,000/mo (Degree) or ₹1,500/mo (Diploma)",
+      "frequency": "Monthly allowance for up to 24 months",
+      "type": "cash_transfer",
+      "shortSummary": "Monthly unemployment stipend up to ₹3,000 for fresh graduates",
+      "detailedBenefit": "Financial bridge support to assist educated youth in Karnataka while searching for employment or preparing for competitive examinations."
+    },
+    "eligibility": {
+      "minAge": 18,
+      "maxAge": 30,
+      "allowedOccupations": [
+        "student",
+        "unemployed",
+        "worker"
+      ],
+      "applicableStates": [
+        "KA"
+      ],
+      "targetCategories": [
+        "employment",
+        "education"
+      ]
+    },
+    "documents": [
+      {
+        "id": "doc-degree",
+        "name": "Degree / Diploma Certificate",
+        "isMandatory": true,
+        "description": "Marks card and passing certificate from recognized Karnataka institution"
+      },
+      {
+        "id": "doc-aadhaar",
+        "name": "Aadhaar Card",
+        "isMandatory": true,
+        "description": "Aadhaar identification proof"
+      },
+      {
+        "id": "doc-bank",
+        "name": "Bank Passbook",
+        "isMandatory": true,
+        "description": "Aadhaar linked bank account"
+      }
+    ],
+    "applicationSteps": [
+      "Apply online through the Seva Sindhu portal (https://sevasindhugs.karnataka.gov.in).",
+      "Upload graduation marks sheet and residential proof in Karnataka.",
+      "Monthly self-declaration of unemployment is verified for stipend release."
+    ],
+    "applicationUrl": "https://sevasindhugs.karnataka.gov.in",
+    "offlineApplicationCenter": "Karnataka One / Grama One Centers",
+    "officialSource": "https://sevasindhugs.karnataka.gov.in",
+    "lastVerified": "2026-09-01",
+    "verifiedStatus": "VERIFIED_OFFICIAL"
+  },
+  {
+    "id": "ap-rythu-bharosa",
+    "name": "YSR Rythu Bharosa",
+    "nativeName": "వైఎస్సార్ రైతు భరోసా",
+    "authority": "Department of Agriculture, Andhra Pradesh",
+    "department": "Agriculture AP",
+    "schemeType": "state",
+    "stateId": "AP",
+    "state": "Andhra Pradesh",
+    "category": "agriculture",
+    "summarySimple": "Financial investment support of ₹13,500 per year for farmer families including tenant farmers across Andhra Pradesh.",
+    "benefits": {
+      "amount": "₹13,500 / year",
+      "frequency": "Three installments (Kharif, Rabi, and Sankranti)",
+      "type": "cash_transfer",
+      "shortSummary": "₹13,500 annual input subsidy directly to farmer families",
+      "detailedBenefit": "Provides timely financial assistance to agricultural families to purchase quality seeds, fertilizers, and farm inputs."
+    },
+    "eligibility": {
+      "allowedOccupations": [
+        "farmer",
+        "agriculture"
+      ],
+      "applicableStates": [
+        "AP"
+      ],
+      "targetCategories": [
+        "agriculture"
+      ]
+    },
+    "documents": [
+      {
+        "id": "doc-aadhaar",
+        "name": "Aadhaar Card",
+        "isMandatory": true,
+        "description": "Aadhaar proof"
+      },
+      {
+        "id": "doc-patta",
+        "name": "Pattadar Passbook / CCRC (Tenant)",
+        "isMandatory": true,
+        "description": "Land record or Crop Cultivator Rights Card"
+      },
+      {
+        "id": "doc-bank",
+        "name": "Bank Passbook",
+        "isMandatory": true,
+        "description": "Aadhaar seeded bank account"
+      }
+    ],
+    "applicationSteps": [
+      "Contact your Village Agriculture Assistant at the Rythu Bharosa Kendra (RBK).",
+      "Verify your landholding and cultivation details.",
+      "Display on social audit list for public verification."
+    ],
+    "applicationUrl": "https://ysrrythubharosa.ap.gov.in",
+    "offlineApplicationCenter": "Rythu Bharosa Kendra (RBK) / Village Secretariat",
+    "officialSource": "https://ysrrythubharosa.ap.gov.in",
+    "lastVerified": "2026-09-01",
+    "verifiedStatus": "VERIFIED_OFFICIAL"
+  },
+  {
+    "id": "ap-amma-vodi",
+    "name": "Jagananna Amma Vodi",
+    "nativeName": "జగనన్న అమ్మ ఒడి",
+    "authority": "School Education Department, Andhra Pradesh",
+    "department": "School Education AP",
+    "schemeType": "state",
+    "stateId": "AP",
+    "state": "Andhra Pradesh",
+    "category": "education",
+    "summarySimple": "Financial incentive of ₹15,000 per year provided to mothers sending their children to school from Class 1 to 12.",
+    "benefits": {
+      "amount": "₹15,000 / year",
+      "frequency": "Annual direct transfer before academic year start",
+      "type": "cash_transfer",
+      "shortSummary": "₹15,000 annual education financial aid to mothers",
+      "detailedBenefit": "Encourages low-income parents to send their children to school with minimum 75% student attendance."
+    },
+    "eligibility": {
+      "requiresStudent": true,
+      "maxAnnualIncome": 120000,
+      "applicableStates": [
+        "AP"
+      ],
+      "targetCategories": [
+        "education",
+        "women"
+      ]
+    },
+    "documents": [
+      {
+        "id": "doc-ration",
+        "name": "Rice Card / White Ration Card",
+        "isMandatory": true,
+        "description": "Proof of economic status in AP"
+      },
+      {
+        "id": "doc-aadhaar",
+        "name": "Aadhaar of Mother & Child",
+        "isMandatory": true,
+        "description": "Identity proofs"
+      },
+      {
+        "id": "doc-school",
+        "name": "School Attendance Certificate",
+        "isMandatory": true,
+        "description": "Proof of active school enrollment with 75% attendance"
+      }
+    ],
+    "applicationSteps": [
+      "School headmaster enrolls child on Childinfo educational portal.",
+      "Village / Ward Secretariat verifies mother's bank details and household mapping.",
+      "Funds credited directly into mother's savings account."
+    ],
+    "applicationUrl": "https://jaganannaammavodi.ap.gov.in",
+    "offlineApplicationCenter": "Grama / Ward Secretariat / School Principal Desk",
+    "officialSource": "https://jaganannaammavodi.ap.gov.in",
+    "lastVerified": "2026-09-01",
+    "verifiedStatus": "VERIFIED_OFFICIAL"
+  },
+  {
+    "id": "mh-ladki-bahin",
+    "name": "Mukhyamantri Majhi Ladki Bahin Yojana",
+    "nativeName": "मुख्यमंत्री माझी लाडकी बहीण योजना",
+    "authority": "Women and Child Development Department, Maharashtra",
+    "department": "Women & Child Development MH",
+    "schemeType": "state",
+    "stateId": "MH",
+    "state": "Maharashtra",
+    "category": "women",
+    "summarySimple": "Monthly financial assistance of ₹1,500 (₹18,000/year) transferred directly into the bank accounts of women aged 21-65 in Maharashtra.",
+    "benefits": {
+      "amount": "₹1,500 / month (₹18,000 / year)",
+      "frequency": "Monthly direct benefit transfer",
+      "type": "cash_transfer",
+      "shortSummary": "₹1,500 monthly financial grant directly to eligible women",
+      "detailedBenefit": "Provides independent social and economic financial freedom to women from low-income families across Maharashtra."
+    },
+    "eligibility": {
+      "minAge": 21,
+      "maxAge": 65,
+      "targetGenders": [
+        "female"
+      ],
+      "maxAnnualIncome": 250000,
+      "applicableStates": [
+        "MH"
+      ],
+      "targetCategories": [
+        "women",
+        "financial"
+      ]
+    },
+    "documents": [
+      {
+        "id": "doc-aadhaar",
+        "name": "Aadhaar Card",
+        "isMandatory": true,
+        "description": "Aadhaar identification proof"
+      },
+      {
+        "id": "doc-ration",
+        "name": "Yellow or Orange Ration Card",
+        "isMandatory": true,
+        "description": "Maharashtra digital ration card"
+      },
+      {
+        "id": "doc-bank",
+        "name": "Bank Passbook",
+        "isMandatory": true,
+        "description": "Aadhaar-seeded bank account"
+      }
+    ],
+    "applicationSteps": [
+      "Apply online through the Nari Shakti Doot App or Aaple Sarkar portal.",
+      "Visit Setu Suvidha Kendra or Anganwadi Centre for offline assistance.",
+      "Complete biometric Aadhaar e-KYC for approval."
+    ],
+    "applicationUrl": "https://ladkibahin.maharashtra.gov.in",
+    "offlineApplicationCenter": "Anganwadi Center / Gram Panchayat / Setu Kendra",
+    "officialSource": "https://ladkibahin.maharashtra.gov.in",
+    "lastVerified": "2026-09-01",
+    "verifiedStatus": "VERIFIED_OFFICIAL"
+  },
+  {
+    "id": "up-kanya-sumangala",
+    "name": "Mukhyamantri Kanya Sumangala Yojana",
+    "nativeName": "मुख्यमंत्री कन्या सुमंगला योजना",
+    "authority": "Department of Women and Child Development, Uttar Pradesh",
+    "department": "Women & Child Development UP",
+    "schemeType": "state",
+    "stateId": "UP",
+    "state": "Uttar Pradesh",
+    "category": "education",
+    "summarySimple": "Financial assistance of ₹25,000 provided across 6 developmental milestones from birth to undergraduate education for girl children in UP.",
+    "benefits": {
+      "amount": "₹25,000 in 6 milestones",
+      "frequency": "Milestone-based installments (Birth, Vaccination, Class 1, 6, 9, and Degree admission)",
+      "type": "subsidy",
+      "shortSummary": "₹25,000 grant across 6 milestones for girl child education & health",
+      "detailedBenefit": "Aims to eliminate female foeticide, foster education, and secure health and wellbeing for daughters in Uttar Pradesh."
+    },
+    "eligibility": {
+      "targetGenders": [
+        "female"
+      ],
+      "maxAnnualIncome": 300000,
+      "applicableStates": [
+        "UP"
+      ],
+      "targetCategories": [
+        "education",
+        "women"
+      ]
+    },
+    "documents": [
+      {
+        "id": "doc-birth",
+        "name": "Birth Certificate of Girl Child",
+        "isMandatory": true,
+        "description": "Official municipal / hospital birth certificate"
+      },
+      {
+        "id": "doc-income",
+        "name": "Income Certificate",
+        "isMandatory": true,
+        "description": "Annual household income below ₹3 Lakh"
+      },
+      {
+        "id": "doc-aadhaar",
+        "name": "Aadhaar Card of Parents & Child",
+        "isMandatory": true,
+        "description": "Identity proofs"
+      },
+      {
+        "id": "doc-bank",
+        "name": "Joint Bank Passbook",
+        "isMandatory": true,
+        "description": "Bank account opened in name of mother/girl child"
+      }
+    ],
+    "applicationSteps": [
+      "Visit the official portal (https://mksy.up.gov.in).",
+      "Register as Citizen and apply under the specific milestone (Stage 1 to Stage 6).",
+      "District Probation Officer verifies records and disburses funds."
+    ],
+    "applicationUrl": "https://mksy.up.gov.in",
+    "offlineApplicationCenter": "Block Development Office / District Probation Office / CSC Center",
+    "officialSource": "https://mksy.up.gov.in",
     "lastVerified": "2026-09-01",
     "verifiedStatus": "VERIFIED_OFFICIAL"
   }
