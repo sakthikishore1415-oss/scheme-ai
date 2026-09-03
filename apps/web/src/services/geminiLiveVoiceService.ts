@@ -638,31 +638,84 @@ CRITICAL RULES FOR VOICE-TO-VOICE:
 5. If the citizen asks for scheme advice or help, guide them warmly and conversationally by naming 1 or 2 relevant programs naturally, and invite them to ask more.
 6. Treat this as an ongoing natural voice chat.`;
 
-      // Pass multi-turn history to maintain realistic dialogue context
-      const historyPayload = this.conversationHistory.slice(-8).map((h) => ({
-        role: h.role === 'assistant' ? 'assistant' : 'user',
-        text: h.text,
-      }));
+      const apiKey =
+        (import.meta as any).env?.VITE_GEMINI_API_KEY ||
+        (window as any).__GEMINI_API_KEY__ ||
+        'AQ.Ab8RN6JSV7z-KRN41yTnI3bUKbzFOGsw5ekHPVh5zSeoMt7DqA';
 
-      const res = await fetch('/api/gemini-generate', {
+      // Build contents array for Gemini REST
+      const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+
+      // Add recent conversation history
+      const recentHistory = this.conversationHistory.slice(-6);
+      for (const h of recentHistory) {
+        contents.push({
+          role: h.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: h.text }],
+        });
+      }
+
+      // Add current turn with system instructions
+      const combinedPrompt = `${systemInstruction}\n\nCitizen says: "${spokenText}"\nRespond naturally and conversationally in 1-2 spoken sentences:`;
+      contents.push({
+        role: 'user',
+        parts: [{ text: combinedPrompt }],
+      });
+
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+      const res = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-goog-api-key': apiKey,
+        },
         signal: this.currentAbortController?.signal,
         body: JSON.stringify({
-          systemInstruction,
-          history: historyPayload,
-          prompt: spokenText,
+          contents,
+          generationConfig: {
+            temperature: this.voiceMode === 'fast' ? 0.3 : 0.5,
+            maxOutputTokens: this.voiceMode === 'fast' ? 120 : 250,
+          },
         }),
       });
 
       if (res.ok) {
         const data = await res.json();
-        if (data.text) {
-          // Clean up formatting artifacts not meant for spoken audio
-          return data.text
+        const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (candidate) {
+          return candidate
             .replace(/[*_#`[\]()]/g, '')
             .replace(/\s+/g, ' ')
             .trim();
+        }
+      } else {
+        // Fallback endpoint if gemini-3.6-flash has temporary model alias issue
+        const fallbackEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+        const fallbackRes = await fetch(fallbackEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-goog-api-key': apiKey,
+          },
+          signal: this.currentAbortController?.signal,
+          body: JSON.stringify({
+            contents,
+            generationConfig: {
+              temperature: 0.4,
+              maxOutputTokens: 150,
+            },
+          }),
+        });
+
+        if (fallbackRes.ok) {
+          const fallbackData = await fallbackRes.json();
+          const text = fallbackData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (text) {
+            return text
+              .replace(/[*_#`[\]()]/g, '')
+              .replace(/\s+/g, ' ')
+              .trim();
+          }
         }
       }
     } catch (e: any) {

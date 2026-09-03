@@ -12,7 +12,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object GeminiVoiceService {
-    const val GEMINI_MODEL = "gemini-flash-latest"
+    const val GEMINI_MODEL = "gemini-3.6-flash"
 
     fun getGreeting(language: String): String {
         return when (language) {
@@ -151,13 +151,24 @@ object GeminiVoiceService {
             if (connection.responseCode == 200) {
                 val responseText = connection.inputStream.bufferedReader().use { it.readText() }
                 val json = JSONObject(responseText)
-                val candidateText = json.getJSONArray("candidates")
-                    .getJSONObject(0)
-                    .getJSONObject("content")
-                    .getJSONArray("parts")
-                    .getJSONObject(0)
-                    .getString("text")
-                return@withContext candidateText.trim()
+                val candidates = json.optJSONArray("candidates")
+                if (candidates != null && candidates.length() > 0) {
+                    val contentObj = candidates.getJSONObject(0).optJSONObject("content")
+                    val partsArray = contentObj?.optJSONArray("parts")
+                    if (partsArray != null) {
+                        val sb = StringBuilder()
+                        for (i in 0 until partsArray.length()) {
+                            val part = partsArray.getJSONObject(i)
+                            if (part.has("text")) {
+                                sb.append(part.getString("text")).append(" ")
+                            }
+                        }
+                        val resultText = sb.toString().replace(Regex("[*_#`\\[\\]()]"), "").trim()
+                        if (resultText.isNotBlank()) {
+                            return@withContext resultText
+                        }
+                    }
+                }
             }
         } catch (e: Exception) {
             // Graceful fallback to deterministic local logic
