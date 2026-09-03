@@ -43,11 +43,11 @@ export const BottomNav: React.FC = () => {
       {/* Mobile Floating Bottom Bar */}
       <nav
         aria-label="Mobile Navigation Bar"
-        className={`md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#e8e1dc] px-2 py-1 shadow-sm ${
-          easyMode ? 'py-2.5' : 'py-1'
+        className={`md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#e8e1dc] px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom),0.5rem)] shadow-lg ${
+          easyMode ? 'pt-2 pb-[max(env(safe-area-inset-bottom),0.75rem)]' : ''
         }`}
       >
-        <div className="flex items-center justify-around">
+        <div className="flex items-center justify-around max-w-md mx-auto">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
 
@@ -57,12 +57,12 @@ export const BottomNav: React.FC = () => {
                   key={tab.id}
                   id="mobile-nav-ask-btn"
                   onClick={() => setShowVoiceModal(true)}
-                  className="-mt-5 flex flex-col items-center justify-center cursor-pointer group"
+                  className="-mt-6 flex flex-col items-center justify-center cursor-pointer group active:scale-95 transition-transform"
                 >
-                  <div className="w-13 h-13 rounded-full bg-[#4a1f2d] text-white flex items-center justify-center shadow-md group-hover:bg-[#6b3548] transition-colors">
+                  <div className="w-14 h-14 rounded-full bg-[#4a1f2d] text-white flex items-center justify-center shadow-lg border-2 border-white ring-4 ring-[#ffd9e1]/80 group-hover:bg-[#6b3548] transition-colors">
                     <Mic className="w-6 h-6 text-[#c8a96b]" />
                   </div>
-                  <span className="text-[10px] font-bold text-[#4a1f2d] mt-0.5 tracking-wider">
+                  <span className="text-[10px] font-black text-[#4a1f2d] mt-1 tracking-wider uppercase">
                     {tab.label}
                   </span>
                 </button>
@@ -74,8 +74,10 @@ export const BottomNav: React.FC = () => {
                 key={tab.id}
                 id={`mobile-nav-${tab.id}-btn`}
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all cursor-pointer ${
-                  isActive ? 'text-[#4a1f2d] font-bold' : 'text-[#756a6f] hover:text-[#241c20]'
+                className={`relative flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all cursor-pointer ${
+                  isActive
+                    ? 'text-[#4a1f2d] font-bold bg-[#ffd9e1]/40'
+                    : 'text-[#756a6f] hover:text-[#241c20]'
                 }`}
               >
                 <div className="relative">
@@ -86,11 +88,11 @@ export const BottomNav: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <span className={`text-[11px] tracking-tight mt-0.5 max-w-[75px] truncate ${isActive ? 'font-bold text-[#4a1f2d]' : 'font-medium'}`}>
+                <span className={`text-[10px] tracking-tight mt-0.5 max-w-[68px] truncate ${isActive ? 'font-bold text-[#4a1f2d]' : 'font-medium'}`}>
                   {tab.label}
                 </span>
                 {isActive && (
-                  <span className="w-5 h-0.5 bg-[#4a1f2d] rounded-full mt-0.5"></span>
+                  <span className="w-4 h-0.5 bg-[#4a1f2d] rounded-full mt-0.5"></span>
                 )}
               </button>
             );

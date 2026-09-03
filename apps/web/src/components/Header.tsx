@@ -112,11 +112,12 @@ export const Header: React.FC = () => {
           <button
             id="state-selector-btn"
             onClick={() => setShowSetupModal(true)}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#faf8f3] hover:bg-[#eedfe4] text-[#241c20] text-xs font-bold border border-[#e8e1dc] transition-all cursor-pointer"
+            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-[#faf8f3] hover:bg-[#eedfe4] text-[#241c20] text-[11px] sm:text-xs font-bold border border-[#e8e1dc] transition-all cursor-pointer"
             title="Click to Change State"
           >
-            <MapPin className="w-3.5 h-3.5 text-[#4a1f2d]" />
-            <span>{currentStateConfig.name}</span>
+            <MapPin className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-[#4a1f2d] shrink-0" />
+            <span className="hidden sm:inline">{currentStateConfig.name}</span>
+            <span className="sm:hidden">{currentStateConfig.name.split(' ')[0]}</span>
           </button>
 
           {/* Quick Language Switcher Dropdown */}
@@ -124,12 +125,12 @@ export const Header: React.FC = () => {
         </div>
 
         {/* Global Action Tools */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
           {/* Quick Voice Mic Button */}
           <button
             id="header-voice-mic-btn"
             onClick={() => setShowVoiceModal(true)}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#4a1f2d] hover:bg-[#6b3548] text-white font-bold text-xs shadow-sm transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-[#4a1f2d] hover:bg-[#6b3548] text-white font-bold text-xs shadow-sm transition-all cursor-pointer"
           >
             <Mic className="w-4 h-4 text-[#c8a96b]" />
             <span className="hidden sm:inline">VOICE ASSISTANT</span>

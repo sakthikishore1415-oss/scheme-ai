@@ -84,7 +84,7 @@ export const MyMatchesView: React.FC = () => {
             </span>
           </div>
 
-          <h1 className={`font-black text-[#092554] tracking-tight mt-1.5 ${easyMode ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
+          <h1 className={`font-black text-[#4a1f2d] tracking-tight mt-1.5 ${easyMode ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
             {t('matches.title')}
           </h1>
 
@@ -104,11 +104,11 @@ export const MyMatchesView: React.FC = () => {
           onClick={() => setShowWizard(!showWizard)}
           className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
             showWizard
-              ? 'bg-[#092554] text-white'
+              ? 'bg-[#4a1f2d] text-white'
               : 'bg-[#d9e2ff] text-[#001944] border border-[#b0c6ff] hover:bg-[#b0c6ff]'
           }`}
         >
-          <Wand2 className="w-4 h-4 text-[#092554]" />
+          <Wand2 className="w-4 h-4 text-[#4a1f2d]" />
           <span>{showWizard ? t('common.close') : t('profile.title')}</span>
         </button>
       </div>
@@ -131,7 +131,7 @@ export const MyMatchesView: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('matches.searchPlaceholder')}
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-[#f2f3fa] border border-[#c5c6d0]/60 text-xs text-[#191c1e] placeholder-[#757780] focus:border-[#092554] outline-none"
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-[#f2f3fa] border border-[#e8e1dc] text-[#111827] placeholder-[#6b7280] focus:border-[#4a1f2d] outline-none"
             />
             {searchQuery && (
               <button
@@ -165,7 +165,7 @@ export const MyMatchesView: React.FC = () => {
             onClick={() => setFilterType('ALL')}
             className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
               filterType === 'ALL'
-                ? 'bg-[#092554] text-white shadow-xs'
+                ? 'bg-[#4a1f2d] text-white shadow-xs'
                 : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
             }`}
           >
@@ -233,7 +233,7 @@ export const MyMatchesView: React.FC = () => {
                 onClick={() => setSelectedCategory(cat.id)}
                 className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer shrink-0 border ${
                   isSelected
-                    ? 'bg-[#fea619] text-[#092554] border-[#fea619] font-bold shadow-xs'
+                    ? 'bg-[#fea619] text-[#4a1f2d] border-[#fea619] font-bold shadow-xs'
                     : 'bg-[#f2f3fa] text-[#44464f] border-[#c5c6d0]/40 hover:bg-[#e1e2ec]'
                 }`}
               >
@@ -273,7 +273,7 @@ export const MyMatchesView: React.FC = () => {
           </div>
           <button
             onClick={handleResetFilters}
-            className="px-6 py-2.5 rounded-2xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs shadow-md transition-all inline-flex items-center gap-2 cursor-pointer"
+            className="px-6 py-2.5 rounded-2xl bg-[#4a1f2d] hover:bg-[#243b6b] text-white font-bold text-xs shadow-md transition-all inline-flex items-center gap-2 cursor-pointer"
           >
             <span>Reset All Filters</span>
           </button>
