@@ -49,9 +49,12 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material.icons.filled.Radio
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -63,6 +66,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -101,6 +105,28 @@ data class ChatMessage(
     val timestamp: Long = System.currentTimeMillis()
 )
 
+data class VoiceLanguageItem(
+    val code: String,
+    val name: String,
+    val nativeName: String,
+    val bcp47: String
+)
+
+val VOICE_LANGUAGES = listOf(
+    VoiceLanguageItem("ta", "Tamil", "தமிழ்", "ta-IN"),
+    VoiceLanguageItem("hi", "Hindi", "हिन्दी", "hi-IN"),
+    VoiceLanguageItem("te", "Telugu", "తెలుగు", "te-IN"),
+    VoiceLanguageItem("kn", "Kannada", "ಕನ್ನಡ", "kn-IN"),
+    VoiceLanguageItem("ml", "Malayalam", "മലയാളം", "ml-IN"),
+    VoiceLanguageItem("mr", "Marathi", "मराठी", "mr-IN"),
+    VoiceLanguageItem("bn", "Bengali", "বাংলা", "bn-IN"),
+    VoiceLanguageItem("gu", "Gujarati", "ગુજરાતી", "gu-IN"),
+    VoiceLanguageItem("or", "Odia", "ଓଡ଼ିଆ", "or-IN"),
+    VoiceLanguageItem("pa", "Punjabi", "ਪੰਜਾਬੀ", "pa-IN"),
+    VoiceLanguageItem("as", "Assamese", "অসমীয়া", "as-IN"),
+    VoiceLanguageItem("en", "English", "English", "en-IN")
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VoiceInputScreen(
@@ -114,6 +140,8 @@ fun VoiceInputScreen(
     val listState = rememberLazyListState()
 
     // State Variables
+    var activeLanguage by remember { mutableStateOf(currentLanguage) }
+    var showLanguageDialog by remember { mutableStateOf(false) }
     var isListening by remember { mutableStateOf(false) }
     var isThinking by remember { mutableStateOf(false) }
     var isSpeaking by remember { mutableStateOf(false) }
@@ -151,15 +179,18 @@ fun VoiceInputScreen(
         isSpeaking = false
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            val bcp47 = when (currentLanguage) {
-                "ml" -> "ml-IN"
+            val bcp47 = when (activeLanguage) {
                 "ta" -> "ta-IN"
                 "hi" -> "hi-IN"
                 "te" -> "te-IN"
                 "kn" -> "kn-IN"
-                "bn" -> "bn-IN"
+                "ml" -> "ml-IN"
                 "mr" -> "mr-IN"
+                "bn" -> "bn-IN"
                 "gu" -> "gu-IN"
+                "or" -> "or-IN"
+                "pa" -> "pa-IN"
+                "as" -> "as-IN"
                 else -> "en-IN"
             }
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, bcp47)
@@ -180,19 +211,46 @@ fun VoiceInputScreen(
         isListening = false
     }
 
+    val switchLanguage: (String) -> Unit = { newLang ->
+        activeLanguage = newLang
+        ttsEngine?.stop()
+        isSpeaking = false
+        val locale = when (newLang) {
+            "ta" -> Locale("ta", "IN")
+            "hi" -> Locale("hi", "IN")
+            "te" -> Locale("te", "IN")
+            "kn" -> Locale("kn", "IN")
+            "ml" -> Locale("ml", "IN")
+            "mr" -> Locale("mr", "IN")
+            "bn" -> Locale("bn", "IN")
+            "gu" -> Locale("gu", "IN")
+            "or" -> Locale("or", "IN")
+            "pa" -> Locale("pa", "IN")
+            "as" -> Locale("as", "IN")
+            else -> Locale.ENGLISH
+        }
+        ttsEngine?.language = locale
+        val greeting = GeminiVoiceService.getGreeting(newLang)
+        messages.add(ChatMessage(id = "msg_switch_${System.currentTimeMillis()}", sender = "assistant", text = greeting))
+        speakAloud(greeting)
+    }
+
     DisposableEffect(Unit) {
         var tts: TextToSpeech? = null
         tts = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
-                val locale = when (currentLanguage) {
-                    "ml" -> Locale("ml", "IN")
+                val locale = when (activeLanguage) {
                     "ta" -> Locale("ta", "IN")
                     "hi" -> Locale("hi", "IN")
                     "te" -> Locale("te", "IN")
                     "kn" -> Locale("kn", "IN")
-                    "bn" -> Locale("bn", "IN")
+                    "ml" -> Locale("ml", "IN")
                     "mr" -> Locale("mr", "IN")
+                    "bn" -> Locale("bn", "IN")
                     "gu" -> Locale("gu", "IN")
+                    "or" -> Locale("or", "IN")
+                    "pa" -> Locale("pa", "IN")
+                    "as" -> Locale("as", "IN")
                     else -> Locale.ENGLISH
                 }
                 tts?.language = locale
@@ -217,7 +275,7 @@ fun VoiceInputScreen(
                 ttsEngine = tts
 
                 // Automatically welcome citizen in chosen language
-                val greeting = GeminiVoiceService.getGreeting(currentLanguage)
+                val greeting = GeminiVoiceService.getGreeting(activeLanguage)
                 messages.add(ChatMessage(id = "msg_welcome", sender = "assistant", text = greeting))
                 if (!isMuted) {
                     tts?.speak(greeting, TextToSpeech.QUEUE_FLUSH, null, "arivom_voice_greeting")
@@ -251,7 +309,7 @@ fun VoiceInputScreen(
                 age = 45,
                 occupation = occupation,
                 state = currentState,
-                voiceLanguage = currentLanguage
+                voiceLanguage = activeLanguage
             )
             onProfileExtracted(profile)
 
@@ -260,7 +318,7 @@ fun VoiceInputScreen(
                 val history = messages.takeLast(4).map { it.sender to it.text }
                 val reply = GeminiVoiceService.generateConversationalReply(
                     spokenText = spoken,
-                    language = currentLanguage,
+                    language = activeLanguage,
                     stateName = currentState,
                     profile = profile,
                     matchingSchemes = emptyList(),
@@ -362,7 +420,7 @@ fun VoiceInputScreen(
                 shadowElevation = 2.dp,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
+                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -374,7 +432,7 @@ fun VoiceInputScreen(
                                 speechRecognizer?.stopListening()
                                 onNavigate(Screen.Home.route)
                             }) {
-                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = PrimaryIndigo)
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = SovereignMaroon)
                             }
                             Column {
                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -382,7 +440,7 @@ fun VoiceInputScreen(
                                         text = "Arivom Voice Live",
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 16.sp,
-                                        color = PrimaryIndigo
+                                        color = SovereignMaroon
                                     )
                                     Box(
                                         modifier = Modifier
@@ -398,16 +456,27 @@ fun VoiceInputScreen(
                                         )
                                     }
                                 }
+                                val activeLangObj = VOICE_LANGUAGES.find { it.code == activeLanguage }
                                 Text(
-                                    text = "📍 $currentState • 🌐 $currentLanguage • ⚡ Gemini Flash",
+                                    text = "📍 $currentState • 🌐 ${activeLangObj?.nativeName ?: activeLanguage} • ⚡ Gemini Live",
                                     fontSize = 11.sp,
                                     color = OnSurfaceVariant
                                 )
                             }
                         }
 
-                        // Action Controls (Speed, Mode, Mute)
+                        // Action Controls (Language, Speed, Mode, Mute)
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            // Language Switch Button
+                            IconButton(onClick = { showLanguageDialog = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.Language,
+                                    contentDescription = "Switch Language",
+                                    tint = SovereignMaroon,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+
                             // Speed Button
                             Surface(
                                 modifier = Modifier
@@ -428,7 +497,7 @@ fun VoiceInputScreen(
                                     text = "${voiceSpeed}x",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = PrimaryIndigo,
+                                    color = SovereignMaroon,
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
                                 )
                             }
@@ -438,7 +507,7 @@ fun VoiceInputScreen(
                                 Icon(
                                     imageVector = if (isFastMode) Icons.Default.FlashOn else Icons.Default.Radio,
                                     contentDescription = "Toggle Fast Mode",
-                                    tint = if (isFastMode) SovereignGold else PrimaryIndigo,
+                                    tint = if (isFastMode) SovereignGold else SovereignMaroon,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -451,9 +520,52 @@ fun VoiceInputScreen(
                                 Icon(
                                     imageVector = if (isMuted) Icons.AutoMirrored.Filled.VolumeMute else Icons.AutoMirrored.Filled.VolumeUp,
                                     contentDescription = "Mute Audio",
-                                    tint = if (isMuted) Color(0xFFBA1A1A) else PrimaryIndigo,
+                                    tint = if (isMuted) Color(0xFFBA1A1A) else SovereignMaroon,
                                     modifier = Modifier.size(20.dp)
                                 )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    // Horizontal Language Chip Strip (All 12 Languages)
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        items(VOICE_LANGUAGES) { lang ->
+                            val isSelected = activeLanguage == lang.code
+                            Surface(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .clickable { switchLanguage(lang.code) },
+                                color = if (isSelected) SovereignMaroon else SurfaceContainerLowest,
+                                border = BorderStroke(
+                                    1.dp,
+                                    if (isSelected) SovereignMaroon else OutlineVariant
+                                )
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                                ) {
+                                    Text(
+                                        text = lang.nativeName,
+                                        fontSize = 11.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (isSelected) Color.White else OnSurfaceVariant
+                                    )
+                                    if (isSelected) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = null,
+                                            tint = Color.White,
+                                            modifier = Modifier.size(12.dp)
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -589,7 +701,7 @@ fun VoiceInputScreen(
                 .padding(padding)
         ) {
             // Suggestion Starter Chips Bar
-            val starters = GeminiVoiceService.starterSuggestions[currentLanguage] ?: GeminiVoiceService.starterSuggestions["en"] ?: emptyList()
+            val starters = GeminiVoiceService.starterSuggestions[activeLanguage] ?: GeminiVoiceService.starterSuggestions["en"] ?: emptyList()
             if (starters.isNotEmpty()) {
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -607,7 +719,7 @@ fun VoiceInputScreen(
                                 text = "💬 $prompt",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Medium,
-                                color = PrimaryIndigo,
+                                color = SovereignMaroon,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                             )
                         }
@@ -619,55 +731,50 @@ fun VoiceInputScreen(
             LazyColumn(
                 state = listState,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
+                    .fillMaxSize()
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(vertical = 12.dp)
+                contentPadding = PaddingValues(bottom = 16.dp)
             ) {
-                items(messages) { msg ->
+                items(messages, key = { it.id }) { msg ->
                     val isUser = msg.sender == "user"
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
                     ) {
-                        Card(
+                        Surface(
                             shape = RoundedCornerShape(
-                                topStart = 16.dp,
-                                topEnd = 16.dp,
-                                bottomStart = if (isUser) 16.dp else 4.dp,
-                                bottomEnd = if (isUser) 4.dp else 16.dp
+                                topStart = 18.dp,
+                                topEnd = 18.dp,
+                                bottomStart = if (isUser) 18.dp else 4.dp,
+                                bottomEnd = if (isUser) 4.dp else 18.dp
                             ),
-                            colors = CardDefaults.cardColors(
-                                containerColor = if (isUser) PrimaryIndigo else SurfaceContainerLowest
-                            ),
-                            border = if (!isUser) BorderStroke(1.dp, OutlineVariant) else null,
-                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-                            modifier = Modifier.fillMaxWidth(0.85f)
+                            color = if (isUser) SovereignMaroon else SurfaceContainerLowest,
+                            border = BorderStroke(1.dp, if (isUser) SovereignMaroon else OutlineVariant),
+                            shadowElevation = 1.dp,
+                            modifier = Modifier.fillMaxWidth(if (msg.text.length < 30) 0.6f else 0.88f)
                         ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
+                            Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = if (isUser) "YOU" else "ARIVOM ASSISTANT",
-                                        fontSize = 10.sp,
+                                        text = if (isUser) "You (Citizen)" else "Arivom AI",
+                                        fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = if (isUser) Color(0xFFFFD9E1) else PrimaryIndigo,
-                                        letterSpacing = 1.sp
+                                        color = if (isUser) Color.White.copy(alpha = 0.8f) else SovereignMaroon
                                     )
-
                                     if (!isUser) {
                                         IconButton(
                                             onClick = { speakAloud(msg.text) },
                                             modifier = Modifier.size(24.dp)
                                         ) {
                                             Icon(
-                                                imageVector = Icons.AutoMirrored.Filled.VolumeUp,
-                                                contentDescription = "Replay Audio",
-                                                tint = PrimaryIndigo,
+                                                Icons.AutoMirrored.Filled.VolumeUp,
+                                                contentDescription = "Speak",
+                                                tint = SovereignMaroon,
                                                 modifier = Modifier.size(16.dp)
                                             )
                                         }
@@ -685,36 +792,77 @@ fun VoiceInputScreen(
                         }
                     }
                 }
+            }
+        }
+    }
 
-                if (isThinking) {
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Start
+    // Language Selection Dialog
+    if (showLanguageDialog) {
+        AlertDialog(
+            onDismissRequest = { showLanguageDialog = false },
+            title = {
+                Text(
+                    text = "Select Voice Language",
+                    fontWeight = FontWeight.Bold,
+                    color = SovereignMaroon
+                )
+            },
+            text = {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(VOICE_LANGUAGES) { lang ->
+                        val isSelected = activeLanguage == lang.code
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable {
+                                    switchLanguage(lang.code)
+                                    showLanguageDialog = false
+                                },
+                            color = if (isSelected) SovereignRosePill else SurfaceContainerLowest,
+                            border = BorderStroke(1.dp, if (isSelected) SovereignMaroon else OutlineVariant)
                         ) {
-                            Surface(
-                                shape = RoundedCornerShape(16.dp),
-                                color = SovereignRosePill.copy(alpha = 0.5f),
-                                border = BorderStroke(1.dp, SovereignRosePill)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                ) {
-                                    Icon(Icons.Default.GraphicEq, contentDescription = null, tint = SovereignMaroon, modifier = Modifier.size(16.dp))
+                                Column {
                                     Text(
-                                        text = "Gemini is thinking...",
-                                        fontSize = 12.sp,
+                                        text = lang.nativeName,
                                         fontWeight = FontWeight.Bold,
+                                        fontSize = 15.sp,
                                         color = SovereignMaroon
+                                    )
+                                    Text(
+                                        text = "${lang.name} (${lang.bcp47})",
+                                        fontSize = 12.sp,
+                                        color = OnSurfaceVariant
+                                    )
+                                }
+                                if (isSelected) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = "Selected",
+                                        tint = SovereignMaroon,
+                                        modifier = Modifier.size(20.dp)
                                     )
                                 }
                             }
                         }
                     }
                 }
+            },
+            confirmButton = {
+                TextButton(onClick = { showLanguageDialog = false }) {
+                    Text("Done", color = SovereignMaroon, fontWeight = FontWeight.Bold)
+                }
             }
-        }
+        )
     }
 }
