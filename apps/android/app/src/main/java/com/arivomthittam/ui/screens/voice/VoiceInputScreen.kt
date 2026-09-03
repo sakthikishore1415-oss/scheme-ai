@@ -205,10 +205,10 @@ fun VoiceInputScreen(
 
     // Initial greeting on opening
     LaunchedEffect(Unit) {
-        val greeting = if (currentLanguage == "ta") {
-            "வணக்கம்! அறிவோம் திட்டம் உங்களை வரவேற்கிறது. உங்கள் நலனுக்கான அரசு திட்டங்களை கண்டறிய நான் உதவலாமா?"
-        } else {
-            "Welcome to Arivom Thittam. I am your civic voice guide. May I help you find government welfare schemes you are entitled to?"
+        val greeting = when (currentLanguage) {
+            "ml" -> "നമസ്കാരം! അറിവോം തിട്ടത്തിലേക്ക് സ്വാഗതം. നിങ്ങൾക്ക് അർഹമായ സർക്കാർ പദ്ധതികൾ കണ്ടെത്താൻ ഞാൻ സഹായിക്കാം."
+            "ta" -> "வணக்கம்! அறிவோம் திட்டம் உங்களை வரவேற்கிறது. உங்கள் நலனுக்கான அரசு திட்டங்களை கண்டறிய நான் உதவலாமா?"
+            else -> "Welcome to Arivom Thittam. I am your civic voice guide. May I help you find government welfare schemes you are entitled to?"
         }
         assistantSay(greeting)
     }
@@ -358,8 +358,8 @@ fun VoiceInputScreen(
     Scaffold(
         topBar = {
             ArivomTopAppBar(
-                title = "Arivom Voice Guide",
-                tamilTitle = "குரல் உரையாடல்",
+                title = com.arivomthittam.domain.language.AndroidTranslations.getString("nav.voice", currentLanguage),
+                logoLetter = com.arivomthittam.domain.language.AndroidTranslations.getLogoLetter(currentLanguage),
                 canNavigateBack = true,
                 onNavigateBack = {
                     stopAllSpeech()
