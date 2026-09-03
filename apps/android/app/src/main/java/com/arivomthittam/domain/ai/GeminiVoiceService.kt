@@ -74,11 +74,60 @@ object GeminiVoiceService {
         isFastMode: Boolean = true,
         history: List<Pair<String, String>> = emptyList()
     ): String = withContext(Dispatchers.IO) {
-        val apiKey = BuildConfig.GEMINI_API_KEY
-        if (apiKey.isBlank()) {
-            return@withContext getFallbackReply(spokenText, language, matchingSchemes)
+        val xaiKey = "xai-HGfw0p7ZC3kABWgf29QA7wfqDQvNFQqfu8H336JL5auLBZFI0t1R5ll1DFmTGBPLU025MzsIhhqvhENP"
+        val apiKey = if (BuildConfig.GEMINI_API_KEY.isNotBlank()) BuildConfig.GEMINI_API_KEY else "AQ.Ab8RN6JSV7z-KRN41yTnI3bUKbzFOGsw5ekHPVh5zSeoMt7DqA"
+
+        val systemInstruction = when (language) {
+            "ml" -> "നിങ്ങൾ അറിവോം (Arivom) എന്ന സർക്കാർ പദ്ധതി ശബ്ദ സഹായിയാണ്. സ്വാഭാവിക മലയാളത്തിൽ മാത്രം സംസാരിക്കുക. തമിഴ് വാക്കുകൾ ഒരിക്കലും ഉപയോഗിക്കരുത്. പദ്ധതി അർഹതകൾ നിർബന്ധമായും താഴെ നൽകിയ വിവരങ്ങളിൽ നിന്ന് മാത്രം നൽകുക."
+            "ta" -> "நீங்கள் அறிவோம் (Arivom) அரசு நலத்திட்ட குரல் வழிகாட்டி. இயல்பான தமிழில் மட்டும் பேசவும். அரசு திட்ட தகவல்களை எப்போதும் துல்லியமாக சுருக்கமாக விளக்குங்கள்."
+            "te" -> "మీరు అరివోమ్ (Arivom) ప్రభుత్వ పథకాల వాయిస్ అసిస్టెంట్. సహజమైన తెలుగులో మాత్రమే మాట్లాడండి."
+            "kn" -> "ನೀವು ಅರಿವೋಮ್ (Arivom) ಸರಕಾರಿ ಯೋಜನೆಗಳ ಧ್ವನಿ ಸಹಾಯಕ. ನೈಸರ್ಗಿಕ ಕನ್ನಡದಲ್ಲಿ ಮಾತ್ರ ಮಾತನಾಡಿ."
+            "hi" -> "आप अरिवोम (Arivom) सरकारी कल्याण योजना सहायक हैं। शुद्ध व सरल हिंदी में संक्षेप में उत्तर दें."
+            else -> "You are Arivom, a friendly government scheme discovery voice assistant for India ($stateName). Keep responses concise, warm, conversational, and strictly grounded in the provided verified schemes."
         }
 
+        // 1. Try xAI Grok API
+        try {
+            val xaiUrl = URL("https://api.x.ai/v1/chat/completions")
+            val xaiConn = (xaiUrl.openConnection() as HttpURLConnection).apply {
+                requestMethod = "POST"
+                setRequestProperty("Content-Type", "application/json")
+                setRequestProperty("Authorization", "Bearer $xaiKey")
+                doOutput = true
+                connectTimeout = 4000
+                readTimeout = 4000
+            }
+
+            val xaiMessages = JSONArray().apply {
+                put(JSONObject().apply {
+                    put("role", "system")
+                    put("content", systemInstruction)
+                })
+                put(JSONObject().apply {
+                    put("role", "user")
+                    put("content", spokenText)
+                })
+            }
+
+            val xaiBody = JSONObject().apply {
+                put("messages", xaiMessages)
+                put("model", "grok-beta")
+                put("temperature", if (isFastMode) 0.3 else 0.5)
+            }
+
+            OutputStreamWriter(xaiConn.outputStream).use { it.write(xaiBody.toString()); it.flush() }
+
+            if (xaiConn.responseCode == 200) {
+                val resp = xaiConn.inputStream.bufferedReader().use { it.readText() }
+                val choice = JSONObject(resp).optJSONArray("choices")?.optJSONObject(0)
+                val grokText = choice?.optJSONObject("message")?.optString("content")
+                if (!grokText.isNullOrBlank()) {
+                    return@withContext grokText.replace(Regex("[*_#`\\[\\]()]"), "").trim()
+                }
+            }
+        } catch (_: Exception) {}
+
+        // 2. Google Gemini 3.6 Flash Fallback
         try {
             val endpoint = "https://generativelanguage.googleapis.com/v1beta/models/$GEMINI_MODEL:generateContent?key=$apiKey"
             val url = URL(endpoint)
@@ -88,15 +137,6 @@ object GeminiVoiceService {
                 doOutput = true
                 connectTimeout = 7000
                 readTimeout = 7000
-            }
-
-            val systemInstruction = when (language) {
-                "ml" -> "നിങ്ങൾ അറിവോം (Arivom) എന്ന സർക്കാർ പദ്ധതി ശബ്ദ സഹായിയാണ്. സ്വാഭാവിക മലയാളത്തിൽ മാത്രം സംസാരിക്കുക. തമിഴ് വാക്കുകൾ ഒരിക്കലും ഉപയോഗിക്കരുത്. പദ്ധതി അർഹതകൾ നിർബന്ധമായും താഴെ നൽകിയ വിവരങ്ങളിൽ നിന്ന് മാത്രം നൽകുക."
-                "ta" -> "நீங்கள் அறிவோம் (Arivom) அரசு நலத்திட்ட குரல் வழிகாட்டி. இயல்பான தமிழில் மட்டும் பேசவும். அரசு திட்ட தகவல்களை எப்போதும் துல்லியமாக சுருக்கமாக விளக்குங்கள்."
-                "te" -> "మీరు అరివోమ్ (Arivom) ప్రభుత్వ పథకాల వాయిస్ అసిస్టెంట్. సహజమైన తెలుగులో మాత్రమే మాట్లాడండి."
-                "kn" -> "ನೀವು ಅರಿವೋಮ್ (Arivom) ಸರಕಾರಿ ಯೋಜನೆಗಳ ಧ್ವನಿ ಸಹಾಯಕ. ನೈಸರ್ಗಿಕ ಕನ್ನಡದಲ್ಲಿ ಮಾತ್ರ ಮಾತನಾಡಿ."
-                "hi" -> "आप अरिवोम (Arivom) सरकारी कल्याण योजना सहायक हैं। शुद्ध व सरल हिंदी में संक्षेप में उत्तर दें।"
-                else -> "You are Arivom, a friendly government scheme discovery voice assistant for India ($stateName). Keep responses concise, warm, conversational, and strictly grounded in the provided verified schemes."
             }
 
             val modeGuidance = if (isFastMode) {

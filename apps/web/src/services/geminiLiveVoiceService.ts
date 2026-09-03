@@ -638,12 +638,56 @@ CRITICAL RULES FOR VOICE-TO-VOICE:
 5. If the citizen asks for scheme advice or help, guide them warmly and conversationally by naming 1 or 2 relevant programs naturally, and invite them to ask more.
 6. Treat this as an ongoing natural voice chat.`;
 
+      const xaiApiKey =
+        (import.meta as any).env?.VITE_XAI_API_KEY ||
+        (window as any).__XAI_API_KEY__ ||
+        'xai-HGfw0p7ZC3kABWgf29QA7wfqDQvNFQqfu8H336JL5auLBZFI0t1R5ll1DFmTGBPLU025MzsIhhqvhENP';
+
       const apiKey =
         (import.meta as any).env?.VITE_GEMINI_API_KEY ||
         (window as any).__GEMINI_API_KEY__ ||
         'AQ.Ab8RN6JSV7z-KRN41yTnI3bUKbzFOGsw5ekHPVh5zSeoMt7DqA';
 
-      // Build contents array for Gemini REST
+      // 1. Try xAI Grok API first if key exists
+      if (xaiApiKey) {
+        try {
+          const xaiRes = await fetch('https://api.x.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${xaiApiKey}`,
+            },
+            signal: this.currentAbortController?.signal,
+            body: JSON.stringify({
+              messages: [
+                { role: 'system', content: systemInstruction },
+                ...this.conversationHistory.slice(-4).map((h) => ({
+                  role: h.role === 'assistant' ? 'assistant' : 'user',
+                  content: h.text,
+                })),
+                { role: 'user', content: spokenText },
+              ],
+              model: 'grok-beta',
+              temperature: this.voiceMode === 'fast' ? 0.3 : 0.5,
+            }),
+          });
+
+          if (xaiRes.ok) {
+            const xaiData = await xaiRes.json();
+            const grokText = xaiData.choices?.[0]?.message?.content;
+            if (grokText) {
+              return grokText
+                .replace(/[*_#`[\]()]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+            }
+          }
+        } catch (_) {
+          // Seamless fallback to Gemini Flash
+        }
+      }
+
+      // 2. Google Gemini 3.6 Flash
       const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
 
       // Add recent conversation history
