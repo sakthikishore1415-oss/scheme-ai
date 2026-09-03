@@ -10,8 +10,11 @@
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
   },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "dependencies": {
-    "@arivom-thittam/api-contracts": "workspace:*",
+    "@arivom-thittam/api-contracts": "*",
     "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.1.14",
     "@types/canvas-confetti": "^1.9.0",

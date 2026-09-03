@@ -34,47 +34,60 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   };
 
   return (
-    <div className={`relative inline-block text-left ${className}`} ref={dropdownRef}>
-      {/* Trigger Button */}
+    <div className={`relative inline-flex items-center gap-1.5 ${className}`} ref={dropdownRef}>
+      {/* Trigger Button for All Regional Languages */}
       <button
         type="button"
         id="language-switcher-btn"
         aria-haspopup="true"
         aria-expanded={isOpen}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#092554] hover:bg-[#133873] text-white text-xs font-bold border border-[#90a6dd]/40 transition-all cursor-pointer shadow-sm"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#faf8f3] hover:bg-[#eedfe4] text-[#241c20] text-xs font-bold border border-[#e8e1dc] transition-all cursor-pointer shadow-xs"
         title={t('header.selectLanguage')}
       >
-        <Globe className="w-4 h-4 text-[#fea619]" />
-        <span className="font-extrabold">{currentLang.nativeName}</span>
-        <ChevronDown className={`w-3.5 h-3.5 text-[#94f6c4] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        <Globe className="w-3.5 h-3.5 text-[#4a1f2d]" />
+        <span className="font-bold">{currentLang.nativeName}</span>
+        <span className="text-[10px] text-[#756a6f] hidden sm:inline">({currentLang.name})</span>
+        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#4a1f2d]/10 text-[#4a1f2d] font-bold tracking-tight">
+          {LANGUAGE_LIST.length} Langs
+        </span>
+        <ChevronDown className={`w-3 h-3 text-[#756a6f] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
-      {/* Dropdown Menu */}
+      {/* Dropdown Menu with All 12 Supported Languages */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-[#092554] text-white shadow-2xl border border-[#90a6dd]/40 py-2 z-50 animate-fade-in divide-y divide-white/10">
-          <div className="px-4 py-2 border-b border-white/10">
-            <span className="text-[11px] font-extrabold text-[#94f6c4] tracking-wider uppercase block">
+        <div className="absolute right-0 top-full mt-2 w-64 rounded-2xl bg-white text-[#241c20] shadow-civic-overlay border border-[#e8e1dc] py-2 z-50 animate-fade-in divide-y divide-[#e8e1dc]">
+          <div className="px-4 py-2 bg-[#faf8f3] border-b border-[#e8e1dc] flex items-center justify-between">
+            <span className="text-[11px] font-bold text-[#4a1f2d] tracking-wider uppercase block">
               {t('header.selectLanguage')}
+            </span>
+            <span className="text-[10px] text-[#756a6f] font-semibold">
+              {LANGUAGE_LIST.length} Languages
             </span>
           </div>
 
-          <div className="max-h-80 overflow-y-auto py-1 divide-y divide-white/5">
+          <div className="max-h-80 overflow-y-auto py-1 divide-y divide-[#faf8f3]">
             {LANGUAGE_LIST.map((lang) => {
               const isSelected = selectedVoiceLanguageId === lang.id;
               return (
                 <button
                   key={lang.id}
                   type="button"
+                  id={`lang-select-option-${lang.id}`}
                   onClick={() => handleSelectLanguage(lang.id)}
                   className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-xs transition-colors cursor-pointer ${
                     isSelected
-                      ? 'bg-[#fea619] text-[#092554] font-bold shadow-xs'
-                      : 'text-white hover:bg-white/10'
+                      ? 'bg-[#4a1f2d] text-white font-bold'
+                      : 'text-[#241c20] hover:bg-[#faf8f3]'
                   }`}
                 >
-                  <span className="text-sm font-bold">{lang.nativeName}</span>
-                  {isSelected && <Check className="w-4 h-4 text-[#092554] shrink-0 font-bold" />}
+                  <div>
+                    <span className="text-sm font-bold block">{lang.nativeName}</span>
+                    <span className={`text-[11px] block ${isSelected ? 'text-white/80' : 'text-[#756a6f]'}`}>
+                      {lang.name}
+                    </span>
+                  </div>
+                  {isSelected && <Check className="w-4 h-4 text-white shrink-0 font-bold" />}
                 </button>
               );
             })}

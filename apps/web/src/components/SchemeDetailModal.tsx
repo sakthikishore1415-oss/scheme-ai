@@ -227,34 +227,34 @@ export const SchemeDetailModal: React.FC = () => {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/75 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-[#c5c6d0]/60 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-[#21191d]/75 animate-fade-in">
+      <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] flex flex-col shadow-civic-overlay border border-[#e8e1dc] overflow-hidden">
         {/* Header Bar */}
-        <div className="bg-[#092554] text-white p-5 sm:p-6 flex items-start justify-between">
+        <div className="bg-[#4a1f2d] text-white p-5 sm:p-6 flex items-start justify-between">
           <div className="space-y-1.5 max-w-[85%]">
             <div className="flex items-center gap-2 flex-wrap">
               <span
-                className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
+                className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
                   scheme.schemeType === 'central'
-                    ? 'bg-[#d9e2ff] text-[#001944] border border-[#b0c6ff]'
-                    : 'bg-[#94f6c4]/30 text-[#94f6c4] border border-[#57b98c]/40'
+                    ? 'bg-[#c8a96b]/20 text-[#ffdea0] border border-[#c8a96b]/40'
+                    : 'bg-[#71806b]/20 text-[#e8e1dc] border border-[#71806b]/40'
                 }`}
               >
                 {scheme.schemeType === 'central' ? 'Central Scheme' : `${scheme.stateId || scheme.state || 'State'} Scheme`}
               </span>
-              <span className="text-xs text-[#90a6dd] font-mono">ID: {scheme.id}</span>
-              <span className="text-[11px] text-[#94f6c4] font-medium">✓ Official Gazette Rule</span>
+              <span className="text-xs text-[#c08494] font-mono">ID: {scheme.id}</span>
+              <span className="text-[11px] text-[#c8a96b] font-medium">✓ Official Gazette Rule</span>
             </div>
 
             <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">
               {scheme.name}
             </h2>
             {scheme.nativeName && (
-              <p className="text-xs sm:text-sm text-[#d9e2ff] font-medium">
+              <p className="text-xs sm:text-sm text-[#ffd9e1] font-medium">
                 {scheme.nativeName}
               </p>
             )}
-            <p className="text-xs text-[#90a6dd]">
+            <p className="text-xs text-[#c08494]">
               Authority: <span className="text-white font-semibold">{scheme.department || scheme.authority || 'Government Authority'}</span>
             </p>
           </div>
@@ -266,7 +266,7 @@ export const SchemeDetailModal: React.FC = () => {
               className={`p-2 rounded-xl border transition-colors cursor-pointer ${
                 isSaved
                   ? 'bg-[#ba1a1a] text-white border-[#ba1a1a]'
-                  : 'bg-[#243b6b] text-[#d9e2ff] border-[#90a6dd]/30 hover:bg-[#243b6b]/80'
+                  : 'bg-[#6b3548] text-[#ffd9e1] border-[#e8e1dc]/30 hover:bg-[#874d60]'
               }`}
               title={isSaved ? 'Remove from Saved' : 'Save Scheme'}
             >
@@ -277,7 +277,7 @@ export const SchemeDetailModal: React.FC = () => {
                 speechService.stop();
                 setSelectedSchemeDetail(null);
               }}
-              className="p-2 rounded-xl bg-[#243b6b] text-[#d9e2ff] border border-[#90a6dd]/30 hover:bg-[#243b6b]/80 cursor-pointer"
+              className="p-2 rounded-xl bg-[#6b3548] text-[#ffd9e1] border border-[#e8e1dc]/30 hover:bg-[#874d60] cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -285,14 +285,14 @@ export const SchemeDetailModal: React.FC = () => {
         </div>
 
         {/* Sub-Navigation Tabs */}
-        <div className="flex items-center gap-1 bg-[#f2f4f6] p-1.5 border-b border-[#c5c6d0]/60 overflow-x-auto text-xs font-bold">
+        <div className="flex items-center gap-1 bg-[#faf8f3] p-1.5 border-b border-[#e8e1dc] overflow-x-auto text-xs font-bold">
           <button
             id="detail-subtab-overview"
             onClick={() => setActiveSubTab('OVERVIEW')}
             className={`px-3.5 py-1.5 rounded-xl transition-colors cursor-pointer ${
               activeSubTab === 'OVERVIEW'
-                ? 'bg-[#092554] text-white shadow-xs'
-                : 'text-[#44464f] hover:bg-[#edeef0]'
+                ? 'bg-[#4a1f2d] text-white shadow-xs'
+                : 'text-[#756a6f] hover:bg-[#eedfe4]'
             }`}
           >
             OVERVIEW & ELIGIBILITY
@@ -302,13 +302,13 @@ export const SchemeDetailModal: React.FC = () => {
             onClick={() => setActiveSubTab('DOCUMENTS')}
             className={`px-3.5 py-1.5 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 ${
               activeSubTab === 'DOCUMENTS'
-                ? 'bg-[#092554] text-white shadow-xs'
-                : 'text-[#44464f] hover:bg-[#edeef0]'
+                ? 'bg-[#4a1f2d] text-white shadow-xs'
+                : 'text-[#756a6f] hover:bg-[#eedfe4]'
             }`}
           >
             <span>DOCUMENTS CHECKLIST</span>
             <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-              activeSubTab === 'DOCUMENTS' ? 'bg-[#243b6b] text-[#94f6c4]' : 'bg-[#e1e2e4] text-[#191c1e]'
+              activeSubTab === 'DOCUMENTS' ? 'bg-[#6b3548] text-white' : 'bg-[#e8e1dc] text-[#241c20]'
             }`}>
               {scheme.documents?.length || 0}
             </span>
@@ -318,8 +318,8 @@ export const SchemeDetailModal: React.FC = () => {
             onClick={() => setActiveSubTab('APPLY')}
             className={`px-3.5 py-1.5 rounded-xl transition-colors cursor-pointer ${
               activeSubTab === 'APPLY'
-                ? 'bg-[#092554] text-white shadow-xs'
-                : 'text-[#44464f] hover:bg-[#edeef0]'
+                ? 'bg-[#4a1f2d] text-white shadow-xs'
+                : 'text-[#756a6f] hover:bg-[#eedfe4]'
             }`}
           >
             HOW TO APPLY
@@ -329,8 +329,8 @@ export const SchemeDetailModal: React.FC = () => {
             onClick={() => setActiveSubTab('SIMPLIFIED')}
             className={`px-3.5 py-1.5 rounded-xl transition-colors cursor-pointer flex items-center gap-1 ${
               activeSubTab === 'SIMPLIFIED'
-                ? 'bg-[#fea619] text-[#684000] shadow-xs'
-                : 'text-[#855300] bg-[#ffddb8]/60 hover:bg-[#ffddb8]'
+                ? 'bg-[#c8a96b] text-[#221700] shadow-xs'
+                : 'text-[#6b3548] bg-[#c8a96b]/15 hover:bg-[#c8a96b]/25'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
@@ -345,22 +345,22 @@ export const SchemeDetailModal: React.FC = () => {
             <div className="space-y-6 animate-fade-in">
               {/* Dynamic Eligibility Missing Question Section */}
               {questionsToAsk.length > 0 && (
-                <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 sm:p-5 space-y-3 shadow-xs">
-                  <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
-                    <HelpCircle className="w-4 h-4 text-[#fea619] shrink-0" />
+                <div className="bg-[#faf8f3] border border-[#c8a96b] rounded-2xl p-4 sm:p-5 space-y-3 shadow-xs">
+                  <div className="flex items-center gap-2 text-[#4a1f2d] font-bold text-xs">
+                    <HelpCircle className="w-4 h-4 text-[#c8a96b] shrink-0" />
                     <span>Quick Eligibility Check: Answer to verify if you qualify</span>
                   </div>
 
                   <div className="space-y-3">
                     {questionsToAsk.map((q) => (
-                      <div key={q.key} className="bg-white p-3.5 rounded-xl border border-amber-200 space-y-2">
-                        <p className="text-xs font-semibold text-slate-800">{q.question}</p>
+                      <div key={q.key} className="bg-white p-3.5 rounded-xl border border-[#e8e1dc] space-y-2">
+                        <p className="text-xs font-semibold text-[#241c20]">{q.question}</p>
                         <div className="flex items-center gap-2 flex-wrap">
                           {q.options.map((opt, idx) => (
                             <button
                               key={idx}
                               onClick={opt.action}
-                              className="px-3 py-1.5 rounded-lg bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs transition-colors cursor-pointer shadow-xs"
+                              className="px-3 py-1.5 rounded-lg bg-[#4a1f2d] hover:bg-[#6b3548] text-white font-bold text-xs transition-colors cursor-pointer shadow-xs"
                             >
                               {opt.label}
                             </button>
@@ -376,24 +376,24 @@ export const SchemeDetailModal: React.FC = () => {
               {matchResult && (
                 <div className={`p-4 rounded-2xl border flex items-center justify-between gap-3 ${
                   matchResult.score >= 70
-                    ? 'bg-emerald-50 border-emerald-300 text-emerald-950'
-                    : 'bg-[#d9e2ff]/40 border-[#b0c6ff] text-[#092554]'
+                    ? 'bg-[#71806b]/12 border-[#71806b] text-[#241c20]'
+                    : 'bg-[#faf8f3] border-[#e8e1dc] text-[#4a1f2d]'
                 }`}>
                   <div className="text-xs space-y-0.5">
                     <div className="flex items-center gap-1.5 font-bold">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <CheckCircle2 className="w-4 h-4 text-[#71806b]" />
                       <span>
                         Profile Eligibility Match: <strong>{matchResult.score}%</strong> ({matchResult.matchLevel})
                       </span>
                     </div>
-                    <p className="text-[#44464f]">
+                    <p className="text-[#756a6f]">
                       Evaluated using your profile (Age: {userProfile?.age || 35}, Occupation: {userProfile?.occupation || 'General'}, State: {userProfile?.state || 'Current'})
                     </p>
                   </div>
                   <button
                     id="detail-whyme-btn"
                     onClick={() => setSelectedWhyMeScheme(matchResult)}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#092554] text-white font-bold text-xs hover:bg-[#243b6b] shrink-0 cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-xl bg-[#4a1f2d] text-white font-bold text-xs hover:bg-[#6b3548] shrink-0 cursor-pointer"
                   >
                     VIEW WHY ME
                   </button>
@@ -401,14 +401,14 @@ export const SchemeDetailModal: React.FC = () => {
               )}
 
               {/* Voice Readout Banner */}
-              <div className="bg-[#d9e2ff]/50 border border-[#b0c6ff] rounded-2xl p-4 flex items-center justify-between gap-3">
+              <div className="bg-[#faf8f3] border border-[#e8e1dc] rounded-2xl p-4 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <Volume2 className="w-5 h-5 text-[#092554] shrink-0" />
+                  <Volume2 className="w-5 h-5 text-[#4a1f2d] shrink-0" />
                   <div>
-                    <p className="text-xs font-bold text-[#092554]">
+                    <p className="text-xs font-bold text-[#4a1f2d]">
                       Hear Scheme Explanation in {currentLanguageConfig.name}
                     </p>
-                    <p className="text-[11px] text-[#243b6b]">
+                    <p className="text-[11px] text-[#514346]">
                       {regionalContent?.summary || scheme.summarySimple}
                     </p>
                   </div>
@@ -422,8 +422,8 @@ export const SchemeDetailModal: React.FC = () => {
                   }
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
                     isPlayingAudio
-                      ? 'bg-[#092554] text-white animate-pulse'
-                      : 'bg-[#092554] text-white hover:bg-[#243b6b]'
+                      ? 'bg-[#4a1f2d] text-white animate-pulse'
+                      : 'bg-[#4a1f2d] text-white hover:bg-[#6b3548]'
                   }`}
                 >
                   {isPlayingAudio ? 'STOP' : 'HEAR AUDIO'}
@@ -432,23 +432,23 @@ export const SchemeDetailModal: React.FC = () => {
 
               {/* What is it? */}
               <div>
-                <h3 className="text-xs font-bold text-[#092554] uppercase tracking-wider mb-2">
+                <h3 className="text-xs font-bold text-[#4a1f2d] uppercase tracking-wider mb-2">
                   What is this Scheme?
                 </h3>
-                <p className="text-xs sm:text-sm text-[#191c1e] leading-relaxed bg-[#f8f9fb] p-4 rounded-2xl border border-[#c5c6d0]/60">
+                <p className="text-xs sm:text-sm text-[#241c20] leading-relaxed bg-[#faf8f3] p-4 rounded-2xl border border-[#e8e1dc]">
                   {scheme.benefits?.detailedBenefit || scheme.summarySimple || scheme.name}
                 </p>
               </div>
 
               {/* Benefits Highlight */}
-              <div className="bg-[#94f6c4]/20 border border-[#57b98c]/40 rounded-2xl p-4 sm:p-5">
-                <span className="text-[11px] font-bold text-[#00462d] uppercase tracking-wider block mb-1">
+              <div className="bg-[#71806b]/12 border border-[#71806b] rounded-2xl p-4 sm:p-5">
+                <span className="text-[11px] font-bold text-[#241c20] uppercase tracking-wider block mb-1">
                   Sanctioned Benefits
                 </span>
-                <p className="text-lg font-bold text-[#002d1c]">
+                <p className="text-lg font-bold text-[#241c20]">
                   {scheme.benefits?.amount || scheme.benefits?.shortSummary || 'Welfare Benefit'}
                 </p>
-                <div className="mt-3 space-y-1 text-xs text-[#44464f]">
+                <div className="mt-3 space-y-1 text-xs text-[#514346]">
                   <p>• <strong>Benefit Type:</strong> {scheme.benefits?.type ? scheme.benefits.type.replace('_', ' ').toUpperCase() : 'WELFARE'}</p>
                   <p>• <strong>Frequency:</strong> {scheme.benefits?.frequency || 'Direct Benefit Transfer / Periodic'}</p>
                   {scheme.benefits?.shortSummary && <p>• <strong>Summary:</strong> {scheme.benefits.shortSummary}</p>}
@@ -457,31 +457,31 @@ export const SchemeDetailModal: React.FC = () => {
 
               {/* Who Qualifies? (Eligibility Rules) */}
               <div>
-                <h3 className="text-xs font-bold text-[#092554] uppercase tracking-wider mb-2">
+                <h3 className="text-xs font-bold text-[#4a1f2d] uppercase tracking-wider mb-2">
                   Who Qualifies?
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="bg-[#f8f9fb] p-3 rounded-xl border border-[#c5c6d0]/60">
-                    <span className="text-[10px] font-bold text-[#757780] uppercase block">Age Limit</span>
-                    <strong className="text-[#191c1e]">
+                  <div className="bg-[#faf8f3] p-3 rounded-xl border border-[#e8e1dc]">
+                    <span className="text-[10px] font-bold text-[#756a6f] uppercase block">Age Limit</span>
+                    <strong className="text-[#241c20]">
                       {scheme.eligibility?.minAge ? `${scheme.eligibility.minAge} years` : 'No minimum'} - {scheme.eligibility?.maxAge ? `${scheme.eligibility.maxAge} years` : 'No maximum'}
                     </strong>
                   </div>
-                  <div className="bg-[#f8f9fb] p-3 rounded-xl border border-[#c5c6d0]/60">
-                    <span className="text-[10px] font-bold text-[#757780] uppercase block">Income Ceiling</span>
-                    <strong className="text-[#191c1e]">
+                  <div className="bg-[#faf8f3] p-3 rounded-xl border border-[#e8e1dc]">
+                    <span className="text-[10px] font-bold text-[#756a6f] uppercase block">Income Ceiling</span>
+                    <strong className="text-[#241c20]">
                       {scheme.eligibility?.maxAnnualIncome ? `₹${scheme.eligibility.maxAnnualIncome.toLocaleString('en-IN')} / year` : 'No restrictive income limit'}
                     </strong>
                   </div>
-                  <div className="bg-[#f8f9fb] p-3 rounded-xl border border-[#c5c6d0]/60">
-                    <span className="text-[10px] font-bold text-[#757780] uppercase block">Target Occupations</span>
-                    <strong className="text-[#191c1e]">
+                  <div className="bg-[#faf8f3] p-3 rounded-xl border border-[#e8e1dc]">
+                    <span className="text-[10px] font-bold text-[#756a6f] uppercase block">Target Occupations</span>
+                    <strong className="text-[#241c20]">
                       {scheme.eligibility?.allowedOccupations ? scheme.eligibility.allowedOccupations.join(', ') : 'All Occupations'}
                     </strong>
                   </div>
-                  <div className="bg-[#f8f9fb] p-3 rounded-xl border border-[#c5c6d0]/60">
-                    <span className="text-[10px] font-bold text-[#757780] uppercase block">Applicable Location</span>
-                    <strong className="text-[#191c1e]">
+                  <div className="bg-[#faf8f3] p-3 rounded-xl border border-[#e8e1dc]">
+                    <span className="text-[10px] font-bold text-[#756a6f] uppercase block">Applicable Location</span>
+                    <strong className="text-[#241c20]">
                       {scheme.stateId === 'ALL' || scheme.state === 'ALL' ? 'All States across India' : `${scheme.stateId || scheme.state} State`}
                     </strong>
                   </div>
@@ -493,11 +493,11 @@ export const SchemeDetailModal: React.FC = () => {
           {/* TAB 2: DOCUMENTS CHECKLIST */}
           {activeSubTab === 'DOCUMENTS' && (
             <div className="space-y-4 animate-fade-in">
-              <div className="bg-[#f8f9fb] p-4 rounded-2xl border border-[#c5c6d0]/60">
-                <h3 className="text-xs font-bold text-[#092554] uppercase tracking-wider mb-1">
+              <div className="bg-[#faf8f3] p-4 rounded-2xl border border-[#e8e1dc]">
+                <h3 className="text-xs font-bold text-[#4a1f2d] uppercase tracking-wider mb-1">
                   Required Citizen Documents
                 </h3>
-                <p className="text-xs text-[#44464f]">
+                <p className="text-xs text-[#514346]">
                   Tick the documents you have ready. These are required for physical or online verification.
                 </p>
               </div>
@@ -511,15 +511,15 @@ export const SchemeDetailModal: React.FC = () => {
                       onClick={() => toggleUserDocument(doc.name)}
                       className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
                         hasDoc
-                          ? 'bg-emerald-50/80 border-emerald-300 shadow-xs'
-                          : 'bg-white border-[#c5c6d0]/60 hover:border-[#092554]'
+                          ? 'bg-[#71806b]/12 border-[#71806b] shadow-xs'
+                          : 'bg-white border-[#e8e1dc] hover:border-[#4a1f2d]'
                       }`}
                     >
                       <div
                         className={`w-5 h-5 rounded-lg border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
                           hasDoc
-                            ? 'bg-emerald-700 border-emerald-700 text-white'
-                            : 'border-[#757780] bg-white'
+                            ? 'bg-[#71806b] border-[#71806b] text-white'
+                            : 'border-[#756a6f] bg-white'
                         }`}
                       >
                         {hasDoc && <Check className="w-3.5 h-3.5" />}
@@ -527,16 +527,16 @@ export const SchemeDetailModal: React.FC = () => {
 
                       <div className="flex-1 space-y-0.5">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-[#191c1e]">
+                          <span className="text-xs font-bold text-[#241c20]">
                             {doc.name}
                           </span>
                           {doc.isMandatory && (
-                            <span className="text-[10px] bg-rose-100 text-rose-800 font-bold px-2 py-0.2 rounded-full">
+                            <span className="text-[10px] bg-[#ffdad6] text-[#93000a] font-bold px-2 py-0.2 rounded-full">
                               Mandatory
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-[#44464f]">
+                        <p className="text-xs text-[#514346]">
                           {doc.description}
                         </p>
                       </div>
@@ -550,22 +550,22 @@ export const SchemeDetailModal: React.FC = () => {
           {/* TAB 3: HOW TO APPLY */}
           {activeSubTab === 'APPLY' && (
             <div className="space-y-5 animate-fade-in">
-              <div className="bg-[#f8f9fb] p-4 rounded-2xl border border-[#c5c6d0]/60">
-                <h3 className="text-xs font-bold text-[#092554] uppercase tracking-wider mb-1">
+              <div className="bg-[#faf8f3] p-4 rounded-2xl border border-[#e8e1dc]">
+                <h3 className="text-xs font-bold text-[#4a1f2d] uppercase tracking-wider mb-1">
                   Step-by-Step Application Process
                 </h3>
-                <p className="text-xs text-[#44464f]">
+                <p className="text-xs text-[#514346]">
                   Follow these instructions to submit your official application.
                 </p>
               </div>
 
               <div className="space-y-3">
                 {scheme.applicationSteps?.map((step, idx) => (
-                  <div key={idx} className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-[#c5c6d0]/60">
-                    <div className="w-6 h-6 rounded-full bg-[#092554] text-white flex items-center justify-center font-bold text-xs shrink-0">
+                  <div key={idx} className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-[#e8e1dc]">
+                    <div className="w-6 h-6 rounded-full bg-[#4a1f2d] text-white flex items-center justify-center font-bold text-xs shrink-0">
                       {idx + 1}
                     </div>
-                    <p className="text-xs text-[#191c1e] font-medium leading-relaxed">
+                    <p className="text-xs text-[#241c20] font-medium leading-relaxed">
                       {step}
                     </p>
                   </div>
@@ -573,21 +573,21 @@ export const SchemeDetailModal: React.FC = () => {
               </div>
 
               {/* Official Links & Offline Center */}
-              <div className="p-4 rounded-2xl bg-[#d9e2ff]/30 border border-[#b0c6ff] space-y-3">
+              <div className="p-4 rounded-2xl bg-[#faf8f3] border border-[#e8e1dc] space-y-3">
                 {scheme.applicationUrl && (
                   <a
                     href={scheme.applicationUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-3 px-4 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
+                    className="w-full py-3 px-4 rounded-xl bg-[#4a1f2d] hover:bg-[#6b3548] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
                   >
                     <span>Visit Official Application Portal</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 )}
                 {scheme.offlineApplicationCenter && (
-                  <div className="text-xs text-[#44464f] flex items-center gap-2">
-                    <Building className="w-4 h-4 text-[#092554] shrink-0" />
+                  <div className="text-xs text-[#514346] flex items-center gap-2">
+                    <Building className="w-4 h-4 text-[#4a1f2d] shrink-0" />
                     <span><strong>Offline Center:</strong> {scheme.offlineApplicationCenter}</span>
                   </div>
                 )}
@@ -598,21 +598,21 @@ export const SchemeDetailModal: React.FC = () => {
           {/* TAB 4: EXPLAIN SIMPLY */}
           {activeSubTab === 'SIMPLIFIED' && (
             <div className="space-y-5 animate-fade-in">
-              <div className="p-5 rounded-3xl bg-linear-to-br from-[#ffddb8]/40 to-[#fea619]/20 border border-[#fea619]/40 space-y-3">
-                <div className="flex items-center gap-2 text-[#684000] font-extrabold text-xs uppercase tracking-wider">
-                  <Sparkles className="w-4 h-4 text-[#fea619]" />
+              <div className="p-5 rounded-3xl bg-[#faf8f3] border border-[#c8a96b] space-y-3">
+                <div className="flex items-center gap-2 text-[#4a1f2d] font-bold text-xs uppercase tracking-wider">
+                  <Sparkles className="w-4 h-4 text-[#c8a96b]" />
                   <span>Simple Explanation (No Jargon)</span>
                 </div>
 
-                <p className="text-sm font-semibold text-[#301c00] leading-relaxed">
+                <p className="text-sm font-semibold text-[#241c20] leading-relaxed">
                   {regionalContent?.summary || scheme.summarySimple}
                 </p>
 
-                <div className="bg-white/80 p-4 rounded-2xl border border-[#fea619]/30 space-y-2">
-                  <span className="text-xs font-bold text-[#684000] block">
+                <div className="bg-white p-4 rounded-2xl border border-[#e8e1dc] space-y-2">
+                  <span className="text-xs font-bold text-[#4a1f2d] block">
                     What this means for your family:
                   </span>
-                  <p className="text-xs text-[#44464f] leading-relaxed">
+                  <p className="text-xs text-[#514346] leading-relaxed">
                     {scheme.benefits?.detailedBenefit || scheme.benefits?.shortSummary}
                   </p>
                 </div>
@@ -622,12 +622,12 @@ export const SchemeDetailModal: React.FC = () => {
         </div>
 
         {/* Modal Bottom Footer */}
-        <div className="p-4 bg-[#f8f9fb] border-t border-[#c5c6d0]/60 flex items-center justify-between gap-3">
+        <div className="p-4 bg-[#faf8f3] border-t border-[#e8e1dc] flex items-center justify-between gap-3">
           <button
             onClick={handleCopySummary}
-            className="px-4 py-2 rounded-xl bg-white border border-[#c5c6d0]/60 text-xs font-bold text-[#191c1e] hover:bg-[#edeef0] transition-colors cursor-pointer flex items-center gap-1.5"
+            className="px-4 py-2 rounded-xl bg-white border border-[#e8e1dc] text-xs font-bold text-[#241c20] hover:bg-[#eedfe4] transition-colors cursor-pointer flex items-center gap-1.5"
           >
-            <Copy className="w-3.5 h-3.5 text-[#757780]" />
+            <Copy className="w-3.5 h-3.5 text-[#756a6f]" />
             <span>{copiedLink ? 'Copied!' : 'Copy Summary'}</span>
           </button>
 
@@ -636,7 +636,7 @@ export const SchemeDetailModal: React.FC = () => {
               speechService.stop();
               setSelectedSchemeDetail(null);
             }}
-            className="px-6 py-2.5 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs transition-colors cursor-pointer"
+            className="px-6 py-2.5 rounded-xl bg-[#4a1f2d] hover:bg-[#6b3548] text-white font-bold text-xs transition-colors cursor-pointer"
           >
             {t('common.close')}
           </button>

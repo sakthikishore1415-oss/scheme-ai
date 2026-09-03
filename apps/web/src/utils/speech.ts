@@ -4,6 +4,7 @@ class SpeechService {
   private isSynthesizing = false;
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private audioContext: AudioContext | null = null;
+  private speechRate: number = 1.12; // Fast, natural, responsive conversational pace
 
   constructor() {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -17,12 +18,21 @@ class SpeechService {
     }
   }
 
+  public setSpeechRate(rate: number) {
+    this.speechRate = Math.max(0.75, Math.min(2.0, rate));
+  }
+
+  public getSpeechRate(): number {
+    return this.speechRate;
+  }
+
   public speak(
     text: string,
     langId: string = 'ta',
     onStart?: () => void,
     onEnd?: () => void,
-    onError?: (err: any) => void
+    onError?: (err: any) => void,
+    overrideRate?: number
   ) {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
       console.warn('Speech synthesis not supported in browser, using audio simulation fallback.');
@@ -40,7 +50,7 @@ class SpeechService {
       const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = langConfig.bcp47Code || 'ta-IN';
-      utterance.rate = 1.0;
+      utterance.rate = overrideRate || this.speechRate;
       utterance.pitch = 1.0;
 
       // Find best matching system voice

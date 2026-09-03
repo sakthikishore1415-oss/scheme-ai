@@ -1,13 +1,19 @@
 {
   "name": "arivom-thittam",
   "private": true,
-  "packageManager": "pnpm@10.5.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "lint": "turbo run lint",
+    "dev": "npm run dev --workspace=apps/web",
+    "build": "npm run build --workspace=apps/web && mkdir -p dist && cp -r apps/web/dist/* dist/",
+    "lint": "npm run lint --workspace=apps/web",
     "clean": "turbo run clean",
     "fetch-schemes": "python3 scripts/fetch_all_india_schemes.py"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   },
   "devDependencies": {
     "turbo": "^2.4.4",

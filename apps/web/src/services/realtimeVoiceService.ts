@@ -47,6 +47,7 @@ export class RealtimeVoiceService {
   private currentAssistantMessageId: string | null = null;
   private fallbackMode: boolean = false;
   private fallbackRecognition: any = null;
+  private fallbackPauseTimer: number | null = null;
   private currentLanguageId: string = 'en';
   private currentStateName: string = 'Tamil Nadu';
 
@@ -335,8 +336,39 @@ export class RealtimeVoiceService {
         this.setState('USER_SPEAKING');
       }
 
+      const activeText = (final.trim() || interim.trim());
+      if (activeText) {
+        if (this.fallbackPauseTimer !== null) {
+          clearTimeout(this.fallbackPauseTimer);
+          this.fallbackPauseTimer = null;
+        }
+
+        // Automatically trigger stop listening and turn processing after 2 seconds pause
+        this.fallbackPauseTimer = window.setTimeout(() => {
+          try {
+            this.fallbackRecognition?.stop();
+          } catch (_) {}
+
+          const text = (final.trim() || interim.trim());
+          if (text) {
+            const userMsg: RealtimeMessage = {
+              id: `user-${Date.now()}`,
+              role: 'user',
+              text,
+              timestamp: Date.now(),
+            };
+            this.callbacks?.onMessage(userMsg);
+            this.processFallbackTurn(text);
+          }
+        }, 2000);
+      }
+
       if (final.trim()) {
         const text = final.trim();
+        if (this.fallbackPauseTimer !== null) {
+          clearTimeout(this.fallbackPauseTimer);
+          this.fallbackPauseTimer = null;
+        }
         const userMsg: RealtimeMessage = {
           id: `user-${Date.now()}`,
           role: 'user',

@@ -43,7 +43,7 @@ export const BottomNav: React.FC = () => {
       {/* Mobile Floating Bottom Bar */}
       <nav
         aria-label="Mobile Navigation Bar"
-        className={`md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-[#c5c6d0]/60 px-2 py-1 shadow-lg ${
+        className={`md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#e8e1dc] px-2 py-1 shadow-sm ${
           easyMode ? 'py-2.5' : 'py-1'
         }`}
       >
@@ -59,10 +59,10 @@ export const BottomNav: React.FC = () => {
                   onClick={() => setShowVoiceModal(true)}
                   className="-mt-5 flex flex-col items-center justify-center cursor-pointer group"
                 >
-                  <div className="w-13 h-13 rounded-full bg-[#092554] text-white flex items-center justify-center shadow-lg shadow-[#092554]/30 group-hover:scale-105 transition-transform">
-                    {tab.icon}
+                  <div className="w-13 h-13 rounded-full bg-[#4a1f2d] text-white flex items-center justify-center shadow-md group-hover:bg-[#6b3548] transition-colors">
+                    <Mic className="w-6 h-6 text-[#c8a96b]" />
                   </div>
-                  <span className="text-[10px] font-extrabold text-[#092554] mt-0.5 tracking-wider">
+                  <span className="text-[10px] font-bold text-[#4a1f2d] mt-0.5 tracking-wider">
                     {tab.label}
                   </span>
                 </button>
@@ -75,22 +75,22 @@ export const BottomNav: React.FC = () => {
                 id={`mobile-nav-${tab.id}-btn`}
                 onClick={() => setActiveTab(tab.id)}
                 className={`relative flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all cursor-pointer ${
-                  isActive ? 'text-[#092554] font-bold' : 'text-[#757780] hover:text-[#191c1e]'
+                  isActive ? 'text-[#4a1f2d] font-bold' : 'text-[#756a6f] hover:text-[#241c20]'
                 }`}
               >
                 <div className="relative">
                   {tab.icon}
                   {tab.badge !== undefined && tab.badge > 0 && (
-                    <span className="absolute -top-1.5 -right-2 bg-[#fea619] text-[#684000] text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border-2 border-white">
+                    <span className="absolute -top-1.5 -right-2 bg-[#4a1f2d] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border-2 border-white">
                       {tab.badge}
                     </span>
                   )}
                 </div>
-                <span className={`text-[11px] tracking-tight mt-0.5 max-w-[75px] truncate ${isActive ? 'font-bold text-[#092554]' : 'font-medium'}`}>
+                <span className={`text-[11px] tracking-tight mt-0.5 max-w-[75px] truncate ${isActive ? 'font-bold text-[#4a1f2d]' : 'font-medium'}`}>
                   {tab.label}
                 </span>
                 {isActive && (
-                  <span className="w-5 h-0.5 bg-[#fea619] rounded-full mt-0.5"></span>
+                  <span className="w-5 h-0.5 bg-[#4a1f2d] rounded-full mt-0.5"></span>
                 )}
               </button>
             );
@@ -101,10 +101,10 @@ export const BottomNav: React.FC = () => {
       {/* Desktop Sticky Sub-Navigation */}
       <aside
         aria-label="Desktop Sidebar Navigation"
-        className="hidden md:flex fixed top-20 left-6 z-30 flex-col gap-2 p-3 bg-white/90 backdrop-blur-md rounded-2xl border border-[#c5c6d0]/60 shadow-md w-56"
+        className="hidden md:flex fixed top-20 left-6 z-30 flex-col gap-2 p-3 bg-white rounded-2xl border border-[#e8e1dc] shadow-sm w-56"
       >
-        <div className="px-3 py-1.5 border-b border-[#e1e2ec] mb-1">
-          <span className="text-[10px] font-bold tracking-widest text-[#757780] uppercase">
+        <div className="px-3 py-1.5 border-b border-[#e8e1dc] mb-1">
+          <span className="text-[10px] font-bold tracking-widest text-[#756a6f] uppercase">
             {t('header.title')}
           </span>
         </div>
@@ -120,12 +120,12 @@ export const BottomNav: React.FC = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center justify-between p-2.5 px-3 rounded-xl text-left transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-[#092554] text-white font-bold shadow-sm'
-                    : 'text-[#44474f] hover:bg-[#f2f3fa] hover:text-[#191c1e]'
+                    ? 'bg-[#4a1f2d] text-white font-bold shadow-xs'
+                    : 'text-[#514346] hover:bg-[#faf8f3] hover:text-[#241c20]'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <span className={isActive ? 'text-[#fea619]' : 'text-[#757780]'}>
+                  <span className={isActive ? 'text-[#c8a96b]' : 'text-[#756a6f]'}>
                     {tab.icon}
                   </span>
                   <span className="text-xs font-bold block">{tab.label}</span>
@@ -133,7 +133,7 @@ export const BottomNav: React.FC = () => {
                 {tab.badge !== undefined && tab.badge > 0 && (
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                      isActive ? 'bg-[#fea619] text-[#684000]' : 'bg-[#e1e2ec] text-[#44474f]'
+                      isActive ? 'bg-[#c8a96b] text-[#310a18]' : 'bg-[#faf8f3] text-[#756a6f] border border-[#e8e1dc]'
                     }`}
                   >
                     {tab.badge}
@@ -143,18 +143,18 @@ export const BottomNav: React.FC = () => {
             );
           })}
 
-        <div className="pt-2 border-t border-[#e1e2ec] mt-1">
+        <div className="pt-2 border-t border-[#e8e1dc] mt-1">
           <button
             id="desktop-nav-voice-btn"
             onClick={() => setShowVoiceModal(true)}
-            className="w-full p-3 rounded-xl bg-linear-to-tr from-[#00462d] to-[#002d1c] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm hover:opacity-95 transition-opacity cursor-pointer border border-[#94f6c4]/40"
+            className="w-full p-3 rounded-xl bg-[#4a1f2d] hover:bg-[#6b3548] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer border border-[#e8e1dc]"
           >
-            <Mic className="w-4 h-4 text-[#fea619] animate-pulse" />
+            <Mic className="w-4 h-4 text-[#c8a96b]" />
             <div className="text-left">
               <span className="block text-xs font-bold">
                 {t('home.startVoiceBtn')}
               </span>
-              <span className="block text-[9px] text-[#94f6c4] uppercase tracking-wider">
+              <span className="block text-[9px] text-[#ffd9e1] uppercase tracking-wider">
                 {t('home.talkToAssistant')}
               </span>
             </div>
