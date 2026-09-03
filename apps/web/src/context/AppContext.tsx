@@ -237,7 +237,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // Evaluate schemes deterministically against loaded schemes
-  const activeMatches = matchUserSchemes(userProfile, schemes);
+  const effectiveProfile: UserProfile = userProfile || {
+    userId: 'guest',
+    name: '',
+    age: 35,
+    gender: 'unspecified',
+    state: selectedStateId,
+    district: currentStateConfig.districts[0] || '',
+    occupation: '',
+    annualIncome: 150000,
+    education: 'other',
+    maritalStatus: 'unspecified',
+    isStudent: false,
+    hasDisability: false,
+    landHoldingAcres: 0,
+    need: 'general',
+    voiceLanguage: selectedVoiceLanguageId,
+    familyRole: 'Self',
+  };
+
+  const activeMatches = matchUserSchemes(effectiveProfile, schemes);
 
   // Save/Unsave Schemes
   const toggleSaveScheme = (schemeId: string) => {

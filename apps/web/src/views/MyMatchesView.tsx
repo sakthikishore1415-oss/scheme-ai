@@ -8,6 +8,11 @@ import {
   Wand2,
   UserPlus,
   Inbox,
+  X,
+  Building2,
+  Landmark,
+  Layers,
+  Filter,
 } from 'lucide-react';
 
 export const MyMatchesView: React.FC = () => {
@@ -17,6 +22,19 @@ export const MyMatchesView: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showWizard, setShowWizard] = useState<boolean>(false);
+
+  const categories = [
+    { id: 'ALL', label: 'All Categories' },
+    { id: 'agriculture', label: '🌾 Agriculture' },
+    { id: 'education', label: '🎓 Education' },
+    { id: 'housing', label: '🏡 Housing' },
+    { id: 'health', label: '🏥 Health' },
+    { id: 'women', label: '👩 Women' },
+    { id: 'senior_citizens', label: '👵 Senior Citizens' },
+    { id: 'employment', label: '💼 Employment' },
+    { id: 'business', label: '💰 Business & Loans' },
+    { id: 'disability', label: '♿ Disability' },
+  ];
 
   // Apply filters
   const filteredMatches = activeMatches.filter((res) => {
@@ -35,12 +53,21 @@ export const MyMatchesView: React.FC = () => {
       const matchName = res.scheme.name.toLowerCase().includes(q);
       const matchNative = res.scheme.nativeName?.toLowerCase().includes(q) || false;
       const matchDept = (res.scheme.department || res.scheme.authority || '').toLowerCase().includes(q);
-      const matchBen = (res.scheme.benefits.amount || '').toLowerCase().includes(q);
-      if (!matchName && !matchNative && !matchDept && !matchBen) return false;
+      const matchBen = (res.scheme.benefits?.amount || res.scheme.benefits?.shortSummary || '').toLowerCase().includes(q);
+      const matchCat = (res.scheme.category || '').toLowerCase().includes(q);
+      if (!matchName && !matchNative && !matchDept && !matchBen && !matchCat) return false;
     }
 
     return true;
   });
+
+  const hasActiveFilters = filterType !== 'ALL' || selectedCategory !== 'ALL' || searchQuery.trim() !== '';
+
+  const handleResetFilters = () => {
+    setFilterType('ALL');
+    setSelectedCategory('ALL');
+    setSearchQuery('');
+  };
 
   return (
     <div className="space-y-6 animate-fade-in pb-12">
@@ -94,9 +121,9 @@ export const MyMatchesView: React.FC = () => {
       )}
 
       {/* Search & Filter Controls */}
-      <div className="bg-white rounded-3xl p-4 sm:p-5 border border-[#c5c6d0]/60 shadow-soft space-y-3">
+      <div className="bg-white rounded-3xl p-4 sm:p-5 border border-[#c5c6d0]/60 shadow-soft space-y-3.5">
+        {/* Row 1: Search Bar & Reset */}
         <div className="flex flex-col sm:flex-row items-center gap-3">
-          {/* Search Input */}
           <div className="relative flex-1 w-full">
             <Search className="w-4 h-4 absolute left-3.5 top-3 text-[#757780]" />
             <input
@@ -104,44 +131,124 @@ export const MyMatchesView: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('matches.searchPlaceholder')}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#f2f3fa] border border-[#c5c6d0]/60 text-xs text-[#191c1e] placeholder-[#757780] focus:border-[#092554] outline-none"
+              className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-[#f2f3fa] border border-[#c5c6d0]/60 text-xs text-[#191c1e] placeholder-[#757780] focus:border-[#092554] outline-none"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-3 text-[#757780] hover:text-[#191c1e] cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
-          {/* Level Filter Tabs */}
-          <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+          {hasActiveFilters && (
             <button
-              onClick={() => setFilterType('ALL')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer shrink-0 ${
-                filterType === 'ALL'
-                  ? 'bg-[#092554] text-white'
-                  : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
-              }`}
+              onClick={handleResetFilters}
+              className="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1 border border-rose-200"
             >
-              {t('matches.filterAll')} ({activeMatches.length})
+              <X className="w-3.5 h-3.5" />
+              <span>Reset Filters</span>
             </button>
-            <button
-              onClick={() => setFilterType('STRONG')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer shrink-0 ${
-                filterType === 'STRONG'
-                  ? 'bg-[#00462d] text-white'
-                  : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
-              }`}
-            >
-              {t('matches.filterStrong')}
-            </button>
-            <button
-              onClick={() => setFilterType('POTENTIAL')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer shrink-0 ${
-                filterType === 'POTENTIAL'
-                  ? 'bg-[#684000] text-white'
-                  : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
-              }`}
-            >
-              {t('matches.filterPotential')}
-            </button>
-          </div>
+          )}
         </div>
+
+        {/* Row 2: Level / Jurisdiction Filter Tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+          <span className="text-[11px] font-bold text-[#757780] flex items-center gap-1 mr-1 shrink-0">
+            <Filter className="w-3 h-3" />
+            <span>Type:</span>
+          </span>
+
+          <button
+            onClick={() => setFilterType('ALL')}
+            className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
+              filterType === 'ALL'
+                ? 'bg-[#092554] text-white shadow-xs'
+                : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>All Schemes ({activeMatches.length})</span>
+          </button>
+
+          <button
+            onClick={() => setFilterType('STATE')}
+            className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
+              filterType === 'STATE'
+                ? 'bg-[#00462d] text-white shadow-xs'
+                : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
+            }`}
+          >
+            <Building2 className="w-3.5 h-3.5" />
+            <span>{currentStateConfig.name} State Schemes</span>
+          </button>
+
+          <button
+            onClick={() => setFilterType('CENTRAL')}
+            className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
+              filterType === 'CENTRAL'
+                ? 'bg-[#684000] text-white shadow-xs'
+                : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
+            }`}
+          >
+            <Landmark className="w-3.5 h-3.5" />
+            <span>Central Government Schemes</span>
+          </button>
+
+          <button
+            onClick={() => setFilterType('STRONG')}
+            className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 ${
+              filterType === 'STRONG'
+                ? 'bg-emerald-700 text-white shadow-xs'
+                : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
+            }`}
+          >
+            <span>{t('matches.filterStrong')}</span>
+          </button>
+
+          <button
+            onClick={() => setFilterType('POTENTIAL')}
+            className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 ${
+              filterType === 'POTENTIAL'
+                ? 'bg-amber-700 text-white shadow-xs'
+                : 'bg-[#f2f3fa] text-[#44464f] hover:bg-[#e1e2ec]'
+            }`}
+          >
+            <span>{t('matches.filterPotential')}</span>
+          </button>
+        </div>
+
+        {/* Row 3: Category Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs pt-1 border-t border-[#e1e2ec]">
+          <span className="text-[11px] font-bold text-[#757780] mr-1 shrink-0">
+            Category:
+          </span>
+          {categories.map((cat) => {
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer shrink-0 border ${
+                  isSelected
+                    ? 'bg-[#fea619] text-[#092554] border-[#fea619] font-bold shadow-xs'
+                    : 'bg-[#f2f3fa] text-[#44464f] border-[#c5c6d0]/40 hover:bg-[#e1e2ec]'
+                }`}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Results Header Summary */}
+      <div className="flex items-center justify-between px-1 text-xs text-[#757780]">
+        <span>
+          Showing <strong>{filteredMatches.length}</strong> matching schemes
+        </span>
       </div>
 
       {/* Scheme Cards Grid */}
@@ -158,18 +265,17 @@ export const MyMatchesView: React.FC = () => {
           </div>
           <div className="space-y-1">
             <h3 className="text-base sm:text-lg font-black text-[#191c1e]">
-              {t('matches.emptyTitle')}
+              No schemes match your filter
             </h3>
             <p className="text-xs text-[#757780] max-w-md mx-auto leading-relaxed">
-              {t('matches.emptySubtitle')}
+              Try adjusting your category, keyword search, or resetting filters to view all available schemes.
             </p>
           </div>
           <button
-            onClick={() => setActiveTab('profile')}
-            className="px-6 py-3 rounded-2xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs shadow-md transition-all inline-flex items-center gap-2 cursor-pointer"
+            onClick={handleResetFilters}
+            className="px-6 py-2.5 rounded-2xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs shadow-md transition-all inline-flex items-center gap-2 cursor-pointer"
           >
-            <UserPlus className="w-4 h-4" />
-            <span>{t('matches.updateProfileBtn')}</span>
+            <span>Reset All Filters</span>
           </button>
         </div>
       )}
