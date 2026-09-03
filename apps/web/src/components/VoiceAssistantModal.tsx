@@ -272,6 +272,8 @@ export const VoiceAssistantModal: React.FC = () => {
   const speechLangLabel = BCP47_SPEECH_MAP[selectedVoiceLanguageId] || 'ta-IN';
   const currentLang = SUPPORTED_LANGUAGES[selectedVoiceLanguageId] || SUPPORTED_LANGUAGES['ta'];
 
+  if (!showVoiceModal) return null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-[#21191d]/50 backdrop-blur-xs animate-fade-in">
       {/* Sovereign Light Mode Modal Container */}
