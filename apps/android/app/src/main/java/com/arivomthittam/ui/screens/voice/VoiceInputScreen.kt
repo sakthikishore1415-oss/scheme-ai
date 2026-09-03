@@ -19,7 +19,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,45 +29,26 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MicOff
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.Shield
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.VolumeOff
-import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface as MaterialSurface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -82,33 +62,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.arivomthittam.data.model.CitizenProfile
+import com.arivomthittam.domain.language.AndroidTranslations
 import com.arivomthittam.domain.language.LanguageDetectionHelper
-import com.arivomthittam.domain.language.TranslationHelper
 import com.arivomthittam.ui.components.ArivomTopAppBar
 import com.arivomthittam.ui.navigation.Screen
 import com.arivomthittam.ui.theme.OnPrimary
 import com.arivomthittam.ui.theme.OnSurface
 import com.arivomthittam.ui.theme.OnSurfaceVariant
 import com.arivomthittam.ui.theme.OutlineVariant
+import com.arivomthittam.ui.theme.PrimaryContainer
 import com.arivomthittam.ui.theme.PrimaryFixed
 import com.arivomthittam.ui.theme.PrimaryIndigo
+import com.arivomthittam.ui.theme.SecondaryContainer
 import com.arivomthittam.ui.theme.Surface
-import com.arivomthittam.ui.theme.SurfaceContainerLow
 import com.arivomthittam.ui.theme.SurfaceContainerLowest
-import kotlinx.coroutines.launch
+import com.arivomthittam.ui.theme.TertiaryContainer
+import com.arivomthittam.ui.theme.TertiaryFixed
 import java.util.Locale
-
-data class AndroidConversationTurn(
-    val id: String,
-    val role: String, // "assistant" or "user"
-    val text: String,
-    val englishTranslation: String? = null,
-    val timestamp: Long = System.currentTimeMillis()
-)
-
-enum class VoiceAssistantState {
-    READY, LISTENING, THINKING, SPEAKING, ERROR
-}
 
 @Composable
 fun VoiceInputScreen(
@@ -118,21 +88,43 @@ fun VoiceInputScreen(
     onNavigate: (String) -> Unit
 ) {
     val context = LocalContext.current
-    val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-
-    var assistantState by remember { mutableStateOf(VoiceAssistantState.READY) }
-    var recognizedLiveText by remember { mutableStateOf("") }
-    var currentSpeakingText by remember { mutableStateOf("") }
+    var isListening by remember { mutableStateOf(false) }
+    var recognizedText by remember { mutableStateOf("") }
+    var assistantReply by remember { mutableStateOf("") }
     var detectedLanguage by remember { mutableStateOf<String?>(null) }
-    var isMuted by remember { mutableStateOf(false) }
-    var soundLevel by remember { mutableFloatStateOf(0f) }
-    var showKeyboardDrawer by remember { mutableStateOf(false) }
-    var typedMessage by remember { mutableStateOf("") }
 
-    val conversationHistory = remember { mutableStateListOf<AndroidConversationTurn>() }
+    // TTS Engine
+    var ttsEngine by remember { mutableStateOf<TextToSpeech?>(null) }
 
-    // In-App Background Speech Recognizer
+    DisposableEffect(Unit) {
+        var tts: TextToSpeech? = null
+        tts = TextToSpeech(context) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                val locale = when (currentLanguage) {
+                    "ml" -> Locale("ml", "IN")
+                    "ta" -> Locale("ta", "IN")
+                    "hi" -> Locale("hi", "IN")
+                    "te" -> Locale("te", "IN")
+                    "kn" -> Locale("kn", "IN")
+                    "bn" -> Locale("bn", "IN")
+                    else -> Locale.ENGLISH
+                }
+                tts?.language = locale
+                ttsEngine = tts
+            }
+        }
+        onDispose {
+            tts?.stop()
+            tts?.shutdown()
+        }
+    }
+
+    val speakAloud: (String) -> Unit = { text ->
+        assistantReply = text
+        ttsEngine?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "arivom_voice")
+    }
+
+    // In-app Speech Recognizer
     val speechRecognizer = remember {
         if (SpeechRecognizer.isRecognitionAvailable(context)) {
             SpeechRecognizer.createSpeechRecognizer(context)
@@ -141,215 +133,118 @@ fun VoiceInputScreen(
         }
     }
 
-    // Android Native TextToSpeech Engine
-    var ttsEngine by remember { mutableStateOf<TextToSpeech?>(null) }
-
-    DisposableEffect(Unit) {
-        var tts: TextToSpeech? = null
-        tts = TextToSpeech(context) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                val locale = when (currentLanguage) {
-                    "ta" -> Locale("ta", "IN")
-                    "hi" -> Locale("hi", "IN")
-                    "te" -> Locale("te", "IN")
-                    "kn" -> Locale("kn", "IN")
-                    "ml" -> Locale("ml", "IN")
-                    "bn" -> Locale("bn", "IN")
-                    "mr" -> Locale("mr", "IN")
-                    "gu" -> Locale("gu", "IN")
-                    else -> Locale("en", "IN")
-                }
-                tts?.language = locale
-                tts?.setSpeechRate(0.92f) // Respectful, calm civic pace
-                ttsEngine = tts
-            }
-        }
-
-        onDispose {
-            try {
-                speechRecognizer?.stopListening()
-                speechRecognizer?.destroy()
-                tts?.stop()
-                tts?.shutdown()
-            } catch (e: Exception) {}
-        }
-    }
-
-    val assistantSay: (String) -> Unit = { text ->
-        currentSpeakingText = text
-        assistantState = VoiceAssistantState.SPEAKING
-        val englishTrans = TranslationHelper.translateToEnglish(text, detectedLanguage ?: currentLanguage)
-
-        conversationHistory.add(
-            AndroidConversationTurn(
-                id = "asst-${System.currentTimeMillis()}",
-                role = "assistant",
-                text = text,
-                englishTranslation = englishTrans
-            )
-        )
-
-        coroutineScope.launch {
-            listState.animateScrollToItem((conversationHistory.size - 1).coerceAtLeast(0))
-        }
-
-        if (!isMuted && ttsEngine != null) {
-            ttsEngine?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "asst_speech")
-        }
-    }
-
-    val stopAllSpeech = {
-        ttsEngine?.stop()
-        assistantState = VoiceAssistantState.READY
-    }
-
-    // Initial greeting on opening
-    LaunchedEffect(Unit) {
-        val greeting = when (currentLanguage) {
-            "ml" -> "നമസ്കാരം! അറിവോം തിട്ടത്തിലേക്ക് സ്വാഗതം. നിങ്ങൾക്ക് അർഹമായ സർക്കാർ പദ്ധതികൾ കണ്ടെത്താൻ ഞാൻ സഹായിക്കാം."
-            "ta" -> "வணக்கம்! அறிவோம் திட்டம் உங்களை வரவேற்கிறது. உங்கள் நலனுக்கான அரசு திட்டங்களை கண்டறிய நான் உதவலாமா?"
-            else -> "Welcome to Arivom Thittam. I am your civic voice guide. May I help you find government welfare schemes you are entitled to?"
-        }
-        assistantSay(greeting)
-    }
-
     val recognitionListener = remember {
         object : RecognitionListener {
             override fun onReadyForSpeech(params: Bundle?) {
-                assistantState = VoiceAssistantState.LISTENING
+                isListening = true
             }
-
             override fun onBeginningOfSpeech() {
-                assistantState = VoiceAssistantState.LISTENING
+                isListening = true
             }
-
-            override fun onRmsChanged(rmsdB: Float) {
-                soundLevel = (rmsdB.coerceIn(0f, 10f) / 10f)
-            }
-
+            override fun onRmsChanged(rmsdB: Float) {}
             override fun onBufferReceived(buffer: ByteArray?) {}
-
             override fun onEndOfSpeech() {
-                assistantState = VoiceAssistantState.THINKING
+                isListening = false
             }
-
             override fun onError(error: Int) {
-                assistantState = VoiceAssistantState.READY
-                recognizedLiveText = ""
+                isListening = false
             }
-
             override fun onResults(results: Bundle?) {
+                isListening = false
                 val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 if (!matches.isNullOrEmpty()) {
-                    val fullText = matches[0]
-                    recognizedLiveText = ""
-                    val detected = LanguageDetectionHelper.detectLanguageFromText(fullText)
+                    val spoken = matches[0]
+                    recognizedText = spoken
+                    val detected = LanguageDetectionHelper.detectLanguageFromText(spoken)
                     detectedLanguage = detected ?: currentLanguage
 
-                    // Add citizen turn
-                    conversationHistory.add(
-                        AndroidConversationTurn(
-                            id = "user-${System.currentTimeMillis()}",
-                            role = "user",
-                            text = fullText,
-                            englishTranslation = TranslationHelper.translateToEnglish(fullText, detectedLanguage)
-                        )
-                    )
-
-                    val lower = fullText.lowercase()
+                    val lower = spoken.lowercase()
                     val occupation = when {
-                        lower.contains("விவசாயி") || lower.contains("farmer") || lower.contains("agriculture") -> "farmer"
-                        lower.contains("மாணவர்") || lower.contains("student") || lower.contains("scholarship") -> "student"
-                        lower.contains("வியாபாரம்") || lower.contains("business") || lower.contains("vendor") -> "business"
-                        lower.contains("தொழிலாளி") || lower.contains("worker") || lower.contains("labour") -> "worker"
-                        lower.contains("முதியோர்") || lower.contains("senior") -> "senior"
+                        lower.contains("விவசாயி") || lower.contains("കർഷകൻ") || lower.contains("farmer") || lower.contains("agriculture") -> "farmer"
+                        lower.contains("மாணவர்") || lower.contains("വിദ്യാർത്ഥി") || lower.contains("student") || lower.contains("scholarship") -> "student"
+                        lower.contains("வியாபாரம்") || lower.contains("ബിസിനസ്") || lower.contains("business") || lower.contains("vendor") -> "business"
+                        lower.contains("தொழிலாளி") || lower.contains("തൊഴിലാളി") || lower.contains("worker") || lower.contains("labour") -> "worker"
+                        lower.contains("முதியோர்") || lower.contains("മുതിർന്ന") || lower.contains("senior") || lower.contains("pension") -> "senior"
                         else -> "farmer"
                     }
 
-                    val followUp = when (occupation) {
-                        "farmer" -> if (currentLanguage == "ta") "நீங்கள் விவசாயி என்று புரிந்துகொண்டேன். உங்களிடம் எவ்வளவு நிலம் உள்ளது?" else "I understand you are a farmer. How many acres of land do you hold?"
-                        "student" -> if (currentLanguage == "ta") "நீங்கள் மாணவர் என்று புரிந்துகொண்டேன். எந்த வகுப்பில் படிக்கிறீர்கள்?" else "I understand you are a student. Which course or year of study are you in?"
-                        "business" -> if (currentLanguage == "ta") "நீங்கள் வியாபாரம் செய்கிறீர்கள் என்று புரிந்துகொண்டேன். சிறுதொழில் கடன் தேவையா?" else "I understand you run a small business. Do you require micro-credit support?"
-                        else -> if (currentLanguage == "ta") "உங்கள் விவரங்களின் அடிப்படையில் திட்டங்களை தேடுகிறேன்..." else "Evaluating matching government welfare schemes..."
+                    val reply = when (currentLanguage) {
+                        "ml" -> "നിങ്ങൾ $occupation മേഖലയിലാണെന്ന് മനസ്സിലായി. നിങ്ങൾക്ക് അനുയോജ്യമായ സർക്കാർ പദ്ധതികൾ കണ്ടെത്തുന്നു..."
+                        "ta" -> "நீங்கள் $occupation பிரிவில் உள்ளீர்கள் என்று புரிந்துகொண்டேன். உங்களுக்கான திட்டங்களை தேடுகிறோம்..."
+                        else -> "Understood. Searching matching government welfare schemes for $occupation..."
                     }
-
-                    assistantSay(followUp)
-                } else {
-                    assistantState = VoiceAssistantState.READY
+                    speakAloud(reply)
                 }
             }
-
             override fun onPartialResults(partialResults: Bundle?) {
                 val matches = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 if (!matches.isNullOrEmpty()) {
-                    recognizedLiveText = matches[0]
+                    recognizedText = matches[0]
                 }
             }
-
             override fun onEvent(eventType: Int, params: Bundle?) {}
         }
     }
 
     DisposableEffect(Unit) {
         speechRecognizer?.setRecognitionListener(recognitionListener)
-        onDispose {}
+        onDispose {
+            speechRecognizer?.destroy()
+        }
     }
 
-    val startInAppListening = {
-        stopAllSpeech()
-        val bcp47 = when (currentLanguage) {
-            "ta" -> "ta-IN"
-            "te" -> "te-IN"
-            "kn" -> "kn-IN"
-            "ml" -> "ml-IN"
-            "hi" -> "hi-IN"
-            "bn" -> "bn-IN"
-            "mr" -> "mr-IN"
-            "gu" -> "gu-IN"
-            else -> "en-IN"
-        }
-
+    val startListening = {
+        ttsEngine?.stop()
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            val bcp47 = when (currentLanguage) {
+                "ml" -> "ml-IN"
+                "ta" -> "ta-IN"
+                "hi" -> "hi-IN"
+                "te" -> "te-IN"
+                "kn" -> "kn-IN"
+                "bn" -> "bn-IN"
+                else -> "en-IN"
+            }
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, bcp47)
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-            putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
         }
+        speechRecognizer?.startListening(intent)
+        isListening = true
+    }
 
-        try {
-            speechRecognizer?.startListening(intent)
-            assistantState = VoiceAssistantState.LISTENING
-        } catch (e: Exception) {
-            assistantState = VoiceAssistantState.ERROR
-        }
+    val stopListening = {
+        speechRecognizer?.stopListening()
+        isListening = false
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        if (isGranted) startInAppListening()
+        if (isGranted) {
+            startListening()
+        }
     }
 
-    val handleMicToggle = {
-        if (assistantState == VoiceAssistantState.LISTENING) {
-            speechRecognizer?.stopListening()
-            assistantState = VoiceAssistantState.READY
+    val handleMicClick = {
+        if (isListening) {
+            stopListening()
         } else {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                startInAppListening()
+                startListening()
             } else {
                 permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
             }
         }
     }
 
-    // Pulse animation for central orb
+    // Pulse animation while listening
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val pulseScale by infiniteTransition.animateFloat(
         initialValue = 1f,
-        targetValue = if (assistantState == VoiceAssistantState.LISTENING || assistantState == VoiceAssistantState.SPEAKING) 1.18f else 1f,
+        targetValue = if (isListening) 1.25f else 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(900, easing = FastOutSlowInEasing),
+            animation = tween(800, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "pulseScale"
@@ -358,120 +253,15 @@ fun VoiceInputScreen(
     Scaffold(
         topBar = {
             ArivomTopAppBar(
-                title = com.arivomthittam.domain.language.AndroidTranslations.getString("nav.voice", currentLanguage),
-                logoLetter = com.arivomthittam.domain.language.AndroidTranslations.getLogoLetter(currentLanguage),
+                title = AndroidTranslations.getString("nav.voice", currentLanguage),
+                logoLetter = AndroidTranslations.getLogoLetter(currentLanguage),
                 canNavigateBack = true,
                 onNavigateBack = {
-                    stopAllSpeech()
+                    ttsEngine?.stop()
+                    speechRecognizer?.stopListening()
                     onNavigate(Screen.Home.route)
                 }
             )
-        },
-        bottomBar = {
-            MaterialSurface(
-                modifier = Modifier.fillMaxWidth(),
-                color = PrimaryIndigo,
-                shadowElevation = 8.dp
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Privacy note
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Icon(Icons.Default.Shield, contentDescription = null, tint = Color(0xFF94F6C4), modifier = Modifier.size(14.dp))
-                        Text(
-                            text = "Privacy: Voice is processed securely to match gazette rules.",
-                            fontSize = 10.sp,
-                            color = Color(0xFFD9E2FF)
-                        )
-                    }
-
-                    // Bottom Action Row
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Mute toggle
-                        IconButton(onClick = {
-                            if (!isMuted) stopAllSpeech()
-                            isMuted = !isMuted
-                        }) {
-                            Icon(
-                                imageVector = if (isMuted) Icons.Default.VolumeOff else Icons.Default.VolumeUp,
-                                contentDescription = "Mute",
-                                tint = Color.White
-                            )
-                        }
-
-                        // Repeat speech
-                        IconButton(onClick = {
-                            if (currentSpeakingText.isNotEmpty()) assistantSay(currentSpeakingText)
-                        }) {
-                            Icon(Icons.Default.Refresh, contentDescription = "Repeat", tint = Color.White)
-                        }
-
-                        // Main Big Mic Button
-                        Button(
-                            onClick = { handleMicToggle() },
-                            shape = RoundedCornerShape(24.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (assistantState == VoiceAssistantState.LISTENING) Color(0xFFBA1A1A) else Color(0xFF0F8A5F)
-                            ),
-                            modifier = Modifier.height(48.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                Icon(
-                                    imageVector = if (assistantState == VoiceAssistantState.LISTENING) Icons.Default.MicOff else Icons.Default.Mic,
-                                    contentDescription = null,
-                                    tint = Color.White
-                                )
-                                Text(
-                                    text = if (assistantState == VoiceAssistantState.LISTENING) "STOP" else "SPEAK",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 13.sp,
-                                    color = Color.White
-                                )
-                            }
-                        }
-
-                        // Keyboard input fallback toggle
-                        IconButton(onClick = { showKeyboardDrawer = !showKeyboardDrawer }) {
-                            Icon(Icons.Default.Keyboard, contentDescription = "Type", tint = Color.White)
-                        }
-
-                        // View matches button
-                        IconButton(onClick = {
-                            stopAllSpeech()
-                            val profile = CitizenProfile(
-                                id = "voice-user-${System.currentTimeMillis()}",
-                                name = "Voice Citizen",
-                                age = 42,
-                                gender = "all",
-                                state = currentState,
-                                district = "Madurai",
-                                occupation = "farmer",
-                                annualIncome = 120000L,
-                                need = "agriculture",
-                                voiceLanguage = detectedLanguage ?: currentLanguage
-                            )
-                            onProfileExtracted(profile)
-                            onNavigate(Screen.Matches.route)
-                        }) {
-                            Icon(Icons.Default.ArrowForward, contentDescription = "Matches", tint = Color(0xFFFEA619))
-                        }
-                    }
-                }
-            }
         }
     ) { padding ->
         Column(
@@ -479,189 +269,152 @@ fun VoiceInputScreen(
                 .fillMaxSize()
                 .background(Surface)
                 .padding(padding)
+                .padding(horizontal = 20.dp, vertical = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Upper Stage: Ambient Animated Voice Orb
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = PrimaryIndigo),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column(
+                Text(
+                    text = AndroidTranslations.getString("home.voiceCardTitle", currentLanguage),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = PrimaryIndigo,
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = AndroidTranslations.getString("home.voiceCardSubtitle", currentLanguage),
+                    fontSize = 13.sp,
+                    color = OnSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 4.dp, bottom = 32.dp)
+                )
+
+                // Large Central Mic Touch Target
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                        .size(180.dp)
+                        .scale(pulseScale)
+                        .clip(CircleShape)
+                        .background(if (isListening) Color(0xFFBA1A1A).copy(alpha = 0.2f) else PrimaryFixed.copy(alpha = 0.4f)),
+                    contentAlignment = Alignment.Center
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(110.dp)
-                            .clickable { handleMicToggle() },
+                            .size(130.dp)
+                            .clip(CircleShape)
+                            .background(if (isListening) Color(0xFFBA1A1A) else PrimaryIndigo),
                         contentAlignment = Alignment.Center
                     ) {
-                        // Expanding Halo
-                        Box(
-                            modifier = Modifier
-                                .size(96.dp)
-                                .scale(pulseScale)
-                                .clip(CircleShape)
-                                .background(
-                                    if (assistantState == VoiceAssistantState.LISTENING) Color(0xFF0F8A5F).copy(alpha = 0.35f)
-                                    else Color(0xFFFEA619).copy(alpha = 0.25f)
-                                )
-                        )
-
-                        // Core Orb
-                        Box(
-                            modifier = Modifier
-                                .size(72.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    if (assistantState == VoiceAssistantState.LISTENING) Color(0xFF0F8A5F)
-                                    else if (assistantState == VoiceAssistantState.SPEAKING) Color(0xFF387EF5)
-                                    else Color(0xFF001944)
-                                ),
-                            contentAlignment = Alignment.Center
+                        IconButton(
+                            onClick = { handleMicClick() },
+                            modifier = Modifier.size(130.dp)
                         ) {
-                            Text(
-                                text = "அ",
-                                color = Color.White,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold
+                            Icon(
+                                imageVector = if (isListening) Icons.Default.MicOff else Icons.Default.Mic,
+                                contentDescription = "Voice Assistant",
+                                tint = Color.White,
+                                modifier = Modifier.size(54.dp)
                             )
                         }
                     }
-
-                    // Status Pill
-                    MaterialSurface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color.White.copy(alpha = 0.15f)
-                    ) {
-                        Text(
-                            text = when (assistantState) {
-                                VoiceAssistantState.LISTENING -> "Listening to your voice..."
-                                VoiceAssistantState.SPEAKING -> "Arivom is speaking..."
-                                VoiceAssistantState.THINKING -> "Understanding criteria..."
-                                else -> "Ready • Tap orb to speak"
-                            },
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFFD9E2FF),
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                        )
-                    }
-
-                    // Live Speech Preview
-                    if (recognizedLiveText.isNotEmpty()) {
-                        Text(
-                            text = "“$recognizedLiveText”",
-                            fontSize = 13.sp,
-                            color = Color.White,
-                            fontWeight = FontWeight.SemiBold,
-                            textAlign = TextAlign.Center
-                        )
-                    }
                 }
-            }
 
-            // Keyboard Typing Drawer
-            if (showKeyboardDrawer) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedTextField(
-                        value = typedMessage,
-                        onValueChange = { typedMessage = it },
-                        placeholder = { Text("Type details (e.g. 45 வயது விவசாயி)...", fontSize = 12.sp) },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryIndigo,
-                            unfocusedBorderColor = OutlineVariant
-                        )
-                    )
-                    IconButton(
-                        onClick = {
-                            if (typedMessage.trim().isNotEmpty()) {
-                                val msg = typedMessage
-                                typedMessage = ""
-                                conversationHistory.add(
-                                    AndroidConversationTurn(
-                                        id = "user-${System.currentTimeMillis()}",
-                                        role = "user",
-                                        text = msg,
-                                        englishTranslation = TranslationHelper.translateToEnglish(msg, currentLanguage)
-                                    )
-                                )
-                                assistantSay("விவரங்கள் பெறப்பட்டன. தகுதியான திட்டங்களை சரிபார்க்கவும்.")
-                            }
-                        }
-                    ) {
-                        Icon(Icons.Default.Send, contentDescription = "Send", tint = PrimaryIndigo)
-                    }
-                }
-            }
+                Spacer(modifier = Modifier.height(20.dp))
 
-            // Lower Section: Full Interactive Conversational Transcript
-            LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                items(conversationHistory) { turn ->
-                    val isAsst = turn.role == "assistant"
-                    Row(
+                Text(
+                    text = if (isListening) "LISTENING..." else "TAP TO SPEAK",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    color = if (isListening) Color(0xFFBA1A1A) else PrimaryIndigo,
+                    letterSpacing = 1.sp
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Spoken Transcript Card
+                if (recognizedText.isNotBlank()) {
+                    Card(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = if (isAsst) Arrangement.Start else Arrangement.End
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = SurfaceContainerLowest),
+                        border = BorderStroke(1.dp, OutlineVariant),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(0.85f),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = if (isAsst) SurfaceContainerLowest else Color(0xFF0F8A5F)
-                            ),
-                            border = if (isAsst) BorderStroke(1.dp, OutlineVariant) else null
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(12.dp),
-                                verticalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = "SPOKEN INPUT:",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = OnSurfaceVariant,
+                                letterSpacing = 1.sp
+                            )
+
+                            Text(
+                                text = "\"$recognizedText\"",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PrimaryIndigo,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+
+                            if (assistantReply.isNotBlank()) {
                                 Text(
-                                    text = if (isAsst) "Arivom Assistant" else "You (Citizen)",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (isAsst) PrimaryIndigo else Color(0xFFD9E2FF)
-                                )
-                                Text(
-                                    text = turn.text,
+                                    text = assistantReply,
                                     fontSize = 13.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = if (isAsst) OnSurface else Color.White,
-                                    lineHeight = 18.sp
+                                    color = OnSurfaceVariant,
+                                    modifier = Modifier.padding(bottom = 12.dp)
                                 )
-                                if (turn.englishTranslation != null && turn.englishTranslation != turn.text) {
-                                    Text(
-                                        text = "“${turn.englishTranslation}”",
-                                        fontSize = 11.sp,
-                                        color = if (isAsst) OnSurfaceVariant else Color(0xFFD9E2FF),
-                                        lineHeight = 15.sp
-                                    )
+                            }
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                OutlinedButton(
+                                    onClick = {
+                                        recognizedText = ""
+                                        assistantReply = ""
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(20.dp),
+                                    border = BorderStroke(1.dp, PrimaryIndigo)
+                                ) {
+                                    Text("CLEAR", color = PrimaryIndigo, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                }
+
+                                Button(
+                                    onClick = {
+                                        val profile = CitizenProfile(
+                                            age = 45,
+                                            occupation = recognizedText,
+                                            state = currentState,
+                                            voiceLanguage = detectedLanguage ?: currentLanguage
+                                        )
+                                        onProfileExtracted(profile)
+                                        onNavigate(Screen.Matches.route)
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
+                                ) {
+                                    Text("VIEW MATCHES", color = OnPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
                     }
                 }
             }
+
+            Text(
+                text = "Voice Assistant processes your spoken words directly to find matching welfare schemes.",
+                fontSize = 11.sp,
+                color = OnSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
         }
     }
 }
