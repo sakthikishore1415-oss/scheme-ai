@@ -4,6 +4,20 @@ import { STATES_LIST, STATES_CONFIG } from '../data/states';
 import { SUPPORTED_LANGUAGES } from '../data/languages';
 import { MapPin, Volume2, Check, Search, Globe, Sparkles, X } from 'lucide-react';
 
+const CONTINUE_TRANSLATIONS: Record<string, string> = {
+  ta: 'தொடர்க  →  (CONTINUE)',
+  en: 'CONTINUE  →',
+  te: 'కొనసాగించండి  →  (CONTINUE)',
+  kn: 'ಮುಂದುವರಿಸಿ  →  (CONTINUE)',
+  ml: 'തുടരുക  →  (CONTINUE)',
+  hi: 'आगे बढ़ें  →  (CONTINUE)',
+  bn: 'এগিয়ে যান  →  (CONTINUE)',
+  mr: 'पुढे सुरू ठेवा  →  (CONTINUE)',
+  gu: 'આગળ વધો  →  (CONTINUE)',
+  or: 'ଆଗକୁ ବଢ଼ନ୍ତୁ  →  (CONTINUE)',
+  pa: 'ਜਾਰੀ ਰੱਖੋ  →  (CONTINUE)',
+};
+
 export const FirstTimeSetupModal: React.FC = () => {
   const {
     showSetupModal,
@@ -26,6 +40,7 @@ export const FirstTimeSetupModal: React.FC = () => {
 
   const targetState = STATES_CONFIG[tempStateId] || STATES_CONFIG['TN'];
   const targetVoiceLang = SUPPORTED_LANGUAGES[tempVoiceLangId] || SUPPORTED_LANGUAGES['ta'];
+  const continueButtonText = CONTINUE_TRANSLATIONS[tempVoiceLangId] || 'CONTINUE  →';
 
   const filteredStates = STATES_LIST.filter(
     (s) =>
@@ -55,18 +70,18 @@ export const FirstTimeSetupModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+      <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-[#c5c6d0]/60 overflow-hidden">
         {/* Header */}
-        <div className="bg-linear-to-r from-emerald-800 to-teal-900 text-white p-5 flex items-start justify-between">
+        <div className="bg-[#092554] text-white p-5 flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="bg-emerald-500/30 text-emerald-300 text-xs px-2.5 py-0.5 rounded-full font-bold border border-emerald-400/30">
+              <span className="bg-[#94f6c4]/30 text-[#94f6c4] text-xs px-2.5 py-0.5 rounded-full font-bold border border-[#57b98c]/40">
                 PERSONALIZATION
               </span>
-              <span className="text-xs text-emerald-200">அறிவோம் திட்டம்</span>
+              <span className="text-xs text-[#d9e2ff]">அறிவோம் திட்டம்</span>
             </div>
-            <h2 className="text-xl font-extrabold tracking-tight">Let's Personalize Your Experience</h2>
-            <p className="text-xs text-emerald-100/90 mt-1">
+            <h2 className="text-xl font-bold tracking-tight">Let's Personalize Your Experience</h2>
+            <p className="text-xs text-[#d9e2ff] mt-1">
               Select your state to discover localized government schemes & activate regional voice.
             </p>
           </div>
@@ -82,11 +97,11 @@ export const FirstTimeSetupModal: React.FC = () => {
         {/* Modal Body */}
         <div className="p-5 overflow-y-auto flex-1 space-y-5">
           {/* Important Principle Alert Box */}
-          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 flex items-start gap-3">
-            <Globe className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
-            <div className="text-xs text-emerald-900">
+          <div className="bg-[#d9e2ff]/40 border border-[#b0c6ff] rounded-2xl p-3.5 flex items-start gap-3">
+            <Globe className="w-5 h-5 text-[#092554] shrink-0 mt-0.5" />
+            <div className="text-xs text-[#092554]">
               <p className="font-bold mb-0.5">English Visual UI + Regional Voice Architecture</p>
-              <p className="text-emerald-800 leading-relaxed">
+              <p className="text-[#44464f] leading-relaxed">
                 The visual smartphone interface remains in <strong>English</strong> by default. Your selected state determines the <strong>voice recognition, voice responses, and spoken explanations</strong>.
               </p>
             </div>
@@ -95,28 +110,28 @@ export const FirstTimeSetupModal: React.FC = () => {
           {/* Step 1: Select State */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-emerald-600" />
+              <label className="text-xs font-bold text-[#092554] uppercase tracking-wider flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-[#092554]" />
                 Which state are you from?
               </label>
-              <span className="text-[11px] text-slate-500">Selected: <strong className="text-emerald-700">{targetState.name}</strong></span>
+              <span className="text-[11px] text-[#757780]">Selected: <strong className="text-[#092554]">{targetState.name}</strong></span>
             </div>
 
             {/* Search Input */}
             <div className="relative mb-3">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <Search className="w-4 h-4 text-[#757780] absolute left-3 top-2.5" />
               <input
                 id="setup-state-search-input"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search state (e.g. Tamil Nadu, Kerala, Karnataka)..."
-                className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-[#c5c6d0] text-[#191c1e] focus:border-[#092554] outline-none transition-all"
               />
             </div>
 
             {/* State Grid Chips */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1 border border-slate-100 rounded-xl bg-slate-50">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1 border border-[#c5c6d0]/60 rounded-2xl bg-[#f8f9fb]">
               {filteredStates.map((st) => {
                 const isSelected = tempStateId === st.id;
                 return (
@@ -126,13 +141,13 @@ export const FirstTimeSetupModal: React.FC = () => {
                     onClick={() => handleStateSelect(st.id)}
                     className={`p-2.5 rounded-xl text-left border transition-all cursor-pointer flex items-center justify-between ${
                       isSelected
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs font-bold'
-                        : 'bg-white text-slate-800 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50'
+                        ? 'bg-[#092554] text-white border-[#092554] shadow-xs font-bold'
+                        : 'bg-white text-[#191c1e] border-[#c5c6d0] hover:border-[#092554] hover:bg-[#f2f4f6]'
                     }`}
                   >
                     <div>
-                      <p className="text-xs font-semibold leading-tight">{st.name}</p>
-                      <p className={`text-[10px] mt-0.5 ${isSelected ? 'text-emerald-100' : 'text-slate-500'}`}>
+                      <p className="text-xs font-bold leading-tight">{st.name}</p>
+                      <p className={`text-[10px] mt-0.5 ${isSelected ? 'text-[#d9e2ff]' : 'text-[#757780]'}`}>
                         {st.nativeName}
                       </p>
                     </div>
@@ -146,14 +161,14 @@ export const FirstTimeSetupModal: React.FC = () => {
           {/* District Selection */}
           {targetState.districts && targetState.districts.length > 0 && (
             <div>
-              <label className="text-xs font-bold text-slate-800 uppercase tracking-wider block mb-1.5">
+              <label className="text-xs font-bold text-[#092554] uppercase tracking-wider block mb-1.5">
                 Select Your District ({targetState.name})
               </label>
               <select
                 id="setup-district-select"
                 value={selectedDistrict || targetState.districts[0]}
                 onChange={(e) => setSelectedDistrict(e.target.value)}
-                className="w-full p-2.5 text-xs rounded-xl border border-slate-300 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                className="w-full p-2.5 text-xs rounded-xl border border-[#c5c6d0] text-[#191c1e] bg-white focus:border-[#092554] outline-none"
               >
                 {targetState.districts.map((dst) => (
                   <option key={dst} value={dst}>
@@ -165,18 +180,18 @@ export const FirstTimeSetupModal: React.FC = () => {
           )}
 
           {/* Step 2: Voice Language Recommendation */}
-          <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+          <div className="bg-[#f8f9fb] rounded-2xl p-4 border border-[#c5c6d0]/60">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-0.5">
+                <span className="text-[11px] font-bold text-[#757780] uppercase tracking-wider block mb-0.5">
                   Recommended Voice Language
                 </span>
                 <div className="flex items-center gap-2">
-                  <Volume2 className="w-5 h-5 text-emerald-600" />
-                  <span className="text-base font-extrabold text-slate-900">
+                  <Volume2 className="w-5 h-5 text-[#092554]" />
+                  <span className="text-base font-bold text-[#092554]">
                     {targetVoiceLang.name}
                   </span>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#d9e2ff] text-[#001944] border border-[#b0c6ff]">
                     {targetVoiceLang.nativeName}
                   </span>
                 </div>
@@ -185,7 +200,7 @@ export const FirstTimeSetupModal: React.FC = () => {
               <button
                 id="setup-change-voice-lang-toggle"
                 onClick={() => setShowLanguagePicker(!showLanguagePicker)}
-                className="text-xs font-bold text-emerald-700 hover:text-emerald-800 underline cursor-pointer"
+                className="text-xs font-bold text-[#092554] hover:underline cursor-pointer"
               >
                 {showLanguagePicker ? 'Done' : 'Change Voice Language'}
               </button>
@@ -193,8 +208,8 @@ export const FirstTimeSetupModal: React.FC = () => {
 
             {/* Language Selector Dropdown / Grid if expanded */}
             {showLanguagePicker && (
-              <div className="mt-3 pt-3 border-t border-slate-200">
-                <p className="text-[11px] text-slate-600 mb-2 font-medium">
+              <div className="mt-3 pt-3 border-t border-[#c5c6d0]/60">
+                <p className="text-[11px] text-[#44464f] mb-2 font-medium">
                   Choose alternate voice language for speech recognition & TTS:
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -205,14 +220,14 @@ export const FirstTimeSetupModal: React.FC = () => {
                         key={lang.id}
                         id={`setup-voice-btn-${lang.id}`}
                         onClick={() => setTempVoiceLangId(lang.id)}
-                        className={`p-2 rounded-lg text-left text-xs border transition-all cursor-pointer ${
+                        className={`p-2 rounded-xl text-left text-xs border transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-emerald-600 text-white font-bold border-emerald-600'
-                            : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50'
+                            ? 'bg-[#092554] text-white font-bold border-[#092554]'
+                            : 'bg-white text-[#191c1e] border-[#c5c6d0] hover:bg-[#edeef0]'
                         }`}
                       >
-                        <p className="font-semibold">{lang.name}</p>
-                        <p className={`text-[10px] ${isSelected ? 'text-emerald-100' : 'text-slate-500'}`}>
+                        <p className="font-bold">{lang.name}</p>
+                        <p className={`text-[10px] ${isSelected ? 'text-[#d9e2ff]' : 'text-[#757780]'}`}>
                           {lang.nativeName}
                         </p>
                       </button>
@@ -225,21 +240,21 @@ export const FirstTimeSetupModal: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
+        <div className="p-4 bg-[#f8f9fb] border-t border-[#c5c6d0]/60 flex items-center justify-end gap-3">
           <button
             id="setup-cancel-btn"
             onClick={() => setShowSetupModal(false)}
-            className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-xl cursor-pointer"
+            className="px-4 py-2 text-xs font-semibold text-[#44464f] hover:text-[#191c1e] rounded-xl cursor-pointer"
           >
             Cancel
           </button>
           <button
             id="setup-continue-btn"
             onClick={handleSaveAndContinue}
-            className="px-6 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+            className="px-6 py-2.5 text-xs font-bold text-white bg-[#092554] hover:bg-[#243b6b] rounded-2xl shadow-md transition-all cursor-pointer flex items-center gap-1.5"
           >
-            <span>CONTINUE</span>
-            <Sparkles className="w-3.5 h-3.5" />
+            <span>{continueButtonText}</span>
+            <Sparkles className="w-3.5 h-3.5 text-[#fea619]" />
           </button>
         </div>
       </div>

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -53,18 +52,22 @@ data class LanguageOption(
     val id: String,
     val name: String,
     val nativeName: String,
-    val stateCode: String
+    val stateCode: String,
+    val continueText: String
 )
 
 val LANGUAGES = listOf(
-    LanguageOption("ta", "Tamil", "தமிழ்", "TN"),
-    LanguageOption("en", "English", "English", "ALL"),
-    LanguageOption("te", "Telugu", "తెలుగు", "AP"),
-    LanguageOption("kn", "Kannada", "ಕನ್ನಡ", "KA"),
-    LanguageOption("ml", "Malayalam", "മലയാളം", "KL"),
-    LanguageOption("hi", "Hindi", "हिन्दी", "ALL"),
-    LanguageOption("bn", "Bengali", "বাংলা", "WB"),
-    LanguageOption("mr", "Marathi", "मराठी", "MH")
+    LanguageOption("ta", "Tamil", "தமிழ்", "TN", "தொடர்க  →  (CONTINUE)"),
+    LanguageOption("en", "English", "English", "ALL", "CONTINUE  →"),
+    LanguageOption("te", "Telugu", "తెలుగు", "AP", "కొనసాగించండి  →  (CONTINUE)"),
+    LanguageOption("kn", "Kannada", "ಕನ್ನಡ", "KA", "ಮುಂದುವರಿಸಿ  →  (CONTINUE)"),
+    LanguageOption("ml", "Malayalam", "മലയാളം", "KL", "തുടരുക  →  (CONTINUE)"),
+    LanguageOption("hi", "Hindi", "हिन्दी", "ALL", "आगे बढ़ें  →  (CONTINUE)"),
+    LanguageOption("bn", "Bengali", "বাংলা", "WB", "এগিয়ে যান  →  (CONTINUE)"),
+    LanguageOption("mr", "Marathi", "मराठी", "MH", "पुढे सुरू ठेवा  →  (CONTINUE)"),
+    LanguageOption("gu", "Gujarati", "ગુજરાતી", "GJ", "આગળ વધો  →  (CONTINUE)"),
+    LanguageOption("or", "Odia", "ଓଡ଼ିଆ", "OR", "ଆଗକୁ ବଢ଼ନ୍ତୁ  →  (CONTINUE)"),
+    LanguageOption("pa", "Punjabi", "ਪੰਜਾਬੀ", "PB", "ਜਾਰੀ ਰੱਖੋ  →  (CONTINUE)")
 )
 
 @Composable
@@ -76,11 +79,13 @@ fun LanguageSelectionScreen(
     var selectedLang by remember { mutableStateOf(currentLanguage) }
     var selectedState by remember { mutableStateOf(LANGUAGES.find { it.id == currentLanguage }?.stateCode ?: "TN") }
 
+    val currentLangOption = LANGUAGES.find { it.id == selectedLang } ?: LANGUAGES[0]
+
     Scaffold(
         topBar = {
             ArivomTopAppBar(
                 title = "Arivom Thittam",
-                tamilTitle = "மொழி தேர்வு"
+                tamilTitle = currentLangOption.nativeName
             )
         },
         bottomBar = {
@@ -106,7 +111,7 @@ fun LanguageSelectionScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
                     ) {
                         Text(
-                            text = "CONTINUE / தொடர்க  →",
+                            text = currentLangOption.continueText,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = OnPrimary
