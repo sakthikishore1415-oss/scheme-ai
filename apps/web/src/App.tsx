@@ -12,7 +12,6 @@ import { SavedSchemesView } from './views/SavedSchemesView';
 import { ProfileView } from './views/ProfileView';
 import { ButtonPhoneView } from './views/ButtonPhoneView';
 import { AssistedView } from './views/AssistedView';
-import { AboutArchitectureView } from './views/AboutArchitectureView';
 import { SmsSimulator } from './components/SmsSimulator';
 
 const MainLayout: React.FC = () => {
@@ -53,7 +52,6 @@ const MainLayout: React.FC = () => {
           )}
           {activeTab === 'family' && <ProfileView />}
           {activeTab === 'assisted' && <AssistedView />}
-          {activeTab === 'architecture' && <AboutArchitectureView />}
         </main>
       </div>
 

@@ -47,6 +47,8 @@ export const VoiceAssistantModal: React.FC = () => {
   const {
     showVoiceModal,
     setShowVoiceModal,
+    taggedSchemeForVoice,
+    setTaggedSchemeForVoice,
     selectedVoiceLanguageId,
     setSelectedVoiceLanguageId,
     currentStateConfig,
@@ -111,13 +113,23 @@ export const VoiceAssistantModal: React.FC = () => {
       }
     );
 
+    // If a specific scheme was tagged (e.g. from HEAR button), automatically trigger its explanation
+    if (taggedSchemeForVoice) {
+      const scheme = taggedSchemeForVoice;
+      const initialPrompt = `Please explain the scheme "${scheme.name}" (${scheme.nativeName || ''}) in simple terms in this language. Tell me what benefit it provides, who is eligible, and what documents are required.`;
+      setTimeout(() => {
+        geminiLiveVoiceService.sendTextMessage(initialPrompt);
+      }, 600);
+    }
+
     return () => {
       geminiLiveVoiceService.endSession();
     };
-  }, [showVoiceModal, selectedVoiceLanguageId, currentStateConfig.name]);
+  }, [showVoiceModal, selectedVoiceLanguageId, currentStateConfig.name, taggedSchemeForVoice]);
 
   const handleEndCall = () => {
     geminiLiveVoiceService.endSession();
+    setTaggedSchemeForVoice(null);
     setShowVoiceModal(false);
   };
 
@@ -380,6 +392,50 @@ export const VoiceAssistantModal: React.FC = () => {
           {/* RIGHT: Live Conversational Transcript (Spacious & Clean) */}
           <div className="lg:col-span-8 flex flex-col h-full bg-white overflow-hidden">
             
+            {/* Tagged Scheme Banner (if launched via HEAR button) */}
+            {taggedSchemeForVoice && (
+              <div className="px-4 py-2.5 bg-[#4a1f2d] text-white border-b border-[#6b3548] flex items-center justify-between gap-2 shrink-0 animate-fade-in">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-6 h-6 rounded-lg bg-[#c8a96b] text-[#310a18] flex items-center justify-center font-bold text-xs shrink-0">
+                    📌
+                  </div>
+                  <div className="min-w-0">
+                    <span className="text-[10px] font-bold text-[#c8a96b] uppercase tracking-wider block leading-none">
+                      Discussing Tagged Scheme
+                    </span>
+                    <p className="text-xs font-bold text-white truncate mt-0.5">
+                      {taggedSchemeForVoice.name}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => geminiLiveVoiceService.sendTextMessage(`Am I eligible for ${taggedSchemeForVoice.name}?`)}
+                    className="hidden sm:inline-block px-2.5 py-1 rounded-lg bg-[#6b3548] hover:bg-[#874d60] text-white text-[11px] font-bold transition-colors cursor-pointer border border-[#e8e1dc]/20"
+                  >
+                    Eligibility?
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => geminiLiveVoiceService.sendTextMessage(`What documents are required for ${taggedSchemeForVoice.name}?`)}
+                    className="hidden sm:inline-block px-2.5 py-1 rounded-lg bg-[#6b3548] hover:bg-[#874d60] text-white text-[11px] font-bold transition-colors cursor-pointer border border-[#e8e1dc]/20"
+                  >
+                    Documents?
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTaggedSchemeForVoice(null)}
+                    className="text-[11px] text-[#ffd9e1] hover:text-white underline font-semibold cursor-pointer"
+                    title="Clear scheme tag to ask general questions"
+                  >
+                    ✕ Clear
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Scrollable Message Feed */}
             <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3.5 bg-white">
               {messages.length === 0 && !interimTranscript ? (

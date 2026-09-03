@@ -40,10 +40,14 @@ interface AppContextType {
   // Navigation & Modals
   activeTab: ViewTab;
   setActiveTab: (tab: ViewTab) => void;
+  // Modals & Inspection Drawers
   showSetupModal: boolean;
   setShowSetupModal: (val: boolean) => void;
   showVoiceModal: boolean;
   setShowVoiceModal: (val: boolean) => void;
+  taggedSchemeForVoice: Scheme | null;
+  setTaggedSchemeForVoice: (scheme: Scheme | null) => void;
+  openVoiceAssistantForScheme: (scheme: Scheme) => void;
   selectedSchemeDetail: Scheme | null;
   setSelectedSchemeDetail: (scheme: Scheme | null) => void;
   selectedWhyMeScheme: MatchResult | null;
@@ -119,6 +123,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [activeTab, setActiveTab] = useState<ViewTab>('home');
   const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
   const [showVoiceModal, setShowVoiceModal] = useState<boolean>(false);
+  const [taggedSchemeForVoice, setTaggedSchemeForVoice] = useState<Scheme | null>(null);
+
+  const openVoiceAssistantForScheme = (scheme: Scheme) => {
+    setTaggedSchemeForVoice(scheme);
+    setShowVoiceModal(true);
+  };
   const [selectedSchemeDetail, setSelectedSchemeDetail] = useState<Scheme | null>(null);
   const [selectedWhyMeScheme, setSelectedWhyMeScheme] = useState<MatchResult | null>(null);
   const [selectedExplainSimplyScheme, setSelectedExplainSimplyScheme] = useState<Scheme | null>(null);
@@ -356,6 +366,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setShowSetupModal,
         showVoiceModal,
         setShowVoiceModal,
+        taggedSchemeForVoice,
+        setTaggedSchemeForVoice,
+        openVoiceAssistantForScheme,
         selectedSchemeDetail,
         setSelectedSchemeDetail,
         selectedWhyMeScheme,

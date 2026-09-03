@@ -181,5 +181,4 @@ export type ViewTab =
   | 'sms'
   | 'family'
   | 'assisted'
-  | 'documents'
-  | 'architecture';
+  | 'documents';

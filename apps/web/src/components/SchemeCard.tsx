@@ -21,36 +21,18 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
   const {
     setSelectedSchemeDetail,
     setSelectedWhyMeScheme,
+    openVoiceAssistantForScheme,
     toggleSaveScheme,
     isSchemeSaved,
-    selectedVoiceLanguageId,
     easyMode,
   } = useApp();
 
   const { scheme, score, matchLevel, criteriaBreakdown } = matchResult;
   const isSaved = isSchemeSaved(scheme.id);
-  const [isPlayingVoice, setIsPlayingVoice] = useState(false);
 
   const handlePlayVoice = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isPlayingVoice) {
-      speechService.stop();
-      setIsPlayingVoice(false);
-      return;
-    }
-
-    const textToSpeak =
-      scheme.languageContent?.[selectedVoiceLanguageId]?.voiceExplanation ||
-      scheme.summarySimple ||
-      scheme.name;
-
-    setIsPlayingVoice(true);
-    speechService.speak(
-      textToSpeak,
-      selectedVoiceLanguageId,
-      () => setIsPlayingVoice(true),
-      () => setIsPlayingVoice(false)
-    );
+    openVoiceAssistantForScheme(scheme);
   };
 
   const getScoreBadgeStyles = (level: string) => {
@@ -204,19 +186,15 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
             <span>WHY ME?</span>
           </button>
 
-          {/* Spoken Voice Button (Regional Voice) */}
+          {/* Voice Assistant Explanation Button */}
           <button
             id={`hear-scheme-voice-btn-${scheme.id}`}
             onClick={handlePlayVoice}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 border transition-all cursor-pointer ${
-              isPlayingVoice
-                ? 'bg-[#4a1f2d] text-white border-[#4a1f2d] animate-pulse'
-                : 'bg-white hover:bg-[#faf8f3] text-[#4a1f2d] border-[#e8e1dc]'
-            }`}
-            title="Hear explanation in regional language voice"
+            className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#eedfe4] text-[#4a1f2d] font-bold text-xs flex items-center gap-1 border border-[#e8e1dc] transition-all cursor-pointer shadow-2xs"
+            title="Open Voice Assistant to hear and discuss this scheme"
           >
             <Volume2 className="w-3.5 h-3.5 text-[#4a1f2d]" />
-            <span>{isPlayingVoice ? 'SPEAKING...' : 'HEAR'}</span>
+            <span>HEAR</span>
           </button>
         </div>
 

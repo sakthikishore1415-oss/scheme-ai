@@ -24,6 +24,7 @@ export const SchemeDetailModal: React.FC = () => {
   const {
     selectedSchemeDetail,
     setSelectedSchemeDetail,
+    openVoiceAssistantForScheme,
     savedSchemeIds,
     toggleSaveScheme,
     selectedVoiceLanguageId,
@@ -260,6 +261,21 @@ export const SchemeDetailModal: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-1.5">
+            <button
+              id="detail-hear-voice-btn"
+              onClick={() => {
+                speechService.stop();
+                setSelectedSchemeDetail(null);
+                openVoiceAssistantForScheme(scheme);
+              }}
+              className="px-3 py-2 rounded-xl bg-[#c8a96b] hover:bg-[#e3c282] text-[#310a18] font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+              title="Discuss this scheme in Voice Assistant"
+            >
+              <Volume2 className="w-4 h-4 text-[#310a18]" />
+              <span className="hidden sm:inline">HEAR IN VOICE</span>
+              <span className="sm:hidden">HEAR</span>
+            </button>
+
             <button
               id="detail-save-btn"
               onClick={() => toggleSaveScheme(scheme.id)}

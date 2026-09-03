@@ -125,7 +125,6 @@ export const DesktopSidebar: React.FC = () => {
     { id: 'profile', label: t('nav.profile'), icon: <User className="w-4 h-4 shrink-0" />, description: 'Demographics' },
     { id: 'button_phone', label: '1800 IVR Flow', icon: <PhoneCall className="w-4 h-4 shrink-0" />, description: 'Feature Phone' },
     { id: 'assisted', label: 'Assisted CSC', icon: <Handshake className="w-4 h-4 shrink-0" />, description: 'Operator Portal' },
-    { id: 'architecture', label: 'Architecture', icon: <Cpu className="w-4 h-4 shrink-0" />, description: 'System Pipeline' },
   ];
 
   return (
