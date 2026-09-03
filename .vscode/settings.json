@@ -11,6 +11,7 @@
   "terminal.integrated.env.linux": {
     "JAVA_HOME": "/home/fire-keeper/Videos/OpenJDK17U-jdk_x64_linux_hotspot_17.0.20.1_1/jdk-17.0.20.1+1",
     "PATH": "/home/fire-keeper/Videos/OpenJDK17U-jdk_x64_linux_hotspot_17.0.20.1_1/jdk-17.0.20.1+1/bin:/home/fire-keeper/platform-tools:${env:PATH}"
-  }
+  },
+  "python.terminal.useEnvFile": true,
+  "python.envFile": "${workspaceFolder}/.env"
 }
-
