@@ -14,6 +14,10 @@ import {
   PhoneCall,
   Copy,
   Sparkles,
+  HelpCircle,
+  CheckCircle2,
+  AlertCircle,
+  ArrowRight,
 } from 'lucide-react';
 
 export const SchemeDetailModal: React.FC = () => {
@@ -26,6 +30,9 @@ export const SchemeDetailModal: React.FC = () => {
     currentLanguageConfig,
     activeMatches,
     setSelectedWhyMeScheme,
+    userProfile,
+    updateUserProfile,
+    triggerMatchCelebration,
     userDocuments,
     toggleUserDocument,
     t,
@@ -35,6 +42,7 @@ export const SchemeDetailModal: React.FC = () => {
   const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [showShareModal, setShowShareModal] = useState<boolean>(false);
+  const [answeredFields, setAnsweredFields] = useState<Record<string, boolean>>({});
 
   if (!selectedSchemeDetail) return null;
 
@@ -66,6 +74,157 @@ export const SchemeDetailModal: React.FC = () => {
   };
 
   const regionalContent = scheme.languageContent?.[selectedVoiceLanguageId];
+
+  // =========================================================================
+  // Determine missing eligibility requirements to ask dynamically
+  // =========================================================================
+  const questionsToAsk: {
+    key: string;
+    question: string;
+    options: { label: string; action: () => void }[];
+  }[] = [];
+
+  // 1. Gender Requirement
+  if (
+    scheme.eligibility.targetGenders &&
+    scheme.eligibility.targetGenders.includes('female') &&
+    (!userProfile || userProfile.gender === 'unspecified')
+  ) {
+    questionsToAsk.push({
+      key: 'gender',
+      question: 'Is this application for a female head of family or woman applicant?',
+      options: [
+        {
+          label: 'Yes, Female Applicant',
+          action: () => {
+            updateUserProfile({ gender: 'female' });
+            setAnsweredFields((prev) => ({ ...prev, gender: true }));
+            triggerMatchCelebration();
+          },
+        },
+        {
+          label: 'No, Male / Other',
+          action: () => {
+            updateUserProfile({ gender: 'male' });
+            setAnsweredFields((prev) => ({ ...prev, gender: true }));
+          },
+        },
+      ],
+    });
+  }
+
+  // 2. Student Requirement
+  if (
+    scheme.eligibility.requiresStudent &&
+    (!userProfile || !userProfile.isStudent)
+  ) {
+    questionsToAsk.push({
+      key: 'student',
+      question: 'Are you currently enrolled as a student in school, college, or polytechnic?',
+      options: [
+        {
+          label: 'Yes, I am a Student',
+          action: () => {
+            updateUserProfile({ isStudent: true, occupation: 'student' });
+            setAnsweredFields((prev) => ({ ...prev, student: true }));
+            triggerMatchCelebration();
+          },
+        },
+        {
+          label: 'No, Not a Student',
+          action: () => {
+            updateUserProfile({ isStudent: false });
+            setAnsweredFields((prev) => ({ ...prev, student: true }));
+          },
+        },
+      ],
+    });
+  }
+
+  // 3. Landholding Requirement (e.g. PM-KISAN, Subhiksha Keralam)
+  if (
+    (scheme.eligibility.requiresLandHoldingMaxAcres || (scheme.eligibility as any).requiresLandOwnership) &&
+    (!userProfile || (userProfile.landHoldingAcres || 0) === 0)
+  ) {
+    questionsToAsk.push({
+      key: 'land',
+      question: 'Do you or your family own cultivable agricultural land?',
+      options: [
+        {
+          label: 'Yes, up to 5 Acres (Small/Marginal Farmer)',
+          action: () => {
+            updateUserProfile({ landHoldingAcres: 2.5, occupation: 'farmer' });
+            setAnsweredFields((prev) => ({ ...prev, land: true }));
+            triggerMatchCelebration();
+          },
+        },
+        {
+          label: 'No Agricultural Land',
+          action: () => {
+            updateUserProfile({ landHoldingAcres: 0 });
+            setAnsweredFields((prev) => ({ ...prev, land: true }));
+          },
+        },
+      ],
+    });
+  }
+
+  // 4. Disability Requirement
+  if (
+    scheme.eligibility.requiresDisability &&
+    (!userProfile || !userProfile.hasDisability)
+  ) {
+    questionsToAsk.push({
+      key: 'disability',
+      question: 'Do you or a family member have a certified disability or require caregiver assistance?',
+      options: [
+        {
+          label: 'Yes, 40%+ Certified Disability',
+          action: () => {
+            updateUserProfile({ hasDisability: true });
+            setAnsweredFields((prev) => ({ ...prev, disability: true }));
+            triggerMatchCelebration();
+          },
+        },
+        {
+          label: 'No Disability',
+          action: () => {
+            updateUserProfile({ hasDisability: false });
+            setAnsweredFields((prev) => ({ ...prev, disability: true }));
+          },
+        },
+      ],
+    });
+  }
+
+  // 5. Income Ceiling Requirement
+  if (
+    scheme.eligibility.maxAnnualIncome &&
+    (!userProfile || (userProfile.annualIncome || 0) > scheme.eligibility.maxAnnualIncome || (userProfile.annualIncome || 0) === 0)
+  ) {
+    const limit = scheme.eligibility.maxAnnualIncome;
+    questionsToAsk.push({
+      key: 'income',
+      question: `Is your annual family income below ₹${limit.toLocaleString('en-IN')}?`,
+      options: [
+        {
+          label: `Yes, Annual Income below ₹${limit.toLocaleString('en-IN')}`,
+          action: () => {
+            updateUserProfile({ annualIncome: Math.min(120000, limit - 10000) });
+            setAnsweredFields((prev) => ({ ...prev, income: true }));
+            triggerMatchCelebration();
+          },
+        },
+        {
+          label: `No, Higher than ₹${limit.toLocaleString('en-IN')}`,
+          action: () => {
+            updateUserProfile({ annualIncome: limit + 50000 });
+            setAnsweredFields((prev) => ({ ...prev, income: true }));
+          },
+        },
+      ],
+    });
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/75 backdrop-blur-sm animate-fade-in">
@@ -184,6 +343,63 @@ export const SchemeDetailModal: React.FC = () => {
           {/* TAB 1: OVERVIEW & ELIGIBILITY */}
           {activeSubTab === 'OVERVIEW' && (
             <div className="space-y-6 animate-fade-in">
+              {/* Dynamic Eligibility Missing Question Section */}
+              {questionsToAsk.length > 0 && (
+                <div className="bg-amber-50 border border-amber-300 rounded-2xl p-4 sm:p-5 space-y-3 shadow-xs">
+                  <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
+                    <HelpCircle className="w-4 h-4 text-[#fea619] shrink-0" />
+                    <span>Quick Eligibility Check: Answer to verify if you qualify</span>
+                  </div>
+
+                  <div className="space-y-3">
+                    {questionsToAsk.map((q) => (
+                      <div key={q.key} className="bg-white p-3.5 rounded-xl border border-amber-200 space-y-2">
+                        <p className="text-xs font-semibold text-slate-800">{q.question}</p>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {q.options.map((opt, idx) => (
+                            <button
+                              key={idx}
+                              onClick={opt.action}
+                              className="px-3 py-1.5 rounded-lg bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs transition-colors cursor-pointer shadow-xs"
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Match Score & Status Banner */}
+              {matchResult && (
+                <div className={`p-4 rounded-2xl border flex items-center justify-between gap-3 ${
+                  matchResult.score >= 70
+                    ? 'bg-emerald-50 border-emerald-300 text-emerald-950'
+                    : 'bg-[#d9e2ff]/40 border-[#b0c6ff] text-[#092554]'
+                }`}>
+                  <div className="text-xs space-y-0.5">
+                    <div className="flex items-center gap-1.5 font-bold">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span>
+                        Profile Eligibility Match: <strong>{matchResult.score}%</strong> ({matchResult.matchLevel})
+                      </span>
+                    </div>
+                    <p className="text-[#44464f]">
+                      Evaluated using your profile (Age: {userProfile?.age || 35}, Occupation: {userProfile?.occupation || 'General'}, State: {userProfile?.state || 'Current'})
+                    </p>
+                  </div>
+                  <button
+                    id="detail-whyme-btn"
+                    onClick={() => setSelectedWhyMeScheme(matchResult)}
+                    className="px-3.5 py-1.5 rounded-xl bg-[#092554] text-white font-bold text-xs hover:bg-[#243b6b] shrink-0 cursor-pointer"
+                  >
+                    VIEW WHY ME
+                  </button>
+                </div>
+              )}
+
               {/* Voice Readout Banner */}
               <div className="bg-[#d9e2ff]/50 border border-[#b0c6ff] rounded-2xl p-4 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
@@ -271,23 +487,6 @@ export const SchemeDetailModal: React.FC = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Why Me Shortcut if matched */}
-              {matchResult && (
-                <div className="bg-[#d9e2ff]/40 border border-[#b0c6ff] p-4 rounded-2xl flex items-center justify-between">
-                  <div className="text-xs">
-                    <p className="font-bold text-[#092554]">Calculated Profile Match: {matchResult.score}%</p>
-                    <p className="text-[#44464f]">Based on your age, occupation and state.</p>
-                  </div>
-                  <button
-                    id="detail-whyme-btn"
-                    onClick={() => setSelectedWhyMeScheme(matchResult)}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#092554] text-white font-bold text-xs hover:bg-[#243b6b] cursor-pointer"
-                  >
-                    VIEW WHY ME
-                  </button>
-                </div>
-              )}
             </div>
           )}
 
@@ -299,53 +498,51 @@ export const SchemeDetailModal: React.FC = () => {
                   Required Citizen Documents
                 </h3>
                 <p className="text-xs text-[#44464f]">
-                  Check off the documents you already possess to verify your readiness before visiting the center.
+                  Tick the documents you have ready. These are required for physical or online verification.
                 </p>
               </div>
 
-              <div className="space-y-2.5">
-                {(scheme.documents || []).map((doc, idx) => {
+              <div className="space-y-2">
+                {scheme.documents?.map((doc) => {
                   const hasDoc = !!userDocuments[doc.name];
                   return (
                     <div
-                      key={idx}
+                      key={doc.id || doc.name}
                       onClick={() => toggleUserDocument(doc.name)}
-                      className={`p-3.5 rounded-2xl border flex items-center justify-between transition-all cursor-pointer ${
+                      className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3 ${
                         hasDoc
-                          ? 'bg-[#94f6c4]/20 border-[#57b98c] text-[#002d1c] font-semibold'
-                          : 'bg-white border-[#c5c6d0]/60 text-[#191c1e] hover:border-[#757780]'
+                          ? 'bg-emerald-50/80 border-emerald-300 shadow-xs'
+                          : 'bg-white border-[#c5c6d0]/60 hover:border-[#092554]'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-5 h-5 rounded-lg border flex items-center justify-center ${
-                            hasDoc
-                              ? 'bg-[#00462d] border-[#00462d] text-white'
-                              : 'border-[#c5c6d0] bg-[#f8f9fb]'
-                          }`}
-                        >
-                          {hasDoc && <Check className="w-3.5 h-3.5" />}
-                        </div>
-                        <div>
-                          <span className="text-xs sm:text-sm block font-bold">{doc.name}</span>
-                          <span className="text-[11px] text-[#44464f]">{doc.description}</span>
-                        </div>
-                      </div>
-
-                      <span
-                        className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
-                          hasDoc ? 'bg-[#94f6c4] text-[#002113]' : 'bg-[#edeef0] text-[#757780]'
+                      <div
+                        className={`w-5 h-5 rounded-lg border flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
+                          hasDoc
+                            ? 'bg-emerald-700 border-emerald-700 text-white'
+                            : 'border-[#757780] bg-white'
                         }`}
                       >
-                        {hasDoc ? 'I HAVE THIS' : 'PENDING'}
-                      </span>
+                        {hasDoc && <Check className="w-3.5 h-3.5" />}
+                      </div>
+
+                      <div className="flex-1 space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-[#191c1e]">
+                            {doc.name}
+                          </span>
+                          {doc.isMandatory && (
+                            <span className="text-[10px] bg-rose-100 text-rose-800 font-bold px-2 py-0.2 rounded-full">
+                              Mandatory
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-[#44464f]">
+                          {doc.description}
+                        </p>
+                      </div>
                     </div>
                   );
                 })}
-              </div>
-
-              <div className="bg-[#ffddb8]/50 border border-[#fea619]/60 rounded-xl p-3 text-xs text-[#855300]">
-                💡 Tip: Carry 2 passport-size photographs along with original and photocopies of checked documents.
               </div>
             </div>
           )}
@@ -353,199 +550,98 @@ export const SchemeDetailModal: React.FC = () => {
           {/* TAB 3: HOW TO APPLY */}
           {activeSubTab === 'APPLY' && (
             <div className="space-y-5 animate-fade-in">
-              <div className="bg-[#d9e2ff]/40 border border-[#b0c6ff] rounded-2xl p-4">
-                <span className="text-[10px] font-bold text-[#092554] uppercase tracking-wider block">
-                  Where to Apply
-                </span>
-                <p className="text-sm font-bold text-[#092554] mt-0.5 flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-[#092554]" />
-                  {scheme.offlineApplicationCenter || 'Nearest e-Seva / CSC Centre / Gram Panchayat'}
-                </p>
-                {scheme.officialSource && (
-                  <p className="text-xs text-[#44464f] mt-1">
-                    Official Portal: <strong className="font-mono text-[#092554]">{scheme.applicationUrl || scheme.officialSource}</strong>
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <h3 className="text-xs font-bold text-[#092554] uppercase tracking-wider mb-3">
-                  Step-by-Step Roadmap:
+              <div className="bg-[#f8f9fb] p-4 rounded-2xl border border-[#c5c6d0]/60">
+                <h3 className="text-xs font-bold text-[#092554] uppercase tracking-wider mb-1">
+                  Step-by-Step Application Process
                 </h3>
-                <div className="space-y-3">
-                  {(scheme.applicationSteps || []).map((step, idx) => (
-                    <div
-                      key={idx}
-                      className="p-3.5 rounded-2xl bg-[#f8f9fb] border border-[#c5c6d0]/60 flex items-start gap-3 text-xs text-[#191c1e]"
-                    >
-                      <div className="w-6 h-6 rounded-full bg-[#092554] text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
-                        {idx + 1}
-                      </div>
-                      <div className="leading-relaxed">
-                        <strong className="text-[#092554] block mb-0.5">Step {idx + 1}</strong>
-                        {step}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <p className="text-xs text-[#44464f]">
+                  Follow these instructions to submit your official application.
+                </p>
               </div>
 
-              {/* Official Source Link */}
-              {scheme.officialSource && (
-                <div className="pt-2">
+              <div className="space-y-3">
+                {scheme.applicationSteps?.map((step, idx) => (
+                  <div key={idx} className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-[#c5c6d0]/60">
+                    <div className="w-6 h-6 rounded-full bg-[#092554] text-white flex items-center justify-center font-bold text-xs shrink-0">
+                      {idx + 1}
+                    </div>
+                    <p className="text-xs text-[#191c1e] font-medium leading-relaxed">
+                      {step}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Official Links & Offline Center */}
+              <div className="p-4 rounded-2xl bg-[#d9e2ff]/30 border border-[#b0c6ff] space-y-3">
+                {scheme.applicationUrl && (
                   <a
-                    id="detail-official-portal-link"
-                    href={scheme.applicationUrl || scheme.officialSource}
+                    href={scheme.applicationUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-3 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                    className="w-full py-3 px-4 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
                   >
-                    <span>VISIT OFFICIAL GOVERNMENT PORTAL</span>
-                    <ExternalLink className="w-4 h-4" />
+                    <span>Visit Official Application Portal</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
                   </a>
-                  <p className="text-[10px] text-[#757780] text-center mt-1.5">
-                    Official Source: {scheme.officialSource}
-                  </p>
-                </div>
-              )}
+                )}
+                {scheme.offlineApplicationCenter && (
+                  <div className="text-xs text-[#44464f] flex items-center gap-2">
+                    <Building className="w-4 h-4 text-[#092554] shrink-0" />
+                    <span><strong>Offline Center:</strong> {scheme.offlineApplicationCenter}</span>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
           {/* TAB 4: EXPLAIN SIMPLY */}
           {activeSubTab === 'SIMPLIFIED' && (
             <div className="space-y-5 animate-fade-in">
-              <div className="bg-[#ffddb8]/40 border border-[#fea619]/60 rounded-2xl p-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-[#855300]" />
-                  <div>
-                    <span className="text-xs font-bold text-[#855300] uppercase">
-                      Citizen-Friendly Simplified Translation
-                    </span>
-                    <p className="text-[11px] text-[#44464f]">
-                      Free of government jargon, gazette acronyms, or complex bureau phrases.
-                    </p>
-                  </div>
+              <div className="p-5 rounded-3xl bg-linear-to-br from-[#ffddb8]/40 to-[#fea619]/20 border border-[#fea619]/40 space-y-3">
+                <div className="flex items-center gap-2 text-[#684000] font-extrabold text-xs uppercase tracking-wider">
+                  <Sparkles className="w-4 h-4 text-[#fea619]" />
+                  <span>Simple Explanation (No Jargon)</span>
                 </div>
-                <button
-                  id="detail-simplified-voice-btn"
-                  onClick={() =>
-                    handlePlayVoice(
-                      regionalContent?.voiceExplanation || scheme.summarySimple
-                    )
-                  }
-                  className="px-3.5 py-1.5 rounded-xl bg-[#fea619] hover:bg-[#855300] text-[#684000] hover:text-white font-bold text-xs cursor-pointer transition-colors"
-                >
-                  HEAR IN {currentLanguageConfig.name.toUpperCase()}
-                </button>
-              </div>
 
-              {/* English Plain Explanation */}
-              <div className="p-4 rounded-2xl bg-[#f8f9fb] border border-[#c5c6d0]/60 space-y-2">
-                <h4 className="text-xs font-bold text-[#092554] uppercase tracking-wider">
-                  Plain English Explanation:
-                </h4>
-                <p className="text-xs sm:text-sm text-[#191c1e] leading-relaxed">
-                  {scheme.summarySimple}
+                <p className="text-sm font-semibold text-[#301c00] leading-relaxed">
+                  {regionalContent?.summary || scheme.summarySimple}
                 </p>
-              </div>
 
-              {/* Regional Plain Explanation */}
-              {regionalContent?.summary && (
-                <div className="p-4 rounded-2xl bg-[#94f6c4]/20 border border-[#57b98c]/40 space-y-2">
-                  <h4 className="text-xs font-bold text-[#00462d] uppercase tracking-wider">
-                    {currentLanguageConfig.name} ({currentLanguageConfig.nativeName}) எளிய விளக்கம்:
-                  </h4>
-                  <p className="text-xs sm:text-sm text-[#002d1c] leading-relaxed font-sans">
-                    {regionalContent.summary}
+                <div className="bg-white/80 p-4 rounded-2xl border border-[#fea619]/30 space-y-2">
+                  <span className="text-xs font-bold text-[#684000] block">
+                    What this means for your family:
+                  </span>
+                  <p className="text-xs text-[#44464f] leading-relaxed">
+                    {scheme.benefits?.detailedBenefit || scheme.benefits?.shortSummary}
                   </p>
                 </div>
-              )}
+              </div>
             </div>
           )}
         </div>
 
-        {/* Footer Actions Bar */}
-        <div className="p-4 bg-[#f8f9fb] border-t border-[#c5c6d0]/60 flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2">
-            <button
-              id="detail-share-btn"
-              onClick={() => setShowShareModal(true)}
-              className="px-3 py-2 rounded-xl bg-white hover:bg-[#edeef0] text-[#191c1e] font-bold text-xs flex items-center gap-1.5 border border-[#c5c6d0]/60 cursor-pointer"
-            >
-              <Share2 className="w-4 h-4 text-[#092554]" />
-              <span>SHARE SCHEME</span>
-            </button>
-
-            <button
-              id="detail-copy-summary-btn"
-              onClick={handleCopySummary}
-              className="px-3 py-2 rounded-xl bg-white hover:bg-[#edeef0] text-[#44464f] font-bold text-xs flex items-center gap-1.5 border border-[#c5c6d0]/60 cursor-pointer"
-            >
-              {copiedLink ? <Check className="w-4 h-4 text-[#00462d]" /> : <Copy className="w-4 h-4" />}
-              <span>{copiedLink ? 'COPIED' : 'COPY SUMMARY'}</span>
-            </button>
-          </div>
+        {/* Modal Bottom Footer */}
+        <div className="p-4 bg-[#f8f9fb] border-t border-[#c5c6d0]/60 flex items-center justify-between gap-3">
+          <button
+            onClick={handleCopySummary}
+            className="px-4 py-2 rounded-xl bg-white border border-[#c5c6d0]/60 text-xs font-bold text-[#191c1e] hover:bg-[#edeef0] transition-colors cursor-pointer flex items-center gap-1.5"
+          >
+            <Copy className="w-3.5 h-3.5 text-[#757780]" />
+            <span>{copiedLink ? 'Copied!' : 'Copy Summary'}</span>
+          </button>
 
           <button
-            id="detail-done-btn"
             onClick={() => {
               speechService.stop();
               setSelectedSchemeDetail(null);
             }}
-            className="px-6 py-2 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs cursor-pointer transition-colors"
+            className="px-6 py-2.5 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs transition-colors cursor-pointer"
           >
-            CLOSE
+            {t('common.close')}
           </button>
         </div>
       </div>
-
-      {/* Share Modal Dialog */}
-      {showShareModal && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-md w-full p-5 border border-[#c5c6d0]/60 shadow-2xl space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold text-[#092554] text-sm">
-                Share {scheme.name}
-              </h3>
-              <button
-                onClick={() => setShowShareModal(false)}
-                className="p-1 text-[#757780] hover:text-[#191c1e] cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <p className="text-xs text-[#44464f]">
-              Send this verified scheme breakdown to family members, farmers, or neighbours via WhatsApp or SMS.
-            </p>
-
-            <div className="space-y-2">
-              <button
-                id="share-whatsapp-btn"
-                onClick={() => {
-                  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
-                    `*${scheme.name}*\nBenefit: ${scheme.benefits?.amount || scheme.benefits?.shortSummary || 'Welfare Benefit'}\nWhere to Apply: ${scheme.offlineApplicationCenter || 'e-Seva Center'}\nPortal: ${scheme.applicationUrl || scheme.officialSource}\nShared via ${t('header.title')}`
-                  )}`;
-                  window.open(url, '_blank');
-                }}
-                className="w-full py-2.5 px-3 rounded-xl bg-[#00462d] hover:bg-[#002d1c] text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <MessageSquare className="w-4 h-4" />
-                <span>SHARE VIA WHATSAPP</span>
-              </button>
-
-              <button
-                id="share-sms-format-btn"
-                onClick={handleCopySummary}
-                className="w-full py-2.5 px-3 rounded-xl bg-[#092554] hover:bg-[#243b6b] text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <PhoneCall className="w-4 h-4" />
-                <span>COPY SMS TEXT (FEATURE PHONES)</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
