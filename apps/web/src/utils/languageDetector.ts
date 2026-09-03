@@ -72,3 +72,4 @@ export function getLanguageConfig(langId: string): LanguageConfig {
     sampleTranscription: ''
   };
 }
+

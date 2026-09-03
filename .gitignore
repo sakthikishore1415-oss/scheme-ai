@@ -11,3 +11,10 @@ bun.lock*
 bun.lockb
 design_system/
 *.zip
+
+# Android & Gradle
+.gradle/
+**/build/
+local.properties
+*.apk
+*.aab

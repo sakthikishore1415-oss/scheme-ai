@@ -1,0 +1,14 @@
+## Arivom Thittam Android Environment Configuration
+## Copy this file to `local.properties` in `apps/android/local.properties` (or set corresponding System environment variables).
+
+# Android SDK Location (Required for local Gradle builds)
+# macOS example: sdk.dir=/Users/YOUR_USERNAME/Library/Android/sdk
+# Linux example: sdk.dir=/home/YOUR_USERNAME/Android/Sdk
+# Windows example: sdk.dir=C\:\\Users\\YOUR_USERNAME\\AppData\\Local\\Android\\Sdk
+sdk.dir=/home/fire-keeper/Android/Sdk
+
+# API Base URL for scheme data / backend sync
+API_BASE_URL=https://api.arivomthittam.gov.in
+
+# Optional Gemini / AI Studio API key (for voice explanation / natural language assist)
+GEMINI_API_KEY=
