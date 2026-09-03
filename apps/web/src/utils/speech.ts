@@ -69,26 +69,43 @@ class SpeechService {
         utterance.voice = voice;
       }
 
+      let hasFinished = false;
+      let watchdogTimer: any = null;
+
+      const finishUtterance = () => {
+        if (hasFinished) return;
+        hasFinished = true;
+        if (watchdogTimer) clearTimeout(watchdogTimer);
+        this.isSynthesizing = false;
+        this.currentUtterance = null;
+        if (onEnd) onEnd();
+      };
+
       utterance.onstart = () => {
         this.isSynthesizing = true;
         if (onStart) onStart();
       };
 
       utterance.onend = () => {
-        this.isSynthesizing = false;
-        this.currentUtterance = null;
-        if (onEnd) onEnd();
+        finishUtterance();
       };
 
       utterance.onerror = (e) => {
-        console.warn('Speech synthesis utterance error:', e);
-        this.isSynthesizing = false;
-        this.currentUtterance = null;
-        this.simulateSpeechAudio(text, onStart, onEnd);
+        console.warn('Speech synthesis utterance notice:', e);
+        finishUtterance();
         if (onError) onError(e);
       };
 
       this.currentUtterance = utterance;
+
+      // Watchdog timer: automatically resolve if browser audio hangs or gets suspended
+      const expectedDurationMs = Math.max(3000, Math.min(12000, text.length * 80));
+      watchdogTimer = setTimeout(() => {
+        if (!hasFinished && this.isSynthesizing) {
+          console.warn('SpeechSynthesis watchdog safety trigger');
+          finishUtterance();
+        }
+      }, expectedDurationMs);
 
       // Small tick delay to avoid Chrome cancel race condition
       setTimeout(() => {
@@ -98,13 +115,13 @@ class SpeechService {
           }
           window.speechSynthesis.speak(utterance);
         } catch (err) {
-          console.warn('SpeechSynthesis speak failed:', err);
-          this.simulateSpeechAudio(text, onStart, onEnd);
+          console.warn('SpeechSynthesis speak fallback:', err);
+          finishUtterance();
         }
       }, 20);
     } catch (err) {
       console.warn('Failed to initialize speech utterance:', err);
-      this.simulateSpeechAudio(text, onStart, onEnd);
+      if (onEnd) onEnd();
     }
   }
 

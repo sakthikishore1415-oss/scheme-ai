@@ -186,14 +186,14 @@ export const ProfileView: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <span className="bg-[#d9e2ff] text-[#001944] text-xs px-2.5 py-0.5 rounded-full font-bold border border-[#b0c6ff] flex items-center gap-1">
-              <User className="w-3.5 h-3.5 text-[#092554]" />
+              <User className="w-3.5 h-3.5 text-[#4a1f2d]" />
               CITIZEN PROFILE
             </span>
             <span className="text-xs text-[#757780] font-mono">
               {userProfile?.name ? `Active Member: ${userProfile.name}` : 'No Profile Loaded'}
             </span>
           </div>
-          <h1 className={`font-bold text-[#092554] mt-1 ${easyMode ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
+          <h1 className={`font-bold text-[#4a1f2d] mt-1 ${easyMode ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
             {userProfile ? 'Profile & Entitlement Questionnaire' : 'Create Citizen Profile'}
           </h1>
           <p className="text-xs text-[#44464f] mt-0.5">
@@ -264,7 +264,7 @@ export const ProfileView: React.FC = () => {
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#c5c6d0]/60 shadow-soft space-y-6">
           {/* Step Progress Indicator */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs font-bold text-[#092554]">
+            <div className="flex items-center justify-between text-xs font-bold text-[#4a1f2d]">
               <span>
                 {currentStep === 1
                   ? 'Step 1 of 3: Shared Essentials'
@@ -290,7 +290,7 @@ export const ProfileView: React.FC = () => {
               <div className="space-y-5 animate-fade-in">
                 <div className="flex items-center justify-between border-b border-[#edeef0] pb-3">
                   <div>
-                    <h3 className="font-bold text-sm text-[#092554]">
+                    <h3 className="font-bold text-sm text-[#4a1f2d]">
                       General Demographics / பொது விவரங்கள்
                     </h3>
                     <p className="text-[11px] text-[#44464f]">
@@ -311,7 +311,7 @@ export const ProfileView: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[#092554] font-bold block mb-1">
+                    <label className="text-[#4a1f2d] font-bold block mb-1">
                       Full Name (Optional / விருப்பப்பட்டால்)
                     </label>
                     <input
@@ -319,12 +319,12 @@ export const ProfileView: React.FC = () => {
                       placeholder="e.g. Arumugam / செல்வி"
                       value={formName}
                       onChange={(e) => setFormName(e.target.value)}
-                      className="w-full p-3 rounded-xl border border-[#c5c6d0] text-[#191c1e] placeholder-[#757780] font-medium bg-white focus:border-[#092554] focus:outline-none"
+                      className="w-full p-3 rounded-xl border border-[#4a1f2d]/30 text-[#111827] placeholder-[#6b7280] font-semibold bg-white focus:border-[#4a1f2d] focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[#092554] font-bold block mb-1">Age (Years / வயது) *</label>
+                    <label className="text-[#4a1f2d] font-bold block mb-1">Age (Years / வயது) *</label>
                     <input
                       type="number"
                       min="1"
@@ -332,18 +332,18 @@ export const ProfileView: React.FC = () => {
                       placeholder="e.g. 42"
                       value={formAge}
                       onChange={(e) => setFormAge(e.target.value === '' ? '' : Number(e.target.value))}
-                      className="w-full p-3 rounded-xl border border-[#c5c6d0] text-[#191c1e] placeholder-[#757780] font-medium bg-white focus:border-[#092554] focus:outline-none"
+                      className="w-full p-3 rounded-xl border border-[#4a1f2d]/30 text-[#111827] placeholder-[#6b7280] font-semibold bg-white focus:border-[#4a1f2d] focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="text-[#092554] font-bold block mb-1">Gender / பாலினம்</label>
+                    <label className="text-[#4a1f2d] font-bold block mb-1">Gender / பாலினம்</label>
                     <select
                       value={formGender}
                       onChange={(e) => setFormGender(e.target.value as any)}
-                      className="w-full p-3 rounded-xl border border-[#c5c6d0] text-[#191c1e] font-medium bg-white focus:border-[#092554] focus:outline-none"
+                      className="w-full p-3 rounded-xl border border-[#4a1f2d]/30 text-[#111827] font-semibold bg-white focus:border-[#4a1f2d] focus:outline-none"
                     >
                       <option value="unspecified">Prefer not to say</option>
                       <option value="female">Female / பெண்</option>
@@ -353,11 +353,11 @@ export const ProfileView: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="text-[#092554] font-bold block mb-1">District / மாவட்டம் *</label>
+                    <label className="text-[#4a1f2d] font-bold block mb-1">District / மாவட்டம் *</label>
                     <select
                       value={formDistrict}
                       onChange={(e) => setFormDistrict(e.target.value)}
-                      className="w-full p-3 rounded-xl border border-[#c5c6d0] text-[#191c1e] font-medium bg-white focus:border-[#092554] focus:outline-none"
+                      className="w-full p-3 rounded-xl border border-[#4a1f2d]/30 text-[#111827] font-semibold bg-white focus:border-[#4a1f2d] focus:outline-none"
                     >
                       {currentStateConfig.districts.map((d) => (
                         <option key={d} value={d}>
@@ -368,7 +368,7 @@ export const ProfileView: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="text-[#092554] font-bold block mb-1">
+                    <label className="text-[#4a1f2d] font-bold block mb-1">
                       Annual Household Income (₹ / வருமானம்) *
                     </label>
                     <input
@@ -378,7 +378,7 @@ export const ProfileView: React.FC = () => {
                       placeholder="e.g. 120000"
                       value={formIncome}
                       onChange={(e) => setFormIncome(e.target.value === '' ? '' : Number(e.target.value))}
-                      className="w-full p-3 rounded-xl border border-[#c5c6d0] text-[#191c1e] placeholder-[#757780] font-medium bg-white focus:border-[#092554] focus:outline-none"
+                      className="w-full p-3 rounded-xl border border-[#4a1f2d]/30 text-[#111827] placeholder-[#6b7280] font-semibold bg-white focus:border-[#4a1f2d] focus:outline-none"
                     />
                     <span className="text-[10px] text-[#44464f] mt-0.5 block">
                       Evaluates BPL / EWS eligibility limit.
@@ -387,13 +387,13 @@ export const ProfileView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-[#092554] font-bold block mb-1">
+                  <label className="text-[#4a1f2d] font-bold block mb-1">
                     Primary Benefit Need / திட்டத் தேவை
                   </label>
                   <select
                     value={formNeed}
                     onChange={(e) => setFormNeed(e.target.value as any)}
-                    className="w-full p-3 rounded-xl border border-[#c5c6d0] text-[#191c1e] font-medium bg-white focus:border-[#092554] focus:outline-none"
+                    className="w-full p-3 rounded-xl border border-[#4a1f2d]/30 text-[#111827] font-semibold bg-white focus:border-[#4a1f2d] focus:outline-none"
                   >
                     <option value="general">General / All Available Sectors</option>
                     {NEED_CATEGORIES.map((c) => (
@@ -406,7 +406,7 @@ export const ProfileView: React.FC = () => {
 
                 {/* Profession Grid Selector */}
                 <div>
-                  <label className="text-[#092554] font-bold block mb-2">
+                  <label className="text-[#4a1f2d] font-bold block mb-2">
                     Select Profession / தொழில் நிலை *
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -446,7 +446,7 @@ export const ProfileView: React.FC = () => {
                     {professions.find((p) => p.id === selectedProfession)?.emoji}
                   </span>
                   <div>
-                    <h3 className="font-bold text-sm text-[#092554]">
+                    <h3 className="font-bold text-sm text-[#4a1f2d]">
                       {professions.find((p) => p.id === selectedProfession)?.label} Entitlement Questions
                     </h3>
                     <p className="text-[11px] text-[#44464f]">
@@ -459,7 +459,7 @@ export const ProfileView: React.FC = () => {
                 {selectedProfession === 'farmer' && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Land Ownership</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Land Ownership</label>
                       <select
                         value={farmerLandOwnership}
                         onChange={(e) => setFarmerLandOwnership(e.target.value)}
@@ -472,7 +472,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">
+                      <label className="text-[#4a1f2d] font-bold block mb-1">
                         Landholding Area (Acres / ஏக்கர்)
                       </label>
                       <input
@@ -486,7 +486,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Primary Crop Type</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Primary Crop Type</label>
                       <select
                         value={farmerCropType}
                         onChange={(e) => setFarmerCropType(e.target.value)}
@@ -501,7 +501,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Irrigation Source</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Irrigation Source</label>
                       <select
                         value={farmerIrrigation}
                         onChange={(e) => setFarmerIrrigation(e.target.value)}
@@ -514,7 +514,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="text-[#092554] font-bold block mb-1">
+                      <label className="text-[#4a1f2d] font-bold block mb-1">
                         Farmer Registration Status
                       </label>
                       <select
@@ -534,7 +534,7 @@ export const ProfileView: React.FC = () => {
                 {selectedProfession === 'student' && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Education Level</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Education Level</label>
                       <select
                         value={studentEducationLevel}
                         onChange={(e) => setStudentEducationLevel(e.target.value)}
@@ -549,7 +549,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Institution Type</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Institution Type</label>
                       <select
                         value={studentInstitutionType}
                         onChange={(e) => setStudentInstitutionType(e.target.value)}
@@ -562,7 +562,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Course / Stream</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Course / Stream</label>
                       <select
                         value={studentCourse}
                         onChange={(e) => setStudentCourse(e.target.value)}
@@ -577,7 +577,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Year of Study</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Year of Study</label>
                       <select
                         value={studentYear}
                         onChange={(e) => setStudentYear(e.target.value)}
@@ -591,7 +591,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="text-[#092554] font-bold block mb-1">Scholarship History</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Scholarship History</label>
                       <select
                         value={studentScholarship}
                         onChange={(e) => setStudentScholarship(e.target.value)}
@@ -610,7 +610,7 @@ export const ProfileView: React.FC = () => {
                 {selectedProfession === 'worker' && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Employment Type</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Employment Type</label>
                       <select
                         value={workerEmploymentType}
                         onChange={(e) => setWorkerEmploymentType(e.target.value)}
@@ -626,7 +626,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Sector Classification</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Sector Classification</label>
                       <select
                         value={workerSector}
                         onChange={(e) => setWorkerSector(e.target.value)}
@@ -638,7 +638,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="text-[#092554] font-bold block mb-1">
+                      <label className="text-[#4a1f2d] font-bold block mb-1">
                         Welfare Board / e-Shram Registration
                       </label>
                       <select
@@ -658,7 +658,7 @@ export const ProfileView: React.FC = () => {
                 {selectedProfession === 'business' && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Enterprise Type</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Enterprise Type</label>
                       <select
                         value={businessType}
                         onChange={(e) => setBusinessType(e.target.value)}
@@ -672,7 +672,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Operating Experience</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Operating Experience</label>
                       <select
                         value={businessYears}
                         onChange={(e) => setBusinessYears(e.target.value)}
@@ -686,7 +686,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Registration Status</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Registration Status</label>
                       <select
                         value={businessRegistration}
                         onChange={(e) => setBusinessRegistration(e.target.value)}
@@ -700,7 +700,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Financing Requirement</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Financing Requirement</label>
                       <select
                         value={businessLoanNeed}
                         onChange={(e) => setBusinessLoanNeed(e.target.value)}
@@ -719,7 +719,7 @@ export const ProfileView: React.FC = () => {
                 {selectedProfession === 'homemaker' && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Marital Status</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Marital Status</label>
                       <select
                         value={homemakerMaritalStatus}
                         onChange={(e) => setHomemakerMaritalStatus(e.target.value)}
@@ -734,7 +734,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Dependent Children</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Dependent Children</label>
                       <select
                         value={homemakerChildren}
                         onChange={(e) => setHomemakerChildren(e.target.value)}
@@ -748,7 +748,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="text-[#092554] font-bold block mb-1">
+                      <label className="text-[#4a1f2d] font-bold block mb-1">
                         Self-Help Group (SHG) Membership
                       </label>
                       <select
@@ -769,7 +769,7 @@ export const ProfileView: React.FC = () => {
                 {selectedProfession === 'senior' && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Age Category</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Age Category</label>
                       <select
                         value={seniorAgeGroup}
                         onChange={(e) => setSeniorAgeGroup(e.target.value)}
@@ -782,7 +782,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Pension Status</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Pension Status</label>
                       <select
                         value={seniorPension}
                         onChange={(e) => setSeniorPension(e.target.value)}
@@ -796,7 +796,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="text-[#092554] font-bold block mb-1">Living Arrangement</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Living Arrangement</label>
                       <select
                         value={seniorLiving}
                         onChange={(e) => setSeniorLiving(e.target.value)}
@@ -814,7 +814,7 @@ export const ProfileView: React.FC = () => {
                 {selectedProfession === 'disability' && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">Disability Category</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Disability Category</label>
                       <select
                         value={disabilityType}
                         onChange={(e) => setDisabilityType(e.target.value)}
@@ -829,7 +829,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-[#092554] font-bold block mb-1">UDID / Disability Card</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">UDID / Disability Card</label>
                       <select
                         value={disabilityCert}
                         onChange={(e) => setDisabilityCert(e.target.value)}
@@ -843,7 +843,7 @@ export const ProfileView: React.FC = () => {
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="text-[#092554] font-bold block mb-1">Disability Percentage</label>
+                      <label className="text-[#4a1f2d] font-bold block mb-1">Disability Percentage</label>
                       <select
                         value={disabilityPercent}
                         onChange={(e) => setDisabilityPercent(e.target.value)}
@@ -873,7 +873,7 @@ export const ProfileView: React.FC = () => {
             {currentStep === 3 && (
               <div className="space-y-5 animate-fade-in">
                 <div className="border-b border-[#edeef0] pb-3">
-                  <h3 className="font-bold text-sm text-[#092554] flex items-center gap-1.5">
+                  <h3 className="font-bold text-sm text-[#4a1f2d] flex items-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-[#fea619]" />
                     Review Profile Summary / சுருக்கம்
                   </h3>
@@ -885,7 +885,7 @@ export const ProfileView: React.FC = () => {
                 <div className="p-4 rounded-2xl bg-[#f8f9fb] border border-[#c5c6d0]/60 space-y-2.5">
                   <div className="flex justify-between border-b border-[#edeef0] pb-1.5">
                     <span className="text-[#757780]">Name:</span>
-                    <strong className="text-[#092554]">{formName || 'Citizen Profile'}</strong>
+                    <strong className="text-[#4a1f2d]">{formName || 'Citizen Profile'}</strong>
                   </div>
                   <div className="flex justify-between border-b border-[#edeef0] pb-1.5">
                     <span className="text-[#757780]">Age & Gender:</span>
@@ -899,7 +899,7 @@ export const ProfileView: React.FC = () => {
                   </div>
                   <div className="flex justify-between border-b border-[#edeef0] pb-1.5">
                     <span className="text-[#757780]">Profession:</span>
-                    <strong className="text-[#092554]">
+                    <strong className="text-[#4a1f2d]">
                       {professions.find((p) => p.id === selectedProfession)?.emoji}{' '}
                       {professions.find((p) => p.id === selectedProfession)?.label}
                     </strong>
@@ -912,9 +912,9 @@ export const ProfileView: React.FC = () => {
 
                 {/* Civic Trust Privacy Badge */}
                 <div className="p-4 rounded-2xl bg-[#d9e2ff]/40 border border-[#b0c6ff] flex items-start gap-3">
-                  <Shield className="w-5 h-5 text-[#092554] shrink-0 mt-0.5" />
+                  <Shield className="w-5 h-5 text-[#4a1f2d] shrink-0 mt-0.5" />
                   <div className="space-y-1">
-                    <span className="text-xs font-bold text-[#092554] block">
+                    <span className="text-xs font-bold text-[#4a1f2d] block">
                       Deterministic Civic Privacy Assurance
                     </span>
                     <p className="text-[11px] text-[#44464f] leading-relaxed">
@@ -931,7 +931,7 @@ export const ProfileView: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setCurrentStep(currentStep - 1)}
-                  className="px-5 py-2.5 rounded-xl border border-[#c5c6d0] hover:bg-[#f2f4f6] text-[#092554] font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors"
+                  className="px-5 py-2.5 rounded-xl border border-[#c5c6d0] hover:bg-[#f2f4f6] text-[#4a1f2d] font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>BACK</span>
@@ -970,7 +970,7 @@ export const ProfileView: React.FC = () => {
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#c5c6d0]/60 shadow-soft space-y-6">
           <div className="flex items-center justify-between border-b border-[#edeef0] pb-4">
             <div>
-              <h3 className="font-bold text-base text-[#092554]">Family Member Profiles</h3>
+              <h3 className="font-bold text-base text-[#4a1f2d]">Family Member Profiles</h3>
               <p className="text-xs text-[#44464f]">
                 Add family members to discover welfare schemes for parents, spouses, or children.
               </p>
@@ -990,7 +990,7 @@ export const ProfileView: React.FC = () => {
                 className="p-4 rounded-2xl bg-[#f8f9fb] border border-[#c5c6d0]/60 flex items-center justify-between"
               >
                 <div className="space-y-0.5">
-                  <h4 className="font-bold text-sm text-[#092554]">{m.name}</h4>
+                  <h4 className="font-bold text-sm text-[#4a1f2d]">{m.name}</h4>
                   <p className="text-xs text-[#757780]">
                     Relation: {m.relation} • Age: {m.profile.age} years
                   </p>
@@ -1000,7 +1000,7 @@ export const ProfileView: React.FC = () => {
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeFamilyMemberId === m.id
                       ? 'bg-[#00462d] text-white'
-                      : 'bg-white text-[#092554] border border-[#c5c6d0]'
+                      : 'bg-white text-[#4a1f2d] border border-[#c5c6d0]'
                   }`}
                 >
                   {activeFamilyMemberId === m.id ? 'ACTIVE' : 'SWITCH'}
@@ -1015,7 +1015,7 @@ export const ProfileView: React.FC = () => {
       {activeTab === 'DOCUMENTS' && (
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#c5c6d0]/60 shadow-soft space-y-6">
           <div className="border-b border-[#edeef0] pb-4">
-            <h3 className="font-bold text-base text-[#092554]">Civic Document Readiness Locker</h3>
+            <h3 className="font-bold text-base text-[#4a1f2d]">Civic Document Readiness Locker</h3>
             <p className="text-xs text-[#44464f]">
               Check off your ready documents to evaluate immediate application readiness.
             </p>
@@ -1054,10 +1054,10 @@ export const ProfileView: React.FC = () => {
       {showAddFamilyModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 border border-[#c5c6d0]/60 shadow-2xl space-y-4">
-            <h3 className="font-bold text-base text-[#092554]">Add Family Member</h3>
+            <h3 className="font-bold text-base text-[#4a1f2d]">Add Family Member</h3>
             <form onSubmit={handleCreateFamilyMember} className="space-y-4 text-xs">
               <div>
-                <label className="text-[#092554] font-bold block mb-1">Relationship</label>
+                <label className="text-[#4a1f2d] font-bold block mb-1">Relationship</label>
                 <select
                   value={newFamilyRelation}
                   onChange={(e) => setNewFamilyRelation(e.target.value)}
@@ -1073,7 +1073,7 @@ export const ProfileView: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-[#092554] font-bold block mb-1">Member Name</label>
+                <label className="text-[#4a1f2d] font-bold block mb-1">Member Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Meenakshi"
@@ -1085,7 +1085,7 @@ export const ProfileView: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-[#092554] font-bold block mb-1">Age</label>
+                <label className="text-[#4a1f2d] font-bold block mb-1">Age</label>
                 <input
                   type="number"
                   placeholder="e.g. 40"

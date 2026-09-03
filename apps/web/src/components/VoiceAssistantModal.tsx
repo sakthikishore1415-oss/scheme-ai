@@ -416,7 +416,7 @@ export const VoiceAssistantModal: React.FC = () => {
         {/* ========================================================= */}
         <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0 relative">
           {/* LEFT: Living Animated Voice Visualizer Stage (Light Theme) */}
-          <div className="lg:col-span-5 p-3 sm:p-6 flex flex-col items-center justify-center text-center space-y-2 sm:space-y-4 border-b lg:border-b-0 lg:border-r border-[#e8e1dc] bg-[#faf8f3] relative">
+          <div className="lg:col-span-5 p-3 sm:p-6 flex flex-col items-center justify-center text-center space-y-1.5 sm:space-y-4 border-b lg:border-b-0 lg:border-r border-[#e8e1dc] bg-[#faf8f3] relative max-h-[30vh] lg:max-h-none shrink-0 overflow-y-auto">
             <VoiceOrbVisualizer
               state={
                 voiceState === 'SPEAKING'
@@ -429,11 +429,11 @@ export const VoiceAssistantModal: React.FC = () => {
               }
               soundLevel={audioLevel}
               onClick={handleToggleListening}
-              size={typeof window !== 'undefined' && window.innerWidth < 640 ? 120 : 170}
+              size={typeof window !== 'undefined' && window.innerWidth < 640 ? 100 : 160}
               langInitial={getLanguageInitial(selectedVoiceLanguageId)}
             />
 
-            <div className="space-y-1">
+            <div className="space-y-0.5 sm:space-y-1">
               <span className="text-xs font-bold text-[#4a1f2d] tracking-wider uppercase block">
                 {voiceState === 'SPEAKING'
                   ? 'Arivom Speaking'
@@ -443,7 +443,7 @@ export const VoiceAssistantModal: React.FC = () => {
                   ? 'Gemini Thinking...'
                   : 'Speak Directly to AI'}
               </span>
-              <p className="text-xs text-[#514346] max-w-xs leading-relaxed">
+              <p className="text-[11px] sm:text-xs text-[#514346] max-w-xs leading-tight sm:leading-relaxed hidden sm:block">
                 No typing required. Speak aloud in <strong>{currentLang.nativeName} ({currentLang.name})</strong>—pausing for 2 seconds automatically stops listening and asks your query.
               </p>
             </div>
@@ -794,8 +794,8 @@ export const VoiceAssistantModal: React.FC = () => {
                     id="voice-assistant-typing-input"
                     value={typedInput}
                     onChange={(e) => setTypedInput(e.target.value)}
-                    placeholder={`Type your question in ${currentLang.nativeName} or English if you cannot speak...`}
-                    className="flex-1 p-2.5 px-3 rounded-xl bg-white border border-[#e8e1dc] text-xs text-[#21191d] placeholder-[#756a6f] focus:border-[#4a1f2d] outline-none shadow-xs"
+                    placeholder={`Type your question in ${currentLang.nativeName} or English...`}
+                    className="flex-1 p-3 px-3.5 rounded-xl bg-white border-2 border-[#4a1f2d]/40 text-sm font-semibold text-[#111827] placeholder-[#6b7280] focus:border-[#4a1f2d] focus:ring-2 focus:ring-[#4a1f2d]/20 outline-none shadow-sm"
                   />
                   <button
                     type="submit"

@@ -99,8 +99,8 @@ export const FirstTimeSetupModal: React.FC = () => {
         <div className="p-5 overflow-y-auto flex-1 space-y-5">
           {/* Important Principle Alert Box */}
           <div className="bg-[#d9e2ff]/40 border border-[#b0c6ff] rounded-2xl p-3.5 flex items-start gap-3">
-            <Globe className="w-5 h-5 text-[#092554] shrink-0 mt-0.5" />
-            <div className="text-xs text-[#092554]">
+            <Globe className="w-5 h-5 text-[#4a1f2d] shrink-0 mt-0.5" />
+            <div className="text-xs text-[#4a1f2d]">
               <p className="font-bold mb-0.5">English Visual UI + Regional Voice Architecture</p>
               <p className="text-[#44464f] leading-relaxed">
                 The visual smartphone interface remains in <strong>English</strong> by default. Your selected state determines the <strong>voice recognition, voice responses, and spoken explanations</strong>.
@@ -111,11 +111,11 @@ export const FirstTimeSetupModal: React.FC = () => {
           {/* Step 1: Select State */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-bold text-[#092554] uppercase tracking-wider flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-[#092554]" />
+              <label className="text-xs font-bold text-[#4a1f2d] uppercase tracking-wider flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-[#4a1f2d]" />
                 Which state are you from?
               </label>
-              <span className="text-[11px] text-[#757780]">Selected: <strong className="text-[#092554]">{targetState.name}</strong></span>
+              <span className="text-[11px] text-[#757780]">Selected: <strong className="text-[#4a1f2d]">{targetState.name}</strong></span>
             </div>
 
             {/* Search Input */}
@@ -127,7 +127,7 @@ export const FirstTimeSetupModal: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search state (e.g. Tamil Nadu, Kerala, Karnataka)..."
-                className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-[#c5c6d0] text-[#191c1e] focus:border-[#092554] outline-none transition-all"
+                className="w-full pl-9 pr-4 py-2 text-sm font-semibold rounded-xl border-2 border-[#4a1f2d]/30 text-[#111827] placeholder-[#6b7280] focus:border-[#4a1f2d] focus:ring-2 focus:ring-[#4a1f2d]/20 outline-none transition-all bg-white"
               />
             </div>
 
@@ -162,7 +162,7 @@ export const FirstTimeSetupModal: React.FC = () => {
           {/* District Selection */}
           {targetState.districts && targetState.districts.length > 0 && (
             <div>
-              <label className="text-xs font-bold text-[#092554] uppercase tracking-wider block mb-1.5">
+              <label className="text-xs font-bold text-[#4a1f2d] uppercase tracking-wider block mb-1.5">
                 Select Your District ({targetState.name})
               </label>
               <select
@@ -188,8 +188,8 @@ export const FirstTimeSetupModal: React.FC = () => {
                   Recommended Voice Language
                 </span>
                 <div className="flex items-center gap-2">
-                  <Volume2 className="w-5 h-5 text-[#092554]" />
-                  <span className="text-base font-bold text-[#092554]">
+                  <Volume2 className="w-5 h-5 text-[#4a1f2d]" />
+                  <span className="text-base font-bold text-[#4a1f2d]">
                     {targetVoiceLang.name}
                   </span>
                   <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#d9e2ff] text-[#001944] border border-[#b0c6ff]">
@@ -201,7 +201,7 @@ export const FirstTimeSetupModal: React.FC = () => {
               <button
                 id="setup-change-voice-lang-toggle"
                 onClick={() => setShowLanguagePicker(!showLanguagePicker)}
-                className="text-xs font-bold text-[#092554] hover:underline cursor-pointer"
+                className="text-xs font-bold text-[#4a1f2d] hover:underline cursor-pointer"
               >
                 {showLanguagePicker ? 'Done' : 'Change Voice Language'}
               </button>

@@ -134,8 +134,16 @@ export class GeminiLiveVoiceService {
     const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRec) {
-      this.setState('ERROR');
-      callbacks.onError?.('Speech recognition is not supported in this browser. Please use Chrome, Edge, or Android Browser.');
+      console.warn('Web Speech recognition not natively supported in this browser, running in interactive text and speech-synthesis mode.');
+      this.setState('IDLE');
+      this.isListeningActive = false;
+      callbacks.onMessage?.({
+        id: `asst-${Date.now()}`,
+        role: 'assistant',
+        text: 'வணக்கம்! Speech recognition is available via typing below. You can also use Google Chrome for direct voice mic.',
+        timestamp: Date.now(),
+        audioVoice: 'Arivom Scheme Advisor',
+      });
       return;
     }
 
@@ -555,78 +563,69 @@ CRITICAL VOICE RULES:
         }
       }
 
-      // 2. Google Gemini 3.6 Flash
+      // Build true multi-turn conversational turns
       const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
-
-      // Add recent conversation history
-      const recentHistory = this.conversationHistory.slice(-6);
-      for (const h of recentHistory) {
+      const historyTurns = this.conversationHistory.slice(-8);
+      for (const h of historyTurns) {
         contents.push({
           role: h.role === 'assistant' ? 'model' : 'user',
           parts: [{ text: h.text }],
         });
       }
 
-      // Add current turn with system instructions
-      const combinedPrompt = `${systemInstruction}\n\nCitizen says: "${spokenText}"\nRespond naturally and conversationally in 1-2 spoken sentences:`;
-      contents.push({
-        role: 'user',
-        parts: [{ text: combinedPrompt }],
-      });
-
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-goog-api-key': apiKey,
-        },
-        signal: this.currentAbortController?.signal,
-        body: JSON.stringify({
-          contents,
-          generationConfig: {
-            temperature: 0.4,
-            maxOutputTokens: 1000,
-          },
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (candidate) {
-          return candidate
-            .replace(/[*_#`[\]()]/g, '')
-            .replace(/\s+/g, ' ')
-            .trim();
-        }
-      } else {
-        // Fallback endpoint: gemini-flash-latest
-        const fallbackEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
-        const fallbackRes = await fetch(fallbackEndpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-goog-api-key': apiKey,
-          },
-          signal: this.currentAbortController?.signal,
-          body: JSON.stringify({
-            contents,
-            generationConfig: {
-              temperature: 0.4,
-              maxOutputTokens: 1000,
-            },
-          }),
+      // Ensure last turn is the user's latest query
+      if (contents.length === 0 || contents[contents.length - 1].role !== 'user') {
+        contents.push({
+          role: 'user',
+          parts: [{ text: spokenText }],
         });
+      }
 
-        if (fallbackRes.ok) {
-          const fallbackData = await fallbackRes.json();
-          const text = fallbackData.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (text) {
-            return text
-              .replace(/[*_#`[\]()]/g, '')
-              .replace(/\s+/g, ' ')
-              .trim();
+      const promptPayload = {
+        system_instruction: {
+          parts: [{ text: systemInstruction }],
+        },
+        contents,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 1000,
+        },
+      };
+
+      // Candidate models for ultra-reliable zero-downtime execution
+      const candidateModels = [
+        'gemini-3.5-flash',
+        'gemini-3.1-flash-lite',
+        'gemini-3-flash-preview',
+        'gemini-3.6-flash',
+      ];
+
+      for (const model of candidateModels) {
+        try {
+          const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-goog-api-key': apiKey,
+            },
+            signal: this.currentAbortController?.signal,
+            body: JSON.stringify(promptPayload),
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            const candidate = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (candidate && candidate.trim()) {
+              return candidate
+                .replace(/[*_#`[\]()]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+            }
+          }
+        } catch (modelErr: any) {
+          if (modelErr?.name === 'AbortError' || this.currentAbortController?.signal.aborted) {
+            return '';
           }
         }
       }

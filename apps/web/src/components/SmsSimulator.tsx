@@ -154,7 +154,7 @@ export const SmsSimulator: React.FC = () => {
           placeholder='Type SMS command, e.g. "SCHEME AGRICULTURE TN"...'
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          className="flex-1 p-3.5 rounded-2xl bg-slate-950 border border-slate-700 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 font-mono"
+          className="flex-1 p-3.5 rounded-2xl bg-white border-2 border-[#4a1f2d]/40 text-sm font-semibold text-[#111827] placeholder-[#6b7280] focus:outline-none focus:border-[#4a1f2d] focus:ring-2 focus:ring-[#4a1f2d]/20 font-mono shadow-sm"
         />
         <button
           type="submit"

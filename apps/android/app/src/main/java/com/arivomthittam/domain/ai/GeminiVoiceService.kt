@@ -127,91 +127,82 @@ object GeminiVoiceService {
             }
         } catch (_: Exception) {}
 
-        // 2. Google Gemini 3.6 Flash Fallback
-        try {
-            val endpoint = "https://generativelanguage.googleapis.com/v1beta/models/$GEMINI_MODEL:generateContent?key=$apiKey"
-            val url = URL(endpoint)
-            val connection = (url.openConnection() as HttpURLConnection).apply {
-                requestMethod = "POST"
-                setRequestProperty("Content-Type", "application/json")
-                doOutput = true
-                connectTimeout = 7000
-                readTimeout = 7000
-            }
+        // 2. Google Gemini Models with Instant Failover
+        val candidateModels = listOf("gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-3-flash-preview", "gemini-3.6-flash")
 
-            val modeGuidance = if (isFastMode) {
-                "⚡ FAST MODE: Keep answer ultra-concise (1-2 sentences maximum), direct, and easy to hear."
-            } else {
-                "🎙️ STUDIO MODE: Provide clear details on eligibility, benefits, and how to apply in 2-3 sentences."
-            }
-
-            val schemeSummary = matchingSchemes.take(3).joinToString("; ") {
-                "${it.name} (${it.benefits.shortSummary})"
-            }
-
-            val historySummary = history.takeLast(3).joinToString("\n") { (role, txt) ->
-                "$role: $txt"
-            }
-
-            val prompt = """
-                $systemInstruction
-                $modeGuidance
-                
-                Citizen Profile: Age ${profile.age}, Occupation: ${profile.occupation}, District: ${profile.district ?: "General"}, State: $stateName.
-                Verified Schemes in Database: $schemeSummary.
-                
-                Recent Conversation:
-                $historySummary
-                
-                Citizen Spoke / Typed: "$spokenText"
-                
-                Respond naturally in the citizen's language ($language).
-            """.trimIndent()
-
-            val requestJson = JSONObject().apply {
-                put("contents", JSONArray().apply {
-                    put(JSONObject().apply {
-                        put("role", "user")
-                        put("parts", JSONArray().apply {
-                            put(JSONObject().put("text", prompt))
-                        })
+        val contentsArray = JSONArray().apply {
+            history.takeLast(6).forEach { (role, txt) ->
+                put(JSONObject().apply {
+                    put("role", if (role == "assistant") "model" else "user")
+                    put("parts", JSONArray().apply {
+                        put(JSONObject().put("text", txt))
                     })
                 })
-                put("generationConfig", JSONObject().apply {
-                    put("temperature", 0.4)
-                    put("maxOutputTokens", 1000)
+            }
+            // Add current spoken user text
+            put(JSONObject().apply {
+                put("role", "user")
+                put("parts", JSONArray().apply {
+                    put(JSONObject().put("text", spokenText))
                 })
-            }
+            })
+        }
 
-            OutputStreamWriter(connection.outputStream).use { writer ->
-                writer.write(requestJson.toString())
-                writer.flush()
-            }
+        val requestJson = JSONObject().apply {
+            put("system_instruction", JSONObject().apply {
+                put("parts", JSONArray().apply {
+                    put(JSONObject().put("text", systemInstruction))
+                })
+            })
+            put("contents", contentsArray)
+            put("generationConfig", JSONObject().apply {
+                put("temperature", 0.7)
+                put("maxOutputTokens", 1000)
+            })
+        }
 
-            if (connection.responseCode == 200) {
-                val responseText = connection.inputStream.bufferedReader().use { it.readText() }
-                val json = JSONObject(responseText)
-                val candidates = json.optJSONArray("candidates")
-                if (candidates != null && candidates.length() > 0) {
-                    val contentObj = candidates.getJSONObject(0).optJSONObject("content")
-                    val partsArray = contentObj?.optJSONArray("parts")
-                    if (partsArray != null) {
-                        val sb = StringBuilder()
-                        for (i in 0 until partsArray.length()) {
-                            val part = partsArray.getJSONObject(i)
-                            if (part.has("text")) {
-                                sb.append(part.getString("text")).append(" ")
+        for (model in candidateModels) {
+            try {
+                val endpoint = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey"
+                val url = URL(endpoint)
+                val connection = (url.openConnection() as HttpURLConnection).apply {
+                    requestMethod = "POST"
+                    setRequestProperty("Content-Type", "application/json")
+                    doOutput = true
+                    connectTimeout = 6000
+                    readTimeout = 6000
+                }
+
+                OutputStreamWriter(connection.outputStream).use { writer ->
+                    writer.write(requestJson.toString())
+                    writer.flush()
+                }
+
+                if (connection.responseCode == 200) {
+                    val responseText = connection.inputStream.bufferedReader().use { it.readText() }
+                    val json = JSONObject(responseText)
+                    val candidates = json.optJSONArray("candidates")
+                    if (candidates != null && candidates.length() > 0) {
+                        val contentObj = candidates.getJSONObject(0).optJSONObject("content")
+                        val partsArray = contentObj?.optJSONArray("parts")
+                        if (partsArray != null) {
+                            val sb = StringBuilder()
+                            for (i in 0 until partsArray.length()) {
+                                val part = partsArray.getJSONObject(i)
+                                if (part.has("text")) {
+                                    sb.append(part.getString("text")).append(" ")
+                                }
                             }
-                        }
-                        val resultText = sb.toString().replace(Regex("[*_#`\\[\\]()]"), "").trim()
-                        if (resultText.isNotBlank()) {
-                            return@withContext resultText
+                            val resultText = sb.toString().replace(Regex("[*_#`\\[\\]()]"), "").trim()
+                            if (resultText.isNotBlank()) {
+                                return@withContext resultText
+                            }
                         }
                     }
                 }
+            } catch (_: Exception) {
+                // Try next candidate model
             }
-        } catch (e: Exception) {
-            // Graceful fallback to deterministic local logic
         }
 
         return@withContext getFallbackReply(spokenText, language, matchingSchemes)
