@@ -338,7 +338,8 @@ export class GeminiLiveVoiceService {
   }
 
   /**
-   * Complete Stop: Immediately cancels audio playback, speech generation, and pauses listening.
+   * Stop Button Action: Immediately interrupts current AI speech/thinking turn,
+   * clears queue, and immediately keeps listening active for citizen's next query without permanently disabling voice.
    */
   public stopEverything(): void {
     if (this.currentAbortController) {
@@ -354,10 +355,13 @@ export class GeminiLiveVoiceService {
     this.speechQueue = [];
     this.isProcessingSpeechQueue = false;
     this.stopPlayback();
-    this.stopListening('manual');
     this.currentInterimText = '';
     this.callbacks?.onInterimTranscript?.('');
-    this.setState('IDLE');
+
+    // Resume listening immediately so citizen can speak their next query right away
+    if (this.state !== 'DISCONNECTED') {
+      this.startListening();
+    }
   }
 
   private enqueueSpeech(sentence: string) {

@@ -122,20 +122,31 @@ export const VoiceAssistantModal: React.FC = () => {
     setShowVoiceModal(false);
   };
 
+  /**
+   * One-Tap Stop: Instantly halts AI speech playback / generation without disabling voice,
+   * keeping listening ready for the citizen's next query.
+   */
   const handleStopEverything = () => {
     geminiLiveVoiceService.stopEverything();
   };
 
+  /**
+   * One-Tap to Speak: Immediate 1-tap activation / interruption / commit.
+   */
   const handleToggleListening = () => {
     if (voiceState === 'SPEAKING' || voiceState === 'THINKING') {
-      geminiLiveVoiceService.interruptAndListen();
+      geminiLiveVoiceService.stopEverything();
       return;
     }
-    if (voiceState === 'LISTENING' || voiceState === 'USER_SPEAKING') {
-      geminiLiveVoiceService.stopListening();
-    } else {
-      geminiLiveVoiceService.startListening();
+    if (voiceState === 'USER_SPEAKING') {
+      geminiLiveVoiceService.commitInterimNow();
+      return;
     }
+    if (voiceState === 'LISTENING') {
+      geminiLiveVoiceService.stopListening('manual');
+      return;
+    }
+    geminiLiveVoiceService.startListening();
   };
 
   const handleSendText = (e: React.FormEvent) => {
@@ -539,26 +550,26 @@ export const VoiceAssistantModal: React.FC = () => {
                   ) : voiceState === 'USER_SPEAKING' || voiceState === 'LISTENING' ? (
                     <>
                       <Mic className="w-4 h-4 text-white animate-pulse" />
-                      <span>Listening... (Speak query)</span>
+                      <span>Listening... (Tap to Send)</span>
                     </>
                   ) : (
                     <>
                       <Mic className="w-4 h-4 text-white" />
-                      <span>Tap to Speak</span>
+                      <span>One Tap to Speak</span>
                     </>
                   )}
                 </button>
 
-                {/* 2. DEDICATED STOP BUTTON (Instant Halt) */}
+                {/* 2. DEDICATED STOP BUTTON (Instant Speech Halt & Keeps Voice Active) */}
                 <button
                   type="button"
                   id="voice-stop-everything-btn"
                   onClick={handleStopEverything}
                   className="py-3 px-4 rounded-2xl bg-[#ba1a1a] hover:bg-[#991b1b] active:scale-95 text-white font-bold text-xs transition-all cursor-pointer flex items-center gap-1.5 border border-[#ba1a1a] shadow-sm shrink-0"
-                  title="Stop AI speech and cancel listening immediately"
+                  title="Stop AI speech immediately without disabling voice"
                 >
                   <Square className="w-4 h-4 fill-white" />
-                  <span>Stop</span>
+                  <span>Stop Speech</span>
                 </button>
 
                 {/* 3. Keyboard Toggle Button */}

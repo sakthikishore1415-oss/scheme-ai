@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Header } from './components/Header';
-import { BottomNav } from './components/BottomNav';
+import { BottomNav, DesktopSidebar } from './components/BottomNav';
 import { FirstTimeSetupModal } from './components/FirstTimeSetupModal';
 import { VoiceAssistantModal } from './components/VoiceAssistantModal';
 import { SchemeDetailModal } from './components/SchemeDetailModal';
@@ -34,24 +34,30 @@ const MainLayout: React.FC = () => {
         </div>
       )}
 
-      {/* Main Page Content Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-6 pb-24 md:pb-12">
-        {activeTab === 'home' && <HomeView />}
-        {activeTab === 'matches' && <MyMatchesView />}
-        {activeTab === 'saved' && <SavedSchemesView />}
-        {activeTab === 'profile' && <ProfileView />}
-        {activeTab === 'button_phone' && <ButtonPhoneView />}
-        {activeTab === 'sms' && (
-          <div className="space-y-6 animate-fade-in pb-12">
-            <SmsSimulator />
-          </div>
-        )}
-        {activeTab === 'family' && <ProfileView />}
-        {activeTab === 'assisted' && <AssistedView />}
-        {activeTab === 'architecture' && <AboutArchitectureView />}
-      </main>
+      {/* Main Container: Desktop Sidebar + Main Content Side-by-Side (Zero Overlap) */}
+      <div className="flex-1 max-w-7xl w-full mx-auto flex items-start gap-4">
+        {/* Desktop Minimized Icon Sidebar (Non-overlapping) */}
+        <DesktopSidebar />
 
-      {/* Desktop & Mobile Bottom Navigators */}
+        {/* Main Page Content Body */}
+        <main className="flex-1 min-w-0 px-3 sm:px-6 py-6 pb-24 md:pb-12">
+          {activeTab === 'home' && <HomeView />}
+          {activeTab === 'matches' && <MyMatchesView />}
+          {activeTab === 'saved' && <SavedSchemesView />}
+          {activeTab === 'profile' && <ProfileView />}
+          {activeTab === 'button_phone' && <ButtonPhoneView />}
+          {activeTab === 'sms' && (
+            <div className="space-y-6 animate-fade-in pb-12">
+              <SmsSimulator />
+            </div>
+          )}
+          {activeTab === 'family' && <ProfileView />}
+          {activeTab === 'assisted' && <AssistedView />}
+          {activeTab === 'architecture' && <AboutArchitectureView />}
+        </main>
+      </div>
+
+      {/* Mobile Minimized Bottom Navigator */}
       <BottomNav />
 
       {/* Global Modals & Drawers */}
