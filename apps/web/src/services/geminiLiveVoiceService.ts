@@ -500,25 +500,39 @@ export class GeminiLiveVoiceService {
       const langConfig = SUPPORTED_LANGUAGES[this.currentLanguageId] || SUPPORTED_LANGUAGES['ta'];
       const languageName = `${langConfig.name} (${langConfig.nativeName})`;
       
-      const languageDirective = `STRICT LANGUAGE DIRECTIVE: You MUST converse, reply, and speak STRICTLY in natural, empathetic spoken ${langConfig.name} (${langConfig.nativeName}). Do NOT reply in another language or mix unnecessarily with English. Style: Speak naturally and conversationally in ${langConfig.nativeName}. Keep answers concise in 1 to 2 spoken sentences without markdown, bullet points, asterisks, or technical jargon.`;
+      const languageDirective = `STRICT NATIVE LANGUAGE MANDATE: You MUST converse, reply, and speak STRICTLY in natural, empathetic, culturally authentic spoken ${langConfig.name} (${langConfig.nativeName}). Do NOT reply in any other language. Speak like a warm, supportive local civic counsellor talking directly to a citizen.`;
 
-      const systemInstruction = `You are Arivom (அறிவோம்), an empathetic, warm, proactive civic AI voice counsellor for citizens in ${this.currentStateName}, India.
-You are having an engaging real-time, two-way conversational dialogue like Gemini Live Voice or a direct civic helpline counsellor.
+      const systemInstruction = `You are Arivom (அறிவோம்), a warm, empathetic, proactive civic AI voice counsellor for citizens in ${this.currentStateName}, India.
+You are having a real-time, interactive, two-way spoken conversation (like Gemini Live Voice or a friendly government helpline counsellor).
 
 CURRENT CONVERSATION LANGUAGE: ${languageName.toUpperCase()}
 ${languageDirective}
 
-🎯 CORE INTERACTIVE CONVERSATIONAL DIRECTIVE:
-Never give a flat one-sided answer and stop. You must actively interact, consult, and converse with the citizen.
-Every response MUST follow this 2-step structure (strictly under 2 short spoken sentences):
-1. [HELPFUL INSIGHT / ADVICE]: In 1 simple, warm spoken sentence, validate or answer their question clearly with government scheme details.
-2. [INTERACTIVE FOLLOW-UP QUESTION]: In 1 natural spoken question, proactively ask them a relevant follow-up question to diagnose their eligibility (e.g. asking about their land size, student course, ration card status, family income, age) or offer step-by-step guidance on how to apply.
+🎯 CORE INTERACTIVE TWO-WAY CONVERSATION MANDATE:
+Never give a dry, flat factual statement and stop. You MUST always maintain a lively, supportive dialogue.
+Every response MUST follow this exact 2-step spoken format (strictly 1 to 2 spoken sentences total, under 35 words):
+1. [HELPFUL INSIGHT / ADVICE]: In 1 warm, clear spoken sentence, directly answer their question with specific government scheme names and benefits in ${langConfig.nativeName}.
+2. [INTERACTIVE FOLLOW-UP QUESTION]: In 1 natural spoken sentence, proactively ask them a relevant follow-up question to diagnose their eligibility (e.g. asking about their land size, student grade/course, ration card type, income, age, or disability status) or guide them on how to apply.
+
+LANGUAGE-SPECIFIC INTERACTIVE EXAMPLES (Tone and 2-step structure to follow):
+- Tamil (தமிழ்): "விவசாயிகளுக்கு PM-KISAN மூலம் ஆண்டுக்கு ₹6,000 கிடைக்கும். உங்களிடம் நிலப்பட்டா அல்லது சிட்டா ஆவணம் உள்ளதா?"
+- Hindi (हिन्दी): "किसानों के लिए पीएम किसान योजना के तहत प्रति वर्ष ₹6,000 की सहायता मिलती है। क्या आपके नाम पर कृषि भूमि के दस्तावेज हैं?"
+- Telugu (తెలుగు): "రైతుల కోసం PM-KISAN ద్వారా సంవత్సరానికి ₹6,000 అందుతాయి. మీ పేరు మీద వ్యవసాయ భూమి పాస్ పుస్తకం ఉందా?"
+- Kannada (ಕನ್ನಡ): "ರೈತರಿಗಾಗಿ ಪಿಎಂ ಕಿಸಾನ್ ಯೋಜನೆಯಡಿ ವರ್ಷಕ್ಕೆ ₹6,000 ಸಿಗುತ್ತದೆ. ನಿಮ್ಮ ಬಳಿ ಜಮೀನಿನ ಪಹಣಿ ಅಥವಾ ದಾಖಲೆಗಳಿವೆಯೇ?"
+- Malayalam (മലയാളം): "കർഷകർക്കായി പിഎം കിസാൻ വഴി വർഷത്തിൽ ₹6,000 ലഭിക്കും. നിങ്ങളുടെ പേരിൽ കൃഷിഭൂമിയുടെ രേഖകൾ ഉണ്ടോ?"
+- Marathi (मराठी): "शेतकऱ्यांसाठी पीएम किसान योजनेतून वर्षाला ₹6,000 मिळतात. आपल्या नावावर शेतजमिनीचा 7/12 उतारा आहे का?"
+- Bengali (বাংলা): "কৃষকদের জন্য পিএম কিষাণ প্রকল্পে বছরে ₹৬,০০০ দেওয়া হয়। আপনার নামে কি জমির খতিয়ান বা পরচা রয়েছে?"
+- Gujarati (ગુજરાતી): "ખેડૂતો માટે પીએમ કિસાન યોજના હેઠળ વાર્ષિક ₹6,000 મળે છે. શું તમારી પાસે જમીનના 7/12 ના દસ્તાવેજ છે?"
+- Odia (ଓଡ଼ିଆ): "କୃଷକମାନଙ୍କ ପାଇଁ ପିଏମ କିଷାନ ଯୋଜନାରେ ବାର୍ଷିକ ₹୬,୦୦୦ ମିଳିଥାଏ। ଆପଣଙ୍କ ପାଖରେ ଜମି ପଟ୍ଟା ଅଛି କି?"
+- Punjabi (ਪੰਜਾਬੀ): "ਕਿਸਾਨਾਂ ਲਈ ਪੀਐੱਮ ਕਿਸਾਨ ਸਕੀਮ ਤਹਿਤ ਸਾਲਾਨਾ ₹6,000 ਮਿਲਦੇ ਹਨ। ਕੀ ਤੁਹਾਡੇ ਨਾਂ 'ਤੇ ਜ਼ਮੀਨ ਦੀ ਫ਼ਰਦ ਹੈ?"
+- Assamese (অসমীয়া): "কৃষকসকলৰ বাবে পিএম কিষাণ আঁচনিত বছৰি ₹৬,০০০ পোৱা যায়। আপোনাৰ নামত কৃষি ভূমিৰ পট্টা আছে নেকি?"
+- English: "Farmers can receive ₹6,000 per year under the PM-KISAN scheme. Do you have your agricultural land records ready?"
 
 CRITICAL VOICE RULES:
 1. Speak directly and respectfully to the citizen strictly in spoken ${languageName}.
-2. Keep replies concise (strictly 1 to 2 spoken sentences, under 35 words total).
-3. NEVER dump bullet points, asterisks, URLs, or markdown symbols.
-4. Keep the back-and-forth alive, encouraging the citizen to speak back.`;
+2. Keep replies concise (strictly 1 to 2 spoken sentences, maximum 30-35 words).
+3. NEVER output bullet points, asterisks, formatting tags, URLs, or markdown symbols.
+4. Keep the turn-taking active, encouraging the citizen to answer your question.`;
 
       const xaiApiKey =
         (import.meta as any).env?.VITE_XAI_API_KEY ||
@@ -646,49 +660,116 @@ CRITICAL VOICE RULES:
 
   private getContextualOfflineReply(spokenText: string): string {
     const q = spokenText.toLowerCase();
-    const isTa = this.currentLanguageId === 'ta';
-    const isMl = this.currentLanguageId === 'ml';
-    const isHi = this.currentLanguageId === 'hi';
+    const lang = this.currentLanguageId;
 
-    if (q.includes('விவசாய') || q.includes('farmer') || q.includes('பயிர்') || q.includes('கடன்') || q.includes('കൃഷി')) {
-      if (isTa) return 'விவசாயிகளுக்காக பிரதமரின் கிசான் திட்டம் (PM-KISAN) மற்றும் கலைஞரின் அனைத்து கிராம ஒருங்கிணைந்த வேளாண் வளர்ச்சி திட்டம் பயன்படும். உங்களிடம் பட்டா சிட்டா ஆவணம் உள்ளதா?';
-      if (isMl) return 'കർഷകർക്കായി പിഎം കിസാൻ പദ്ധതി വഴി പ്രതിവർഷം ₹6,000 ലഭിക്കും. നിങ്ങളുടെ പേരിൽ കൃഷിഭൂമിയുടെ രേഖകൾ ഉണ്ടോ?';
-      if (isHi) return 'किसानों के लिए पीएम किसान योजना के तहत ₹6,000 वार्षिक सहायता मिलती है। क्या आपके नाम पर कृषि भूमि है?';
-      return 'Farmers can benefit from PM-KISAN (₹6,000/year) and subsidized agricultural inputs. Do you hold agricultural land records?';
+    const sectorReplies: Record<string, Record<string, string>> = {
+      farmer: {
+        ta: 'விவசாயிகளுக்காக பிரதமரின் கிசான் திட்டம் (PM-KISAN) மற்றும் மானியத் திட்டங்கள் உள்ளன. உங்களிடம் நிலப்பட்டா அல்லது சிட்டா ஆவணம் உள்ளதா?',
+        te: 'రైతుల కోసం PM-KISAN పథకం మరియు సబ్సిడీ పథకాలు అందుబాటులో ఉన్నాయి. మీ పేరు మీద వ్యవసాయ భూమి పాస్ పుస్తకం ఉందా?',
+        kn: 'ರೈತರಿಗಾಗಿ ಪಿಎಂ ಕಿಸಾನ್ ಮತ್ತು ಕೃಷಿ ಸಬ್ಸಿಡಿ ಯೋಜನೆಗಳಿವೆ. ನಿಮ್ಮ ಬಳಿ ಜಮೀನಿನ ಪಹಣಿ ಅಥವಾ ದಾಖಲೆಗಳಿವೆಯೇ?',
+        ml: 'കർഷകർക്കായി പിഎം കിസാൻ പദ്ധതിയും സബ്സിഡികളും ലഭ്യമാണ്. നിങ്ങളുടെ പേരിൽ കൃഷിഭൂമിയുടെ പട്ടയം ഉണ്ടോ?',
+        hi: 'किसानों के लिए पीएम किसान योजना और कृषि सब्सिडी उपलब्ध हैं। क्या आपके नाम पर कृषि भूमि के दस्तावेज हैं?',
+        mr: 'शेतकऱ्यांसाठी पीएम किसान योजना आणि कृषी अनुदाने उपलब्ध आहेत. आपल्या नावावर 7/12 उतारा आहे का?',
+        bn: 'কৃষকদের জন্য পিএম কিষাণ প্রকল্প ও কৃষি ভর্তুকি উপলব্ধ। আপনার নামে কি জমির খতিয়ান বা পরচা রয়েছে?',
+        gu: 'ખેડૂતો માટે પીએમ કિસાન યોજના અને કૃષિ સબસિડી ઉપલબ્ધ છે. શું તમારી પાસે જમીનના 7/12 ના દસ્તાવેજ છે?',
+        or: 'କୃଷକମାନଙ୍କ ପାଇଁ ପିଏମ କିଷାନ ଯୋଜନା ଓ କୃଷି ରିହାତି ଉପଲବ୍ଧ। ଆପଣଙ୍କ ପାଖରେ ଜମି ପଟ୍ଟା ଅଛି କି?',
+        pa: 'ਕਿਸਾਨਾਂ ਲਈ ਪੀਐੱਮ ਕਿਸਾਨ ਸਕੀਮ ਅਤੇ ਖੇਤੀਬਾੜੀ ਸਬਸਿਡੀਆਂ ਉਪਲਬਧ ਹਨ। ਕੀ ਤੁਹਾਡੇ ਨਾਂ ਉੱਤੇ ਜ਼ਮੀਨ ਦੀ ਫ਼ਰਦ ਹੈ?',
+        as: 'কৃষকসকলৰ বাবে পিএম কিষাণ আঁচনি আৰু ৰেহাই ব্যৱস্থা উপলব্ধ। আপোনাৰ নামত কৃষি ভূমিৰ পট্টা আছে নেকি?',
+        en: 'Farmers can benefit from PM-KISAN (₹6,000/year) and agricultural input subsidies. Do you hold agricultural land records?',
+      },
+      student: {
+        ta: 'மாணவர்களுக்கான உதவித்தொகை மற்றும் கட்டணச் சலுகை திட்டங்கள் உள்ளன. நீங்கள் எந்த வகுப்பு அல்லது படிப்பு படிக்கிறீர்கள்?',
+        te: 'విద్యార్థుల కోసం పోస్ట్-మెట్రిక్ స్కాలర్‌షిప్‌లు మరియు విద్యా దీవెన ఉన్నాయి. మీరు ఏ తరగతి లేదా కోర్సు చదువుతున్నారు?',
+        kn: 'ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಮೆಟ್ರಿಕ್ ನಂತರದ ಸ್ಕಾಲರ್‌ಶಿಪ್ ಮತ್ತು ಶುಲ್ಕ ವಿನಾಯಿತಿಗಳಿವೆ. ನೀವು ಯಾವ ಕೋರ್ಸ್ ಓದುತ್ತಿದ್ದೀರಿ?',
+        ml: 'വിദ്യാർത്ഥികൾക്കായി പോസ്റ്റ്-മെട്രിക് സ്കോളർഷിപ്പും വിദ്യാഭ്യാസ ഗ്രാന്റുകളും ലഭ്യമാണ്. നിങ്ങൾ ഏത് കോഴ്സാണ് പഠിക്കുന്നത്?',
+        hi: 'छात्रों के लिए पोस्ट-मैट्रिक छात्रवृत्ति और शुल्क प्रतिपूर्ति उपलब्ध है। आप किस कक्षा या कोर्स में पढ़ रहे हैं?',
+        mr: 'विद्यार्थ्यांसाठी शिष्यवृत्ती आणि शिक्षण शुल्क माफीच्या योजना आहेत. आपण कोणत्या वर्गात किंवा अभ्यासक्रमात शिकत आहात?',
+        bn: 'শিক্ষার্থীদের জন্য পোস্ট-ম্যাট্রিক বৃত্তি ও শিক্ষাগত অনুদান উপলব্ধ। আপনি কোন ক্লাসে বা কোর্সে পড়াশোনা করছেন?',
+        gu: 'વિદ્યાર્થીઓ માટે શિષ્યવૃત્તિ અને શિક્ષણ સહાય યોજનાઓ ઉપલબ્ધ છે. તમે કયા ધોરણ અથવા કોર્સમાં અભ્યાસ કરો છો?',
+        or: 'ଛାତ୍ରଛାତ୍ରୀଙ୍କ ପାଇଁ ପୋଷ୍ଟ-ମେଟ୍ରିକ ବୃତ୍ତି ଓ ଶିକ୍ଷା ସହାୟତା ଉପଲବ୍ଧ। ଆପଣ କେଉଁ ଶ୍ରେଣୀ ବା ପାଠ୍ୟକ୍ରମରେ ପଢ଼ୁଛନ୍ତି?',
+        pa: 'ਵਿਦਿਆਰਥੀਆਂ ਲਈ ਵਜ਼ੀਫ਼ੇ ਅਤੇ ਮੁਫ਼ਤ ਸਿੱਖਿਆ ਸਕੀਮਾਂ ਉਪਲਬਧ ਹਨ। ਤੁਸੀਂ ਕਿਹੜੀ ਜਮਾਤ ਜਾਂ ਕੋਰਸ ਵਿੱਚ ਪੜ੍ਹ ਰਹੇ ਹੋ?',
+        as: 'ছাত্ৰ-ছাত্ৰীসকলৰ বাবে বৃত্তি আৰু শিক্ষাগত অনুদান উপলব্ধ। আপুনি কোন শ্ৰেণীত বা পাঠ্যক্ৰমত পঢ়ি আছে?',
+        en: 'Students can receive merit scholarships and tuition assistance. What grade or course are you currently studying?',
+      },
+      women: {
+        ta: 'மகளிருக்காக மகளிர் உரிமைத் தொகை மற்றும் சுயஉதவிக் குழு கடன் திட்டங்கள் உள்ளன. உங்களிடம் ரேஷன் கார்டு உள்ளதா?',
+        te: 'మహిళల కోసం స్వయం సహాయక సంఘాల రుణాలు మరియు ఆర్థిక సహాయ పథకాలు ఉన్నాయి. మీ వద్ద రేషన్ కార్డు ఉందా?',
+        kn: 'ಮಹಿಳೆಯರಿಗಾಗಿ ಗೃಹಲಕ್ಷ್ಮಿ ಮತ್ತು ಸ್ವಸಹಾಯ ಗುಂಪುಗಳ ಸಾಲ ಯೋಜನೆಗಳಿವೆ. ನಿಮ್ಮ ಬಳಿ ರೇಷನ್ ಕಾರ್ಡ್ ಇದೆಯೇ?',
+        ml: 'വനിതകൾക്കായി കുടുംബശ്രീ സ്വയംതൊഴിൽ വായ്പകളും സഹായങ്ങളും ലഭ്യമാണ്. നിങ്ങളുടെ അടുക്കൽ റേഷൻ കാർഡ് ഉണ്ടോ?',
+        hi: 'महिलाओं के लिए आजीविका मिशन, मातृत्व वंदना और ऋण योजनाएं उपलब्ध हैं। क्या आपके पास राशन कार्ड है?',
+        mr: 'महिलांसाठी लाडकी बहीण आणि बचत गट कर्ज योजना उपलब्ध आहेत. आपल्याकडे रेशन कार्ड आहे का?',
+        bn: 'মহিলাদের জন্য লক্ষ্মীর ভাণ্ডার এবং স্বনির্ভর গোষ্ঠী ঋণ প্রকল্প রয়েছে। আপনার কি রেশন কার্ড আছে?',
+        gu: 'મહિલાઓ માટે આજીવિકા મિશન અને સહાય યોજનાઓ ઉપલબ્ધ છે. શું તમારી પાસે રેશન કાર્ડ છે?',
+        or: 'ମହିଳାମାନଙ୍କ ପାଇଁ ମିଶନ ଶକ୍ତି ଏବଂ ସହାୟତା ଯୋଜନା ଉପଲବ୍ଧ। ଆପଣଙ୍କ ପାଖରେ ରାସନ କାର୍ଡ ଅଛି କି?',
+        pa: 'ਮਹਿਲਾਵਾਂ ਲਈ ਵਿੱਤੀ ਸਹਾਇਤਾ ਅਤੇ ਸਵੈ-ਰੁਜ਼ਗਾਰ ਸਕੀਮਾਂ ਉਪਲਬਧ ਹਨ। ਕੀ ਤੁਹਾਡੇ ਕੋਲ ਰਾਸ਼ਨ ਕਾਰਡ ਹੈ?',
+        as: 'মহিলাসকলৰ বাবে অৰুণোদয় আৰু আত্মসহায়ক গোটৰ ঋণ উপলব্ধ। আপোনাৰ ৰেচন কাৰ্ড আছে নেকি?',
+        en: 'Women can access direct monthly financial aid and self-help group loans. Do you have an active ration card?',
+      },
+      senior: {
+        ta: 'முதியோருக்கான தேசிய முதியோர் ஓய்வூதியத் திட்டம் (IGNOAPS) மூலம் மாதம் உதவித்தொகை வழங்கப்படுகிறது. உங்கள் வயது 60க்கு மேல் உள்ளதா?',
+        te: 'వృద్ధుల కోసం వృద్ధాప్య పెన్షన్ పథకం ద్వారా ప్రతినెలా పింఛను అందుతుంది. మీ వయస్సు 60 సంవత్సరాలు దాటిందా?',
+        kn: 'ಹಿರಿಯ ನಾಗರಿಕರಿಗಾಗಿ ಮಾಸಿಕ ವೃದ್ಧಾಪ್ಯ ವೇತನ ಯೋಜನೆ ಲಭ್ಯವಿದೆ. ನಿಮ್ಮ ವಯಸ್ಸು 60 ವರ್ಷ ಮೇಲ್ಪಟ್ಟಿದೆಯೇ?',
+        ml: 'മുതിർന്ന പൗരന്മാർക്കായി പ്രതിമാസ പെൻഷൻ പദ്ധതി ലഭ്യമാണ്. നിങ്ങളുടെ പ്രായം 60 വയസ്സിന് മുകളിലാണോ?',
+        hi: 'वरिष्ठ नागरिकों के लिए वृद्धावस्था पेंशन योजना उपलब्ध है। क्या आपकी आयु 60 वर्ष या उससे अधिक है?',
+        mr: 'ज्येष्ठ नागरिकांसाठी वृद्धापकाळ निवृत्तीवेतन योजना उपलब्ध आहे. आपले वय 60 वर्षे किंवा त्याहून अधिक आहे का?',
+        bn: 'বয়স্ক নাগরিকদের জন্য বার্ধক্য ভাতা প্রকল্প উপলব্ধ রয়েছে। আপনার বয়স কি ৬০ বছরের বেশি?',
+        gu: 'વરિષ્ઠ નાગરિકો માટે વૃદ્ધ પેન્શન યોજના ઉપલબ્ધ છે. શું તમારી ઉંમર 60 વર્ષ કે તેથી વધુ છે?',
+        or: 'ବରିଷ୍ଠ ନାଗରିକମାନଙ୍କ ପାଇଁ ବାର୍ଦ୍ଧକ୍ୟ ଭତ୍ତା ଯୋଜନା ଉପଲବ୍ଧ। ଆପଣଙ୍କ ବୟସ ୬୦ ବର୍ଷରୁ ଅଧିକ କି?',
+        pa: 'ਬਜ਼ੁਰਗਾਂ ਲਈ ਬੁਢਾਪਾ ਪੈਨਸ਼ਨ ਸਕੀਮ ਉਪਲਬਧ ਹੈ। ਕੀ ਤੁਹਾਡੀ ਉਮਰ 60 ਸਾਲ ਤੋਂ ਵੱਧ ਹੈ?',
+        as: 'বয়োজ্যেষ্ঠ নাগৰিকসকলৰ বাবে বাৰ্ধক্য পেঞ্চন আঁচনি উপলব্ধ। আপোনাৰ বয়স ৬০ বছৰৰ ওপৰত নেকি?',
+        en: 'Senior citizens can receive monthly old-age pensions. Is your age 60 years or above?',
+      },
+      health: {
+        ta: 'முதலமைச்சரின் மருத்துவக் காப்பீட்டுத் திட்டம் மற்றும் ஆயுஷ்மான் பாரத் மூலம் ₹5 லட்சம் வரை இலவச சிகிச்சை பெறலாம். உங்களிடம் காப்பீட்டு அட்டை உள்ளதா?',
+        te: 'ఆరోగ్యశ్రీ మరియు ఆయుష్మాన్ భారత్ ద్వారా ₹5 లక్షల వరకు ఉచిత చికిత్స లభిస్తుంది. మీ వద్ద ఆరోగ్య కార్డు ఉందా?',
+        kn: 'ಆಯುಷ್ಮಾನ್ ಭಾರತ್ ಮತ್ತು ಆರೋಗ್ಯ ಕರ್ನಾಟಕ ಮೂಲಕ ₹5 ಲಕ್ಷದವರೆಗೆ ಉಚಿತ ಚಿಕಿತ್ಸೆ ಸಿಗುತ್ತದೆ. ನಿಮ್ಮ ಬಳಿ ಆರೋಗ್ಯ ಕಾರ್ಡ್ ಇದೆಯೇ?',
+        ml: 'കാരുണ്യ ആരോഗ്യ സുരക്ഷാ പദ്ധതി വഴി ₹5 ലക്ഷം വരെയുള്ള സൗജന്യ ചികിത്സ ലഭ്യമാണ്. നിങ്ങളുടെ റേഷൻ കാർഡ് ബിപിഎൽ ആണോ?',
+        hi: 'आयुष्मान भारत योजना के तहत ₹5 लाख तक का निःशुल्क उपचार उपलब्ध है। क्या आपके पास आयुष्मान कार्ड है?',
+        mr: 'महात्मा फुले जन आरोग्य योजना आणि आयुष्मान भारत अंतर्गत ₹5 लाखांपर्यंत मोफत उपचार मिळतात. आपल्याकडे आरोग्य कार्ड आहे का?',
+        bn: 'স্বাস্থ্য সাথী ও আয়ুষ্মান ভারত প্রকল্পে ₹৫ লক্ষ পর্যন্ত বিনামূল্যে চিকিৎসা মেলে। আপনার কি স্বাস্থ্য কার্ড রয়েছে?',
+        gu: 'મા અમૃતમ અને આયુષ્માન ભારત હેઠળ ₹5 લાખ સુધીની મફત સારવાર મળે છે. શું તમારી પાસે આયુષ્માન કાર્ડ છે?',
+        or: 'ବିଜୁ ସ୍ୱାସ୍ଥ୍ୟ କଲ୍ୟାଣ ଯୋଜନା ଏବଂ ଆୟୁଷ୍ମାନ ଭାରତରେ ₹୫ ଲକ୍ଷ ପର୍ଯ୍ୟନ୍ତ ମାଗଣା ଚିକିତ୍ସା ମିଳେ। ଆପଣଙ୍କ ପାଖରେ ସ୍ୱାସ୍ଥ୍ୟ କାର୍ଡ ଅଛି କି?',
+        pa: 'ਸਰਬੱਤ ਸਿਹਤ ਬੀਮਾ ਅਤੇ ਆਯੁਸ਼ਮਾਨ ਭਾਰਤ ਤਹਿਤ ₹5 ਲੱਖ ਤੱਕ ਮੁਫ਼ਤ ਇਲਾਜ ਮਿਲਦਾ ਹੈ। ਕੀ ਤੁਹਾਡੇ ਕੋਲ ਸਿਹਤ ਕਾਰਡ ਹੈ?',
+        as: 'আয়ুষ্মান অসম আৰু আয়ুষ্মান ভাৰতত ₹৫ লাখলৈকে বিনামূলীয়া চিকিৎসা উপলব্ধ। আপোনাৰ স্বাস্থ্য কাৰ্ড আছে নেকি?',
+        en: 'Ayushman Bharat and State Health Insurance provide up to ₹5 Lakhs free hospitalization. Do you have a health card?',
+      },
+      general: {
+        ta: `வணக்கம்! ${this.currentStateName} மாநிலத்தில் விவசாயம், கல்வி, மகளிர் நலம், முதியோர் ஓய்வூதியம் மற்றும் மருத்துவக் காப்பீடு திட்டங்கள் உள்ளன. உங்களுக்கு எந்தத் துறையின் உதவி தேவைப்படுகிறது?`,
+        te: `నమస్కారం! ${this.currentStateName} లో వ్యవసాయం, విద్య, మహిళా సంక్షేమం, పెన్షన్ మరియు ఆరోగ్య పథకాలు ఉన్నాయి. మీకు ఏ రంగంలో సహాయం కావాలి?`,
+        kn: `ನಮಸ್ಕಾರ! ${this.currentStateName} ನಲ್ಲಿ ಕೃಷಿ, ಶಿಕ್ಷಣ, ಮಹಿಳಾ ಕಲ್ಯಾಣ, ಪಿಂಚಣಿ ಮತ್ತು ಆರೋಗ್ಯ ಯೋಜನೆಗಳಿವೆ. ನಿಮಗೆ ಯಾವ ಯೋಜನೆಯ ಮಾಹಿತಿ ಬೇಕು?`,
+        ml: `നമസ്കാരം! ${this.currentStateName} സംസ്ഥാനത്ത് കൃഷി, വിദ്യാഭ്യാസം, വനിതാ ക്ഷേമം, പെൻഷൻ പദ്ധതികൾ ലഭ്യമാണ്. നിങ്ങൾക്ക് ഏത് സഹായമാണ് വേണ്ടത്?`,
+        hi: `नमस्ते! ${this.currentStateName} में कृषि, छात्रवृत्ति, महिला कल्याण, पेंशन और स्वास्थ्य योजनाएं उपलब्ध हैं। आप किस प्रकार की योजना की जानकारी चाहते हैं?`,
+        mr: `नमस्कार! ${this.currentStateName} मध्ये कृषी, शिक्षण, महिला कल्याण, निवृत्तीवेतन आणि आरोग्य योजना आहेत. आपल्याला कोणत्या योजनेची मदत हवी आहे?`,
+        bn: `নমস্কার! ${this.currentStateName} রাজ্যে কৃষি, শিক্ষা, মহিলা কল্যাণ, বার্ধক্য ভাতা ও স্বাস্থ্য প্রকল্প রয়েছে। আপনি কোন বিষয়ে জানতে চান?`,
+        gu: `નમસ્તે! ${this.currentStateName} માં ખેતી, શિક્ષણ, મહિલા કલ્યાણ, પેન્શન અને આરોગ્ય યોજનાઓ ઉપલબ્ધ છે. તમને કયા ક્ષેત્રની સહાય જોઈએ છે?`,
+        or: `ନମସ୍କାର! ${this.currentStateName} ରେ କୃଷି, ଶିକ୍ଷା, ମହିଳା କଲ୍ୟାଣ, ଭତ୍ତା ଏବଂ ସ୍ୱାସ୍ଥ୍ୟ ଯୋଜନା ଉପଲବ୍ଧ। ଆପଣ କେଉଁ ବିଷୟରେ ଜାଣିବାକୁ ଚାହାଁନ୍ତି?`,
+        pa: `ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ${this.currentStateName} ਵਿੱਚ ਖੇਤੀਬਾੜੀ, ਸਿੱਖਿਆ, ਮਹਿਲਾ ਭਲਾਈ, ਪੈਨਸ਼ਨ ਅਤੇ ਸਿਹਤ ਸਕੀਮਾਂ ਹਨ। ਤੁਹਾਨੂੰ ਕਿਸ ਯੋਜਨਾ ਦੀ ਲੋੜ ਹੈ?`,
+        as: `নমস্কাৰ! ${this.currentStateName} ত কৃষি, শিক্ষা, মহিলা কল্যাণ, পেঞ্চন আৰু স্বাস্থ্য আঁচনিসমূহ উপলব্ধ। আপোনাক কি আঁচনিৰ সহায় লাগে?`,
+        en: `Hello! We have verified government schemes for agriculture, education, women welfare, pensions, and healthcare in ${this.currentStateName}. Which category are you looking for?`,
+      },
+    };
+
+    if (q.includes('விவசாய') || q.includes('farmer') || q.includes('பயிர்') || q.includes('கடன்') || q.includes('കൃഷി') || q.includes('किसान') || q.includes('రైతు') || q.includes('ರೈತ') || q.includes('শেকত') || q.includes('কৃষক') || q.includes('ਖੇਤੀ')) {
+      return sectorReplies.farmer[lang] || sectorReplies.farmer.en;
     }
 
-    if (q.includes('மாணவர்') || q.includes('student') || q.includes('பள்ளி') || q.includes('கல்லூரி') || q.includes('படிப்பு') || q.includes('വിദ്യാർത്ഥി') || q.includes('scholarship')) {
-      if (isTa) return 'மாணவர்களுக்கான புதுமைப் பெண் மற்றும் தமிழ்ப் புதல்வன் திட்டங்கள் மூலம் மாதம் ₹1,000 உதவித்தொகை வழங்கப்படுகிறது. நீங்கள் அரசுப் பள்ளியில் படித்தவரா?';
-      if (isMl) return 'വിദ്യാർത്ഥികൾക്കായി പോസ്റ്റ്-മെട്രിക് സ്കോളർഷിപ്പും ഉന്നത വിദ്യാഭ്യാസ ഗ്രാന്റുകളും ലഭ്യമാണ്. നിങ്ങൾ ഏത് കോഴ്സാണ് പഠിക്കുന്നത്?';
-      if (isHi) return 'छात्रों के लिए पोस्ट-मैट्रिक छात्रवृत्ति और उच्च शिक्षा सहायता उपलब्ध है। आप किस कक्षा या कोर्स में पढ़ रहे हैं?';
-      return 'Students can receive monthly scholarships (₹1,000/month) and tuition fee waivers. Are you studying in government or aided institutions?';
+    if (q.includes('மாணவர்') || q.includes('student') || q.includes('பள்ளி') || q.includes('கல்லூரி') || q.includes('படிப்பு') || q.includes('വിദ്യാർത്ഥി') || q.includes('scholarship') || q.includes('छात्र') || q.includes('విద్యార్థి') || q.includes('ವಿದ್ಯಾರ್ಥಿ') || q.includes('পড়াশোনা')) {
+      return sectorReplies.student[lang] || sectorReplies.student.en;
     }
 
-    if (q.includes('பெண்') || q.includes('women') || q.includes('மகளிர்') || q.includes('தாய்') || q.includes('സ്ത്രീ') || q.includes('mahila')) {
-      if (isTa) return 'மகளிருக்காக கலைஞர் மகளிர் உரிமைத் திட்டம் மூலம் மாதம் ₹1,000 உரிமைத்தொகையும் விடியல் பயணமும் வழங்கப்படுகிறது. உங்களிடம் ஸ்மார்ட் ரேஷன் கார்டு உள்ளதா?';
-      if (isMl) return 'വനിതകൾക്കായി സ്വയംതൊഴിൽ വായ്പകളും കുടുംബശ്രീ സഹായങ്ങളും ലഭ്യമാണ്. നിങ്ങൾക്ക് കൂടുതൽ വിവരങ്ങൾ അറിയണമെന്നുണ്ടോ?';
-      if (isHi) return 'महिलाओं के लिए आजीविका मिशन और मातृत्व वंदना योजना उपलब्ध हैं। क्या आपके पास आधार कार्ड है?';
-      return 'Women can access monthly direct financial aid and zero-fare transit schemes. Do you have a ration card and Aadhaar card ready?';
+    if (q.includes('பெண்') || q.includes('women') || q.includes('மகளிர்') || q.includes('தாய்') || q.includes('സ്ത്രീ') || q.includes('mahila') || q.includes('महिला') || q.includes('మహిళ') || q.includes('ಮಹಿಳೆ') || q.includes('মহিলা')) {
+      return sectorReplies.women[lang] || sectorReplies.women.en;
     }
 
-    if (q.includes('முதியோர்') || q.includes('senior') || q.includes('வயது') || q.includes('pension') || q.includes('பென்ஷன்') || q.includes('പെൻഷൻ')) {
-      if (isTa) return 'முதியோருக்கான இந்திரா காந்தி தேசிய முதியோர் ஓய்வூதியத் திட்டம் (IGNOAPS) மூலம் மாதம் ₹1,000 வழங்கப்படுகிறது. உங்கள் வயது 60க்கு மேல் உள்ளதா?';
-      if (isMl) return 'മുതിർന്ന പൗരന്മാർക്കായി ₹1,600 പ്രതിമാസ പെൻഷൻ പദ്ധതി ലഭ്യമാണ്. അപേക്ഷ സമർപ്പിക്കാൻ സഹായിക്കണോ?';
-      if (isHi) return 'वरिष्ठ नागरिकों के लिए राष्ट्रीय वृद्धावस्था पेंशन योजना उपलब्ध है। क्या आपकी आयु 60 वर्ष से अधिक है?';
-      return 'Senior citizens can receive monthly old-age pensions (IGNOAPS). Is your age 60 years or above?';
+    if (q.includes('முதியோர்') || q.includes('senior') || q.includes('வயது') || q.includes('pension') || q.includes('பென்ஷன்') || q.includes('പെൻഷൻ') || q.includes('पेंशन') || q.includes('పింఛన్') || q.includes('ವೃದ್ಧಾಪ್ಯ') || q.includes('ভাতা')) {
+      return sectorReplies.senior[lang] || sectorReplies.senior.en;
     }
 
-    if (q.includes('மருத்துவ') || q.includes('health') || q.includes('சிகிச்சை') || q.includes('ஆரோக்கிய') || q.includes('ആശുപത്രി')) {
-      if (isTa) return 'முதலமைச்சரின் விரிவான மருத்துவக் காப்பீட்டுத் திட்டம் (CMCHIS) மற்றும் ஆயுஷ்மான் பாரத் மூலம் ₹5 லட்சம் வரை இலவச சிகிச்சை பெறலாம். உங்களிடம் முதலமைச்சர் காப்பீட்டு அட்டை உள்ளதா?';
-      if (isMl) return 'കാരുണ്യ ആരോഗ്യ സുരക്ഷാ പദ്ധതി (KASP) വഴി ₹5 ലക്ഷം വരെയുള്ള സൗജന്യ ചികിത്സ ലഭ്യമാണ്. നിങ്ങളുടെ റേഷൻ കാർഡ് ബിപിഎൽ ആണോ?';
-      if (isHi) return 'आयुष्मान भारत योजना के तहत प्रति वर्ष ₹5 लाख तक का निःशुल्क उपचार उपलब्ध है। क्या आपके पास आयुष्मान कार्ड है?';
-      return 'Ayushman Bharat and State Health Insurance provide up to ₹5 Lakhs free hospitalization per year. Do you have a health card?';
+    if (q.includes('மருத்துவ') || q.includes('health') || q.includes('சிகிச்சை') || q.includes('ஆரோக்கிய') || q.includes('ആശുപത്രി') || q.includes('स्वास्थ्य') || q.includes('ఆరోగ్య') || q.includes('ಆರೋಗ್ಯ') || q.includes('হাসপাতাল')) {
+      return sectorReplies.health[lang] || sectorReplies.health.en;
     }
 
-    if (isTa) return `வணக்கம்! ${this.currentStateName} மாநிலத்தில் விவசாயம், கல்வி, மகளிர் நலம், முதியோர் ஓய்வூதியம் மற்றும் மருத்துவக் காப்பீடு திட்டங்கள் உள்ளன. உங்களுக்கு எந்தத் துறையின் உதவி தேவைப்படுகிறது?`;
-    if (isMl) return `നമസ്കാരം! കൃഷി, വിദ്യാഭ്യാസം, വനിതാ ക്ഷേമം, പെൻഷൻ പദ്ധതികളെക്കുറിച്ച് അറിയാൻ സഹായിക്കാം. നിങ്ങൾക്ക് ഏത് സഹായമാണ് വേണ്ടത്?`;
-    if (isHi) return `नमस्ते! कृषि, छात्रवृत्ति, महिला कल्याण, पेंशन और स्वास्थ्य योजनाओं की जानकारी उपलब्ध है। आप किस प्रकार की योजना चाहते हैं?`;
-    return `Hello! We have verified government schemes for agriculture, education, women empowerment, pensions, and healthcare in ${this.currentStateName}. Which category are you looking for?`;
+    return sectorReplies.general[lang] || sectorReplies.general.en;
   }
 
   public async speak(text: string): Promise<void> {
