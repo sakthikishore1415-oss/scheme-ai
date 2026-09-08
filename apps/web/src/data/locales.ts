@@ -14,6 +14,7 @@ export interface RegionalVoicePack {
   incomeQuestion: string;
   districtQuestion: string;
   needQuestion: string;
+  landQuestion?: string;
   evaluatingPrompt: string;
   matchedHeading: (count: number) => string;
   whyMeHeading: string;
@@ -67,6 +68,7 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     incomeQuestion: 'உங்கள் குடும்பத்தின் தோராயமான ஆண்டு வருமானம் என்ன?',
     districtQuestion: 'நீங்கள் எந்த மாவட்டத்தைச் சேர்ந்தவர்?',
     needQuestion: 'உங்களுக்கு எந்த பிரிவில் உதவி வேண்டும்? (விவசாயம், கல்வி, வீடு, மகளிர் நலன்)',
+    landQuestion: 'உங்களுக்கு விவசாய நிலம் உள்ளதா?',
     evaluatingPrompt: 'உங்கள் தகவல்களை வைத்து தகுதியான அரசு திட்டங்களை தேடுகிறோம்...',
     matchedHeading: (count) => `வாழ்த்துகள்! உங்கள் தகுதிக்கு ஏற்ப ${count} சாத்தியமான திட்டங்கள் கண்டறியப்பட்டுள்ளன.`,
     whyMeHeading: 'இந்த திட்டம் உங்களுக்கு ஏன் பொருந்துகிறது?',
@@ -109,6 +111,7 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     incomeQuestion: 'आपके परिवार की अनुमानित वार्षिक आय कितनी है?',
     districtQuestion: 'आप किस जिले से हैं?',
     needQuestion: 'आपको किस क्षेत्र में सहायता चाहिए? (कृषि, शिक्षा, आवास, स्वास्थ्य, पेंशन)',
+    landQuestion: 'क्या आपके या आपके परिवार के पास कृषि भूमि है?',
     evaluatingPrompt: 'आपकी योग्यता के अनुसार उपयुक्त सरकारी योजनाओं की खोज हो रही है...',
     matchedHeading: (count) => `बधाई हो! आपकी जानकारी के अनुसार ${count} संभावित योजनाएं पाई गई हैं।`,
     whyMeHeading: 'यह योजना आपके लिए क्यों उपयुक्त है?',
@@ -148,6 +151,7 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     incomeQuestion: 'കുടുംബത്തിന്റെ ഏകദേശ വാർഷിക വരുമാനം എത്രയാണ്?',
     districtQuestion: 'ഏത് ജില്ലയിലാണ് താമസം?',
     needQuestion: 'ഏത് മേഖലയിലാണ് സഹായം ആവശ്യം? (കൃഷി, വിദ്യാഭ്യാസം, വീട്, ആരോഗ്യം)',
+    landQuestion: 'നിങ്ങൾക്കോ നിങ്ങളുടെ കുടുംബത്തിനോ കൃഷിഭൂമിയുണ്ടോ?',
     evaluatingPrompt: 'നിങ്ങൾക്ക് അനുയോജ്യമായ പദ്ധതികൾ കണ്ടെത്തുന്നു...',
     matchedHeading: (count) => `അഭിനന്ദനങ്ങൾ! താങ്കൾക്ക് അനുയോജ്യമായ ${count} പദ്ധതികൾ ലഭ്യമാണ്.`,
     whyMeHeading: 'ഈ പദ്ധതി താങ്കൾക്ക് എന്തുകൊണ്ട് അനുയോജ്യമാണ്?',
@@ -184,6 +188,7 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     incomeQuestion: 'ನಿಮ್ಮ ಕುಟುಂಬದ ವಾರ್ಷಿಕ ಆದಾಯ ಎಷ್ಟು?',
     districtQuestion: 'ನೀವು ಯಾವ ಜಿಲ್ಲೆಯವರು?',
     needQuestion: 'ಯಾವ ಕ್ಷೇತ್ರದಲ್ಲಿ ನೆರವು ಬೇಕು? (ಕೃಷಿ, ಶಿಕ್ಷಣ, ವಸತಿ, ಮಹಿಳಾ ಕಲ್ಯಾಣ)',
+    landQuestion: 'ನಿಮಗೆ ಅಥವಾ ನಿಮ್ಮ ಕುಟುಂಬಕ್ಕೆ ಕೃಷಿ ಜಮೀನಿದೆಯೇ?',
     evaluatingPrompt: 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್‌ಗೆ ಸೂಕ್ತವಾದ ಯೋಜನೆಗಳನ್ನು ಹುಡುಕಲಾಗುತ್ತಿದೆ...',
     matchedHeading: (count) => `ಅಭಿನಂದನೆಗಳು! ನಿಮ್ಮ ಅರ್ಹತೆಗೆ ತಕ್ಕಂತೆ ${count} ಯೋಜನೆಗಳು ಲಭ್ಯವಿದೆ.`,
     whyMeHeading: 'ಈ ಯೋಜನೆ ನಿಮಗೆ ಏಕೆ ಸೂಕ್ತವಾಗಿದೆ?',
@@ -220,6 +225,7 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     incomeQuestion: 'మీ కుటుంబ వార్షిక ఆదాయం సుమారుగా ఎంత?',
     districtQuestion: 'మీ జిల్లా ఏది?',
     needQuestion: 'మీకు ఏ రంగంలో సహాయం కావాలి? (వ్యవసాయం, చదువు, ఇల్లు, మహిళా సంక్షేమం)',
+    landQuestion: 'మీకు లేదా మీ కుటుంబానికి వ్యవసాయ భూమి ఉందా?',
     evaluatingPrompt: 'మీ అర్హతకు తగిన ప్రభుత్వ పథకాలను వెతుకుతున్నాము...',
     matchedHeading: (count) => `అభినందనలు! మీ వివరాలకు సంబంధించి ${count} పథకాలు లభించాయి.`,
     whyMeHeading: 'ఈ పథకం మీకు ఎందుకు సరిపోతుంది?',
@@ -250,6 +256,7 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     incomeQuestion: 'আপনার পরিবারের আনুমানিক বার্ষিক আয় কত?',
     districtQuestion: 'আপনার জেলা কোনটি?',
     needQuestion: 'কোন বিষয়ে সাহায্য চাই? (কৃষি, শিক্ষা, আবাসন, স্বাস্থ্য, কর্মসংস্থান)',
+    landQuestion: 'আপনার বা আপনার পরিবারের কি কোনো কৃষি জমি আছে?',
     evaluatingPrompt: 'আপনার জন্য উপযুক্ত সরকারি প্রকল্প খোঁজা হচ্ছে...',
     matchedHeading: (count) => `অভিনন্দন! আপনার জন্য ${count}টি সম্ভাব্য প্রকল্প পাওয়া গেছে।`,
     whyMeHeading: 'এই প্রকল্প আপনার জন্য কেন উপযুক্ত?',
@@ -280,6 +287,7 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     incomeQuestion: 'कुटुंबाचे अंदाजे वार्षिक उत्पन्न किती आहे?',
     districtQuestion: 'आपला जिल्हा कोणता?',
     needQuestion: 'कोणत्या क्षेत्रात मदत हवी आहे? (शेती, शिक्षण, घरकुल, आरोग्य)',
+    landQuestion: 'तुमच्याकडे किंवा तुमच्या कुटुंबाकडे शेतजमीन आहे का?',
     evaluatingPrompt: 'तुमच्यासाठी योग्य योजना शोधत आहोत...',
     matchedHeading: (count) => `अभिनंदन! आपल्या पात्रतेनुसार ${count} योजना उपलब्ध आहेत.`,
     whyMeHeading: 'ही योजना आपल्यासाठी का योग्य आहे?',
@@ -310,6 +318,7 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     incomeQuestion: 'તમારા કુટુંબની અંદાજિત વાર્ષિક આવક કેટલી છે?',
     districtQuestion: 'તમારો જિલ્લો કયો છે?',
     needQuestion: 'કયા ક્ષેત્રમાં મદદ જોઈએ છે? (ખેતી, શિક્ષણ, આવાસ, ધંધો)',
+    landQuestion: 'શું તમારી કે તમારા પરિવારની પાસે કૃષિ જમીન છે?',
     evaluatingPrompt: 'તમારા માટે યોગ્ય યોજનાઓ શોધી રહ્યા છીએ...',
     matchedHeading: (count) => `અભિનંદન! તમારી યોગ્યતા મુજબ ${count} સંભવિત યોજનાઓ મળી છે.`,
     whyMeHeading: 'આ યોજના તમારા માટે કેમ યોગ્ય છે?',
@@ -340,6 +349,7 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     incomeQuestion: 'ପରିବାରର ଆନୁମାନିକ ବାର୍ଷିକ ଆୟ କେତେ?',
     districtQuestion: 'ଆପଣ କେଉଁ ଜିଲ୍ଲାର?',
     needQuestion: 'କେଉଁ ବିଷୟରେ ସାହାଯ୍ୟ ଦରକାର? (କୃଷି, ଶିକ୍ଷା, ଆବାସ, ସ୍ୱାସ୍ଥ୍ୟ)',
+    landQuestion: 'ଆପଣଙ୍କର କିମ୍ବା ଆପଣଙ୍କ ପରିବାରର କୃଷି ଜମି ଅଛି କି?',
     evaluatingPrompt: 'ଆପଣଙ୍କ ପାଇଁ ଯୋଜନା ଖୋଜା ଚାଲିଛି...',
     matchedHeading: (count) => `ଅଭିନନ୍ଦନ! ଆପଣଙ୍କ ପାଇଁ ${count}ଟି ଯୋଜନା ମିଳିଛି।`,
     whyMeHeading: 'ଏହି ଯୋଜନା ଆପଣଙ୍କ ପାଇଁ କାହିଁକି ଉପଯୁକ୍ତ?',
@@ -370,6 +380,7 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     incomeQuestion: 'ਤੁਹਾਡੀ ਸਾਲਾਨਾ ਪਰਿਵਾਰਕ ਆਮਦਨ ਕਿੰਨੀ ਹੈ?',
     districtQuestion: 'ਤੁਹਾਡਾ ਜ਼ਿਲ੍ਹਾ ਕਿਹੜਾ ਹੈ?',
     needQuestion: 'ਕਿਸ ਖੇਤਰ ਵਿੱਚ ਸਹਾਇਤਾ ਚਾਹੀਦੀ ਹੈ? (ਖੇਤੀਬਾੜੀ, ਸਿੱਖਿਆ, ਮਕਾਨ, ਸਿਹਤ)',
+    landQuestion: 'ਕੀ ਤੁਹਾਡੇ ਜਾਂ ਤੁਹਾਡੇ ਪਰਿਵਾਰ ਕੋਲ ਖੇਤੀਬਾੜੀ ਜ਼ਮੀਨ ਹੈ?',
     evaluatingPrompt: 'ਤੁਹਾਡੇ ਲਈ ਢੁਕਵੀਆਂ ਯੋਜਨਾਵਾਂ ਲੱਭ ਰਹੇ ਹਾਂ...',
     matchedHeading: (count) => `ਮੁਬਾਰਕਾਂ! ਤੁਹਾਡੀ ਜਾਣਕਾਰੀ ਮੁਤਾਬਕ ${count} ਯੋਜਨਾਵਾਂ ਮਿਲੀਆਂ ਹਨ।`,
     whyMeHeading: 'ਇਹ ਯੋਜਨਾ ਤੁਹਾਡੇ ਲਈ ਕਿਉਂ ਢੁਕਵੀਂ ਹੈ?',
@@ -400,6 +411,7 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     incomeQuestion: 'আপোনাৰ পৰিয়ালৰ আনুমানিক বাৰ্ষিক আয় কিমান?',
     districtQuestion: 'আপোনাৰ জিলা কি?',
     needQuestion: 'কোন ক্ষেত্ৰত সাহায্য লাগে? (কৃষি, শিক্ষা, গৃহ, স্বাস্থ্য)',
+    landQuestion: 'আপোনাৰ বা আপোনাৰ পৰিয়ালৰ কৃষি ভূমি আছে নেকি?',
     evaluatingPrompt: 'আপোনাৰ বাবে উপযুক্ত আঁচনি বিচৰা হৈছে...',
     matchedHeading: (count) => `অভিনন্দন! আপোনাৰ তথ্যৰ ভিত্তিত ${count}খন আঁচনি পোৱা গৈছে।`,
     whyMeHeading: 'এই আঁচনিখন আপোনাৰ বাবে কিয় উপযুক্ত?',
@@ -439,6 +451,7 @@ export const REGIONAL_VOICE_PACKS: Record<string, RegionalVoicePack> = {
     incomeQuestion: 'What is your approximate annual family income?',
     districtQuestion: 'Which district are you from?',
     needQuestion: 'Which area do you need support in? (Agriculture, Education, Housing, Health, Pension)',
+    landQuestion: 'Do you or your family own agricultural land?',
     evaluatingPrompt: 'Checking deterministic eligibility criteria across Central and State schemes...',
     matchedHeading: (count) => `We found ${count} potential scheme matches based on your profile.`,
     whyMeHeading: 'Why did we match this scheme to you?',

@@ -1,4 +1,4 @@
-﻿/* @ts-nocheck -- React type declarations are provided by the consuming app. */
+/* @ts-nocheck -- React type declarations are provided by the consuming app. */
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { NEED_CATEGORIES } from '../data/categories';
@@ -272,7 +272,7 @@ export const AdaptiveQuestionWizard: React.FC = () => {
               5. Do you or your family own agricultural land?
             </h4>
             <button
-              onClick={() => speakQuestion(selectedVoiceLanguageId === 'ta' ? 'உங்களுக்கு விவசாய நிலம் உள்ளதா?' : 'Do you or your family own agricultural land?')}
+              onClick={() => speakQuestion(voicePack.landQuestion || 'Do you or your family own agricultural land?')}
               className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 cursor-pointer"
               title="Hear Question in Regional Language"
             >

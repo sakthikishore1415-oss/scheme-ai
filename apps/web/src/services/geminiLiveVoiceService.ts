@@ -100,6 +100,7 @@ export class GeminiLiveVoiceService {
     stateName: string,
     callbacks: GeminiLiveVoiceCallbacks
   ): Promise<void> {
+    speechService.unlockAudio();
     this.callbacks = callbacks;
     this.currentLanguageId = languageId;
     this.currentStateName = stateName;
@@ -816,7 +817,8 @@ CRITICAL VOICE RULES:
         }),
       });
 
-      if (ttsRes.ok) {
+      const contentType = ttsRes.headers.get('content-type') || '';
+      if (ttsRes.ok && contentType.includes('application/json')) {
         const ttsData = await ttsRes.json();
         if (ttsData.audio) {
           await this.playGeminiAudio(ttsData.audio);

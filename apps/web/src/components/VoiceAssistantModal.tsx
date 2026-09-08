@@ -118,10 +118,25 @@ export const VoiceAssistantModal: React.FC = () => {
       }
     );
 
-    // If a specific scheme was tagged (e.g. from HEAR button), automatically trigger its explanation
+    // If a specific scheme was tagged (e.g. from HEAR button), automatically trigger its explanation in the chosen language
     if (taggedSchemeForVoice) {
       const scheme = taggedSchemeForVoice;
-      const initialPrompt = `Please explain the scheme "${scheme.name}" (${scheme.nativeName || ''}) in simple terms in this language. Tell me what benefit it provides, who is eligible, and what documents are required.`;
+      const lang = selectedVoiceLanguageId;
+      const initialPrompts: Record<string, string> = {
+        ta: `"${scheme.name}" (${scheme.nativeName || ''}) திட்டம் பற்றி எளிய தமிழில் விளக்குங்கள். இதன் நன்மைகள், தகுதிகள் மற்றும் தேவையான ஆவணங்கள் என்ன?`,
+        hi: `"${scheme.name}" (${scheme.nativeName || ''}) योजना के बारे में सरल हिंदी में बताएं। इसके लाभ, पात्रता और आवश्यक दस्तावेज क्या हैं?`,
+        ml: `"${scheme.name}" (${scheme.nativeName || ''}) പദ്ധതിയെക്കുറിച്ച് ലളിതമായ മലയാളത്തിൽ പറയൂ. ഇതിന്റെ ആനുകൂല്യങ്ങളും അർഹതയും രേഖകളും എന്തൊക്കെയാണ്?`,
+        te: `"${scheme.name}" (${scheme.nativeName || ''}) పథకం గురించి సులభమైన తెలుగులో వివరించండి. దీని ప్రయోజనాలు, అర్హతలు మరియు కావలసిన పత్రాలు ఏమిటి?`,
+        kn: `"${scheme.name}" (${scheme.nativeName || ''}) ಯೋಜನೆಯ ಬಗ್ಗೆ ಸರಳ ಕನ್ನಡದಲ್ಲಿ ತಿಳಿಸಿ. ಇದರ ಪ್ರಯೋಜನಗಳು, ಅರ್ಹತೆ ಮತ್ತು ಅಗತ್ಯ ದಾಖಲೆಗಳು ಯಾವುವು?`,
+        mr: `"${scheme.name}" (${scheme.nativeName || ''}) योजनेबद्दल सोप्या मराठीत सांगा. याचे फायदे, पात्रता आणि आवश्यक कागदपत्रे कोणती आहेत?`,
+        bn: `"${scheme.name}" (${scheme.nativeName || ''}) প্রকল্প সম্পর্কে সহজ বাংলায় বিবরণ দিন। এর সুবিধা, যোগ্যতা ও প্রয়োজনীয় কাগজপত্র কী কী?`,
+        gu: `"${scheme.name}" (${scheme.nativeName || ''}) યોજના વિશે સરળ ગુજરાતીમાં સમજાવો. તેના લાભો, પાત્રતા અને જરૂરી દસ્તાવેજો કયા છે?`,
+        or: `"${scheme.name}" (${scheme.nativeName || ''}) ଯୋଜନା ବିଷୟରେ ସରଳ ଓଡ଼ିଆରେ କୁହନ୍ତୁ। ଏହାର ଲାଭ, ଯୋଗ୍ୟତା ଏବଂ ଆବଶ୍ୟକ କାଗଜପତ୍ର କ’ଣ?`,
+        pa: `"${scheme.name}" (${scheme.nativeName || ''}) ਸਕੀਮ ਬਾਰੇ ਸਰਲ ਪੰਜਾਬੀ ਵਿੱਚ ਦੱਸੋ। ਇਸਦੇ ਲਾਭ, ਯੋਗਤਾ ਅਤੇ ਜ਼ਰੂਰੀ ਦਸਤਾਵੇਜ਼ ਕਿਹੜੇ ਹਨ?`,
+        as: `"${scheme.name}" (${scheme.nativeName || ''}) আঁচনিৰ বিষয়ে সৰল অসমীয়াত বুজাই দিয়ক। ইয়াৰ সুবিধা, যোগ্যতা আৰু প্ৰয়োজনীয় নথিপত্ৰ কি কি?`,
+        en: `Please explain the scheme "${scheme.name}" (${scheme.nativeName || ''}) in simple terms in English. Tell me what benefit it provides, who is eligible, and what documents are required.`,
+      };
+      const initialPrompt = initialPrompts[lang] || initialPrompts.en;
       setTimeout(() => {
         geminiLiveVoiceService.sendTextMessage(initialPrompt);
       }, 600);
@@ -417,14 +432,48 @@ export const VoiceAssistantModal: React.FC = () => {
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     type="button"
-                    onClick={() => geminiLiveVoiceService.sendTextMessage(`Am I eligible for ${taggedSchemeForVoice.name}?`)}
+                    onClick={() => {
+                      const lang = selectedVoiceLanguageId;
+                      const eligibilityPrompts: Record<string, string> = {
+                        ta: `நான் "${taggedSchemeForVoice.name}" திட்டத்திற்கு தகுதியானவனா?`,
+                        hi: `क्या मैं "${taggedSchemeForVoice.name}" योजना के लिए पात्र हूँ?`,
+                        ml: `ഞാൻ "${taggedSchemeForVoice.name}" പദ്ധതിക്ക് അർഹനാണോ?`,
+                        te: `నేను "${taggedSchemeForVoice.name}" పథకానికి అర్హుడనా?`,
+                        kn: `ನಾನು "${taggedSchemeForVoice.name}" ಯೋಜನೆಗೆ ಅರ್ಹನೇ?`,
+                        mr: `मी "${taggedSchemeForVoice.name}" योजनेसाठी पात्र आहे का?`,
+                        bn: `আমি কি "${taggedSchemeForVoice.name}" প্রকল্পের জন্য যোগ্য?`,
+                        gu: `શું હું "${taggedSchemeForVoice.name}" યોજના માટે યોગ્ય છું?`,
+                        or: `ମୁଁ "${taggedSchemeForVoice.name}" ଯୋଜନା ପାଇଁ ଯୋଗ୍ୟ କି?`,
+                        pa: `ਕੀ ਮੈਂ "${taggedSchemeForVoice.name}" ਸਕੀਮ ਲਈ ਯੋਗ ਹਾਂ?`,
+                        as: `মই "${taggedSchemeForVoice.name}" আঁচনিৰ বাবে যোগ্য নেকি?`,
+                        en: `Am I eligible for ${taggedSchemeForVoice.name}?`,
+                      };
+                      geminiLiveVoiceService.sendTextMessage(eligibilityPrompts[lang] || eligibilityPrompts.en);
+                    }}
                     className="hidden sm:inline-block px-2.5 py-1 rounded-lg bg-[#6b3548] hover:bg-[#874d60] text-white text-[11px] font-bold transition-colors cursor-pointer border border-[#e8e1dc]/20"
                   >
                     Eligibility?
                   </button>
                   <button
                     type="button"
-                    onClick={() => geminiLiveVoiceService.sendTextMessage(`What documents are required for ${taggedSchemeForVoice.name}?`)}
+                    onClick={() => {
+                      const lang = selectedVoiceLanguageId;
+                      const docPrompts: Record<string, string> = {
+                        ta: `"${taggedSchemeForVoice.name}" திட்டத்திற்கு என்னென்ன ஆவணங்கள் தேவை?`,
+                        hi: `"${taggedSchemeForVoice.name}" योजना के लिए कौन से दस्तावेज आवश्यक हैं?`,
+                        ml: `"${taggedSchemeForVoice.name}" പദ്ധതിക്ക് ഏതെല്ലാം രേഖകൾ വേണം?`,
+                        te: `"${taggedSchemeForVoice.name}" పథకానికి ఏ పత్రాలు అవసరం?`,
+                        kn: `"${taggedSchemeForVoice.name}" ಯೋಜನೆಗೆ ಯಾವ ದಾಖಲೆಗಳು ಬೇಕು?`,
+                        mr: `"${taggedSchemeForVoice.name}" योजनेसाठी कोणती कागदपत्रे लागतील?`,
+                        bn: `"${taggedSchemeForVoice.name}" প্রকল্পের জন্য কী কী কাগজপত্র প্রয়োজন?`,
+                        gu: `"${taggedSchemeForVoice.name}" યોજના માટે કયા દસ્તાવેજો જોઈએ?`,
+                        or: `"${taggedSchemeForVoice.name}" ଯୋଜନା ପାଇଁ କେଉଁ କାଗଜପତ୍ର ଆବଶ୍ୟକ?`,
+                        pa: `"${taggedSchemeForVoice.name}" ਸਕੀਮ ਲਈ ਕਿਹੜੇ ਦਸਤਾਵੇਜ਼ ਚਾਹੀਦੇ ਹਨ?`,
+                        as: `"${taggedSchemeForVoice.name}" আঁচনিৰ বাবে কি কি নথিপত্ৰ লাগে?`,
+                        en: `What documents are required for ${taggedSchemeForVoice.name}?`,
+                      };
+                      geminiLiveVoiceService.sendTextMessage(docPrompts[lang] || docPrompts.en);
+                    }}
                     className="hidden sm:inline-block px-2.5 py-1 rounded-lg bg-[#6b3548] hover:bg-[#874d60] text-white text-[11px] font-bold transition-colors cursor-pointer border border-[#e8e1dc]/20"
                   >
                     Documents?

@@ -27,6 +27,22 @@ class SpeechService {
     return this.speechRate;
   }
 
+  public unlockAudio() {
+    if (typeof window === 'undefined') return;
+    if ('speechSynthesis' in window) {
+      try {
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+      } catch (_) {}
+    }
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      try {
+        this.audioContext.resume();
+      } catch (_) {}
+    }
+  }
+
   public speak(
     text: string,
     langId: string = 'ta',
@@ -46,6 +62,7 @@ class SpeechService {
     }
 
     this.stop();
+    this.unlockAudio();
 
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
       this.simulateSpeechAudio(cleanText, onStart, onEnd);
@@ -64,18 +81,20 @@ class SpeechService {
       utterance.lang = bcp47;
       utterance.rate = overrideRate || this.speechRate;
       utterance.pitch = 1.0;
+      utterance.volume = 1.0;
 
-      // Find matching system voice for this specific language ONLY
+      // Look for authentic native voice matching language code or name (e.g. ta, hi, te, kn, ml, mr, bn, gu, or, pa, as, etc.)
       const voices = window.speechSynthesis.getVoices();
       const targetCode = bcp47.toLowerCase();
       const langPrefix = (langConfig.id || 'ta').toLowerCase();
 
-      // Look for authentic native voice matching language code (e.g. ta, hi, te, kn, ml, etc.)
       const matchingVoice = voices.find(
         (v) =>
           v.lang.toLowerCase() === targetCode ||
           v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix) ||
-          (v.lang.toLowerCase().includes(langPrefix) && !v.lang.toLowerCase().startsWith('en'))
+          (v.lang.toLowerCase().includes(langPrefix) && !v.lang.toLowerCase().startsWith('en')) ||
+          v.name.toLowerCase().includes(langConfig.name.toLowerCase()) ||
+          v.name.toLowerCase().includes(langConfig.nativeName.toLowerCase())
       );
 
       if (matchingVoice) {
@@ -118,18 +137,21 @@ class SpeechService {
         }
       }, expectedDurationMs);
 
-      // Speak with safe microtask delay
+      // Speak with safe microtask delay (60ms allows Chrome speech engine pipeline to reset after cancel)
       setTimeout(() => {
         try {
           if (window.speechSynthesis.paused) {
             window.speechSynthesis.resume();
           }
           window.speechSynthesis.speak(utterance);
+          if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
         } catch (err) {
           console.warn('SpeechSynthesis speak fallback:', err);
           finishUtterance();
         }
-      }, 20);
+      }, 60);
     } catch (err) {
       console.warn('Failed to initialize speech utterance:', err);
       if (onEnd) onEnd();
