@@ -121,13 +121,27 @@ export class GeminiLiveVoiceService {
     const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRec) {
-      console.warn('Web Speech recognition not natively supported in this browser, running in interactive text and speech-synthesis mode.');
+      const noSpeechRecNotices: Record<string, string> = {
+        ta: 'வணக்கம்! கீழே தட்டச்சு செய்து கேள்வி கேட்கலாம். நேரடி குரல் பதிவுக்கு கூகுள் குரோம் பயன்படுத்தலாம்.',
+        hi: 'नमस्ते! आप नीचे टाइप करके प्रश्न पूछ सकते हैं। सीधे वॉइस माइक के लिए गूगल क्रोम का उपयोग करें।',
+        te: 'నమస్కారం! మీరు క్రింద టైప్ చేయడం ద్వారా ప్రశ్నలను అడగవచ్చు. డైరెక్ట్ వాయిస్ మైక్ కోసం గూగుల్ క్రోమ్ ఉపయోగించండి.',
+        kn: 'ನಮಸ್ಕಾರ! ನೀವು ಕೆಳಗೆ ಟೈಪ್ ಮಾಡುವ ಮೂಲಕ ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಬಹುದು. ನೇರ ವಾಯ್ಸ್ ಮೈಕ್‌ಗಾಗಿ ಗೂಗಲ್ ಕ್ರೋಮ್ ಬಳಸಿ.',
+        ml: 'നമസ്കാരം! താഴെ ടൈപ്പ് ചെയ്ത ചോദ്യങ്ങൾ ചോദിക്കാം. നേരിട്ടുള്ള ശബ്ദത്തിന് ഗൂഗിൾ ക്രോം ഉപയോഗിക്കുക.',
+        mr: 'नमस्कार! आपण खाली टाईप करून प्रश्न विचारू शकता. थेट व्हॉइस मायक्रोफोनसाठी गूगल क्रोम वापरा.',
+        bn: 'নমস্কার! নিচে টাইপ করে প্রশ্ন জিজ্ঞাসা করতে পারেন। সরাসরি ভয়েস মাইকের জন্য গুগল ক্রোম ব্যবহার করুন।',
+        gu: 'નમસ્તે! તમે નીચે ટાઈપ કરીને પ્રશ્નો પૂછી શકો છો. સીધા વોઈસ માઈક માટે ગૂગલ ક્રોમનો ઉપયોગ કરો.',
+        or: 'ନମସ୍କାର! ଆପଣ ତଳେ ଟାଇପ୍ କରି ପ୍ରଶ୍ନ ପଚାରିପାରିବେ। ସିଧାସଳଖ ଭଏସ୍ ମାଇକ୍ ପାଇଁ ଗୁଗଲ୍ କ୍ରୋମ୍ ବ୍ୟବହାର କରନ୍ତୁ।',
+        pa: 'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਤੁਸੀਂ ਹੇਠਾਂ ਟਾਈਪ ਕਰਕੇ ਸਵਾਲ ਪੁੱਛ ਸਕਦੇ ਹੋ। ਸਿੱਧੇ ਵਾਇਸ ਮਾਈਕ ਲਈ ਗੂਗਲ ਕਰੋਮ ਦੀ ਵਰਤੋਂ ਕਰੋ।',
+        as: 'নমস্কাৰ! আপুনি তলত টাইপ কৰি প্ৰশ্ন সুধিব পাৰে। প্ৰত্যক্ষ ভয়েছ মাইকৰ বাবে গুগল ক্ৰোম ব্যৱহাৰ কৰক।',
+        en: 'Hello! Speech recognition is available via typing below. You can also use Google Chrome for direct voice mic.',
+      };
+      const notif = noSpeechRecNotices[this.currentLanguageId] || noSpeechRecNotices.en;
       this.setState('IDLE');
       this.isListeningActive = false;
       callbacks.onMessage?.({
         id: `asst-${Date.now()}`,
         role: 'assistant',
-        text: 'வணக்கம்! Speech recognition is available via typing below. You can also use Google Chrome for direct voice mic.',
+        text: notif,
         timestamp: Date.now(),
         audioVoice: 'Arivom Scheme Advisor',
       });
@@ -509,7 +523,21 @@ export class GeminiLiveVoiceService {
       this.conversationHistory.push({ role: 'assistant', text: responseText });
       await this.speak(responseText);
     } else {
-      const fallback = "I didn't quite catch that. Could you please say that again?";
+      const fallbackNotices: Record<string, string> = {
+        ta: 'மன்னிக்கவும், தெளிவாகக் கேட்கவில்லை. மீண்டும் கூறுங்கள் அல்லது கீழே தட்டச்சு செய்யுங்கள்.',
+        hi: 'क्षमा करें, स्पष्ट सुनाई नहीं दिया। कृपया पुनः बोलें या नीचे टाइप करें।',
+        te: 'క్షమించండి, స్పష్టంగా వినపడలేదు. దయచేసి మళ్లీ చెప్పండి లేదా టైప్ చేయండి.',
+        kn: 'ಕ್ಷಮಿಸಿ, ಸ್ಪಷ್ಟವಾಗಿ ಕೇಳಿಸಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೊಮ್ಮೆ ಹೇಳಿ ಅಥವಾ ಟೈಪ್ ಮಾಡಿ.',
+        ml: 'ക്ഷമിക്കണം, വ്യക്തമായി കേട്ടില്ല. ദയവായി വീണ്ടും പറയുക അല്ലെങ്കിൽ ടൈപ്പ് ചെയ്യുക.',
+        mr: 'माफ करा, स्पष्ट ऐकू आले नाही. कृपया पुन्हा बोला किंवा टाईप करा.',
+        bn: 'দুঃখিত, পরিষ্কার শোনা যায়নি। অনুগ্রহ করে আবার বলুন বা টাইপ করুন।',
+        gu: 'માફ કરશો, સ્પષ્ટ સંભળાયું નથી. કૃપા કરીને ફરી બોલો અથવા ટાઈપ કરો.',
+        or: 'କ୍ଷମା କରିବେ, ସ୍ପଷ୍ଟ ଶୁଣାଗଲାନାହିଁ। ଦୟାକରି ପୁଣି କୁହନ୍ତୁ କିମ୍ବା ଟାଇପ୍ କରନ୍ତୁ।',
+        pa: 'ਮੁਆਫ਼ ਕਰਨਾ, ਸਪੱਸ਼ਟ ਨਹੀਂ ਸੁਣਿਆ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਬੋਲੋ ਜਾਂ ਟਾਈਪ ਕਰੋ।',
+        as: 'ক্ষমা কৰিব, স্পষ্টকৈ শুના নগ’ল। অনুগ্ৰহ কৰি পুনৰ কওক বা টাইপ কৰক।',
+        en: "I didn't quite catch that. Could you please say that again or type below?",
+      };
+      const fallback = fallbackNotices[this.currentLanguageId] || fallbackNotices.en;
       await this.speak(fallback);
     }
   }
@@ -791,29 +819,67 @@ CRITICAL VOICE RULES:
     return sectorReplies.general[lang] || sectorReplies.general.en;
   }
 
+  public getGeminiVoiceForLanguage(langId: string): string {
+    const map: Record<string, string> = {
+      ta: 'Aoede',
+      hi: 'Kore',
+      te: 'Fenrir',
+      kn: 'Aoede',
+      ml: 'Charon',
+      mr: 'Kore',
+      bn: 'Puck',
+      gu: 'Zephyr',
+      or: 'Kore',
+      pa: 'Fenrir',
+      as: 'Aoede',
+      en: 'Kore',
+    };
+    return map[langId] || 'Kore';
+  }
+
   public async speak(text: string): Promise<void> {
     const cleanText = text.replace(/[*_#`]/g, '').trim();
     if (!cleanText) return;
+
+    const currentVoice = this.getGeminiVoiceForLanguage(this.currentLanguageId);
+    this.selectedVoice = currentVoice;
 
     this.callbacks?.onMessage({
       id: `asst-${Date.now()}`,
       role: 'assistant',
       text: cleanText,
       timestamp: Date.now(),
-      audioVoice: this.selectedVoice,
+      audioVoice: currentVoice,
     });
 
     this.setState('SPEAKING');
 
     // 1. Primary: High-Definition Gemini Voice via Server TTS (gemini-3.1-flash-tts-preview)
     try {
+      const bcp47Map: Record<string, string> = {
+        ta: 'ta-IN',
+        ml: 'ml-IN',
+        kn: 'kn-IN',
+        te: 'te-IN',
+        hi: 'hi-IN',
+        mr: 'mr-IN',
+        bn: 'bn-IN',
+        gu: 'gu-IN',
+        or: 'or-IN',
+        pa: 'pa-IN',
+        as: 'as-IN',
+        en: 'en-IN',
+      };
+      const bcp47Code = bcp47Map[this.currentLanguageId] || 'ta-IN';
+
       const ttsRes = await fetch('/api/gemini-tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: cleanText,
-          voiceName: this.selectedVoice,
+          voiceName: currentVoice,
           languageId: this.currentLanguageId,
+          bcp47Code: bcp47Code,
         }),
       });
 
@@ -1058,6 +1124,7 @@ CRITICAL VOICE RULES:
 
   public setLanguage(languageId: string): void {
     this.currentLanguageId = languageId;
+    this.selectedVoice = this.getGeminiVoiceForLanguage(languageId);
     const bcp47Map: Record<string, string> = {
       ta: 'ta-IN',
       en: 'en-IN',

@@ -254,7 +254,26 @@ function geminiLiveServerPlugin(): Plugin {
 
             const parsed = JSON.parse(body || '{}');
             const textToSpeak = (parsed.text || '').trim();
-            const voiceName = parsed.voiceName || 'Kore'; // 'Kore', 'Puck', 'Charon', 'Fenrir', 'Zephyr'
+            const languageId = (parsed.languageId || 'ta').toLowerCase();
+            
+            const LANGUAGE_VOICE_MAP: Record<string, string> = {
+              ta: 'Aoede',
+              hi: 'Kore',
+              te: 'Fenrir',
+              kn: 'Aoede',
+              ml: 'Charon',
+              mr: 'Kore',
+              bn: 'Puck',
+              gu: 'Zephyr',
+              or: 'Kore',
+              pa: 'Fenrir',
+              as: 'Aoede',
+              en: 'Kore',
+            };
+            
+            const voiceName = parsed.voiceName && parsed.voiceName !== 'Kore' 
+              ? parsed.voiceName 
+              : (LANGUAGE_VOICE_MAP[languageId] || 'Kore');
 
             if (!textToSpeak) {
               res.statusCode = 400;

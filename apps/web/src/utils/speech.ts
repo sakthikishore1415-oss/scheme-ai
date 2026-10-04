@@ -6,17 +6,118 @@ class SpeechService {
   private currentAudioElement: HTMLAudioElement | null = null;
   private audioContext: AudioContext | null = null;
   private speechRate: number = 1.05; // Conversational pace
+  private cachedVoices: SpeechSynthesisVoice[] = [];
 
   constructor() {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       // Warm up voices on browser load
-      window.speechSynthesis.getVoices();
+      this.getVoices();
       if (window.speechSynthesis.onvoiceschanged !== undefined) {
         window.speechSynthesis.onvoiceschanged = () => {
-          window.speechSynthesis.getVoices();
+          this.getVoices();
         };
       }
     }
+  }
+
+  /**
+   * Retrieves all available voices, caching loaded voices for asynchronous readiness.
+   */
+  public getVoices(): SpeechSynthesisVoice[] {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return [];
+    let voices = window.speechSynthesis.getVoices();
+    if ((!voices || voices.length === 0) && this.cachedVoices.length > 0) {
+      voices = this.cachedVoices;
+    }
+    if (voices && voices.length > 0) {
+      this.cachedVoices = voices;
+    }
+    return voices || [];
+  }
+
+  /**
+   * Selects the best available voice for the specified language ID.
+   * If an exact regional voice is unavailable, uses an appropriate voice from the same language family
+   * rather than falling back directly to English.
+   */
+  public getBestVoice(langId: string): SpeechSynthesisVoice | null {
+    const voices = this.getVoices();
+    if (!voices || voices.length === 0) return null;
+
+    const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
+    const bcp47 = (langConfig.bcp47Code || 'ta-IN').toLowerCase();
+    const langPrefix = (langConfig.id || langId || 'ta').toLowerCase();
+    const langName = (langConfig.name || '').toLowerCase();
+    const nativeName = (langConfig.nativeName || '').toLowerCase();
+
+    const isEnglish = langPrefix === 'en';
+
+    // 1. Exact match on BCP-47 locale code (e.g., "ta-in", "hi-in", "te-in", "kn-in", "ml-in", "mr-in", "bn-in", "gu-in", "or-in", "pa-in", "as-in")
+    let best = voices.find(
+      (v) =>
+        v.lang.toLowerCase() === bcp47 ||
+        v.lang.toLowerCase().replace('_', '-') === bcp47
+    );
+    if (best) return best;
+
+    // 2. Match on language prefix (e.g., "ta-", "hi-", "te-", "kn-", "ml-", "mr-", "bn-", "gu-", "or-", "pa-", "as-")
+    best = voices.find(
+      (v) =>
+        v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix + '-') ||
+        v.lang.toLowerCase() === langPrefix
+    );
+    if (best) return best;
+
+    // 3. Match on voice name or native name (e.g., "Google தமிழ்", "Microsoft Swara - Hindi", "Google Hindi")
+    best = voices.find(
+      (v) =>
+        (langName && v.name.toLowerCase().includes(langName)) ||
+        (nativeName && v.name.toLowerCase().includes(nativeName))
+    );
+    if (best) return best;
+
+    // 4. Substring match on lang tag (excluding English voices when looking for non-English)
+    if (!isEnglish) {
+      best = voices.find(
+        (v) =>
+          v.lang.toLowerCase().includes(langPrefix) &&
+          !v.lang.toLowerCase().startsWith('en')
+      );
+      if (best) return best;
+
+      // 5. Fallback for Indian regional languages when specific regional voice is missing:
+      // Look for any available Indic language voice (hi, ta, te, kn, ml, mr, bn, gu, pa, as)
+      // so it speaks using an Indic phoneme engine instead of falling back to English!
+      const indicPrefixes = ['hi', 'ta', 'te', 'kn', 'ml', 'mr', 'bn', 'gu', 'or', 'pa', 'as'];
+      best = voices.find((v) => {
+        const vl = v.lang.toLowerCase().replace('_', '-');
+        return indicPrefixes.some((pref) => vl.startsWith(pref + '-') || vl === pref);
+      });
+      if (best) return best;
+
+      // Also check voices with "India" or "-IN" in lang/name excluding default English voices
+      best = voices.find(
+        (v) =>
+          (v.lang.toLowerCase().includes('-in') || v.name.toLowerCase().includes('india')) &&
+          !v.name.toLowerCase().includes('david') &&
+          !v.name.toLowerCase().includes('zira') &&
+          !v.name.toLowerCase().includes('mark')
+      );
+      if (best) return best;
+    }
+
+    // 6. For English, return any English voice (preferably en-IN)
+    if (isEnglish) {
+      best =
+        voices.find(
+          (v) =>
+            v.lang.toLowerCase().startsWith('en-in') ||
+            v.name.toLowerCase().includes('india')
+        ) || voices.find((v) => v.lang.toLowerCase().startsWith('en'));
+      if (best) return best;
+    }
+
+    return voices[0] || null;
   }
 
   public setSpeechRate(rate: number) {
@@ -83,22 +184,13 @@ class SpeechService {
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
 
-      // Look for authentic native voice matching language code or name (e.g. ta, hi, te, kn, ml, mr, bn, gu, or, pa, as, etc.)
-      const voices = window.speechSynthesis.getVoices();
-      const targetCode = bcp47.toLowerCase();
-      const langPrefix = (langConfig.id || 'ta').toLowerCase();
-
-      const matchingVoice = voices.find(
-        (v) =>
-          v.lang.toLowerCase() === targetCode ||
-          v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix) ||
-          (v.lang.toLowerCase().includes(langPrefix) && !v.lang.toLowerCase().startsWith('en')) ||
-          v.name.toLowerCase().includes(langConfig.name.toLowerCase()) ||
-          v.name.toLowerCase().includes(langConfig.nativeName.toLowerCase())
-      );
-
+      // Select best voice for the language and assign explicitly
+      const matchingVoice = this.getBestVoice(langId);
       if (matchingVoice) {
         utterance.voice = matchingVoice;
+        if (matchingVoice.lang) {
+          utterance.lang = matchingVoice.lang;
+        }
       }
 
       let hasFinished = false;
@@ -176,17 +268,15 @@ class SpeechService {
   }
 
   public hasNativeVoice(langId: string): boolean {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false;
+    const voice = this.getBestVoice(langId);
+    if (!voice) return false;
     const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
-    const voices = window.speechSynthesis.getVoices();
-    const targetCode = (langConfig.bcp47Code || 'ta-IN').toLowerCase();
-    const langPrefix = (langConfig.id || 'ta').toLowerCase();
-
-    return voices.some(
-      (v) =>
-        v.lang.toLowerCase() === targetCode ||
-        v.lang.toLowerCase().startsWith(langPrefix) ||
-        v.name.toLowerCase().includes(langConfig.name.toLowerCase())
+    const langPrefix = (langConfig.id || langId || 'ta').toLowerCase();
+    if (langPrefix === 'en') return voice.lang.toLowerCase().startsWith('en');
+    return (
+      voice.lang.toLowerCase().startsWith(langPrefix) ||
+      voice.name.toLowerCase().includes(langConfig.name.toLowerCase()) ||
+      voice.name.toLowerCase().includes(langConfig.nativeName.toLowerCase())
     );
   }
 
