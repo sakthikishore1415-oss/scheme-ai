@@ -2,6 +2,7 @@ import React from 'react';
 import { useApp } from '../context/AppContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { getLanguageInitial } from '../data/languages';
+import { speechService } from '../utils/speech';
 import {
   Mic,
   MapPin,
@@ -129,7 +130,10 @@ export const Header: React.FC = () => {
           {/* Quick Voice Mic Button */}
           <button
             id="header-voice-mic-btn"
-            onClick={() => setShowVoiceModal(true)}
+            onClick={() => {
+              speechService.unlockAudio();
+              setShowVoiceModal(true);
+            }}
             className="flex items-center gap-1.5 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-[#4a1f2d] hover:bg-[#6b3548] text-white font-bold text-xs shadow-sm transition-all cursor-pointer"
           >
             <Mic className="w-4 h-4 text-[#c8a96b]" />

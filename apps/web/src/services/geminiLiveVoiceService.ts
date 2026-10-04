@@ -545,51 +545,35 @@ export class GeminiLiveVoiceService {
   private async generateGeminiReply(spokenText: string): Promise<string> {
     try {
       const langConfig = SUPPORTED_LANGUAGES[this.currentLanguageId] || SUPPORTED_LANGUAGES['ta'];
-      const languageName = `${langConfig.name} (${langConfig.nativeName})`;
+      const languageName = langConfig.name;
+      const nativeName = langConfig.nativeName;
       
-      const languageDirective = `STRICT NATIVE LANGUAGE MANDATE: You MUST converse, reply, and speak STRICTLY in natural, empathetic, culturally authentic spoken ${langConfig.name} (${langConfig.nativeName}). Do NOT reply in any other language. Speak like a warm, supportive local civic counsellor talking directly to a citizen.`;
-
       const systemInstruction = `You are Arivom (அறிவோம்), a warm, empathetic, proactive civic AI voice counsellor for citizens in ${this.currentStateName}, India.
-You are having a real-time, interactive, two-way spoken conversation (like Gemini Live Voice or a friendly government helpline counsellor).
 
-CURRENT CONVERSATION LANGUAGE: ${languageName.toUpperCase()}
-${languageDirective}
+CRITICAL SINGLE SOURCE OF TRUTH LANGUAGE MANDATE:
+The user has explicitly chosen to converse in: ${languageName.toUpperCase()} (${nativeName}).
+You MUST write your ENTIRE response ONLY in ${languageName} (${nativeName}) text script.
+Do NOT use English, do NOT use any other language, and do NOT translate into English.
+Even if the citizen speaks in English, Latin script, or another language, you MUST respond STRICTLY in ${languageName} (${nativeName}).
+Even if the conversation history has turns in previous languages, IGNORE the previous language and output ONLY in ${languageName} (${nativeName}).
 
 🎯 CORE INTERACTIVE TWO-WAY CONVERSATION MANDATE:
 Never give a dry, flat factual statement and stop. You MUST always maintain a lively, supportive dialogue.
 Every response MUST follow this exact 2-step spoken format (strictly 1 to 2 spoken sentences total, under 35 words):
-1. [HELPFUL INSIGHT / ADVICE]: In 1 warm, clear spoken sentence, directly answer their question with specific government scheme names and benefits in ${langConfig.nativeName}.
+1. [HELPFUL INSIGHT / ADVICE]: In 1 warm, clear spoken sentence, directly answer their question with specific government scheme names and benefits in ${nativeName}.
 2. [INTERACTIVE FOLLOW-UP QUESTION]: In 1 natural spoken sentence, proactively ask them a relevant follow-up question to diagnose their eligibility (e.g. asking about their land size, student grade/course, ration card type, income, age, or disability status) or guide them on how to apply.
 
-LANGUAGE-SPECIFIC INTERACTIVE EXAMPLES (Tone and 2-step structure to follow):
-- Tamil (தமிழ்): "விவசாயிகளுக்கு PM-KISAN மூலம் ஆண்டுக்கு ₹6,000 கிடைக்கும். உங்களிடம் நிலப்பட்டா அல்லது சிட்டா ஆவணம் உள்ளதா?"
-- Hindi (हिन्दी): "किसानों के लिए पीएम किसान योजना के तहत प्रति वर्ष ₹6,000 की सहायता मिलती है। क्या आपके नाम पर कृषि भूमि के दस्तावेज हैं?"
-- Telugu (తెలుగు): "రైతుల కోసం PM-KISAN ద్వారా సంవత్సరానికి ₹6,000 అందుతాయి. మీ పేరు మీద వ్యవసాయ భూమి పాస్ పుస్తకం ఉందా?"
-- Kannada (ಕನ್ನಡ): "ರೈತರಿಗಾಗಿ ಪಿಎಂ ಕಿಸಾನ್ ಯೋಜನೆಯಡಿ ವರ್ಷಕ್ಕೆ ₹6,000 ಸಿಗುತ್ತದೆ. ನಿಮ್ಮ ಬಳಿ ಜಮೀನಿನ ಪಹಣಿ ಅಥವಾ ದಾಖಲೆಗಳಿವೆಯೇ?"
-- Malayalam (മലയാളം): "കർഷകർക്കായി പിഎം കിസാൻ വഴി വർഷത്തിൽ ₹6,000 ലഭിക്കും. നിങ്ങളുടെ പേരിൽ കൃഷിഭൂമിയുടെ രേഖകൾ ഉണ്ടോ?"
-- Marathi (मराठी): "शेतकऱ्यांसाठी पीएम किसान योजनेतून वर्षाला ₹6,000 मिळतात. आपल्या नावावर शेतजमिनीचा 7/12 उतारा आहे का?"
-- Bengali (বাংলা): "কৃষকদের জন্য পিএম কিষাণ প্রকল্পে বছরে ₹৬,০০০ দেওয়া হয়। আপনার নামে কি জমির খতিয়ান বা পরচা রয়েছে?"
-- Gujarati (ગુજરાતી): "ખેડૂતો માટે પીએમ કિસાન યોજના હેઠળ વાર્ષિક ₹6,000 મળે છે. શું તમારી પાસે જમીનના 7/12 ના દસ્તાવેજ છે?"
-- Odia (ଓଡ଼ିଆ): "କୃଷକମାନଙ୍କ ପାଇଁ ପିଏମ କିଷାନ ଯୋଜନାରେ ବାର୍ଷିକ ₹୬,୦୦୦ ମିଳିଥାଏ। ଆପଣଙ୍କ ପାଖରେ ଜମି ପଟ୍ଟା ଅଛି କି?"
-- Punjabi (ਪੰਜਾਬੀ): "ਕਿਸਾਨਾਂ ਲਈ ਪੀਐੱਮ ਕਿਸਾਨ ਸਕੀਮ ਤਹਿਤ ਸਾਲਾਨਾ ₹6,000 ਮਿਲਦੇ ਹਨ। ਕੀ ਤੁਹਾਡੇ ਨਾਂ 'ਤੇ ਜ਼ਮੀਨ ਦੀ ਫ਼ਰਦ ਹੈ?"
-- Assamese (অসমীয়া): "কৃষকসকলৰ বাবে পিএম কিষাণ আঁচনিত বছৰি ₹৬,০০০ পোৱা যায়। আপোনাৰ নামত কৃষি ভূমিৰ পট্টা আছে নেকি?"
-- English: "Farmers can receive ₹6,000 per year under the PM-KISAN scheme. Do you have your agricultural land records ready?"
-
 CRITICAL VOICE RULES:
-1. Speak directly and respectfully to the citizen strictly in spoken ${languageName}.
+1. Speak directly and respectfully to the citizen strictly in spoken ${languageName} (${nativeName}).
 2. Keep replies concise (strictly 1 to 2 spoken sentences, maximum 30-35 words).
 3. NEVER output bullet points, asterisks, formatting tags, URLs, or markdown symbols.
 4. Keep the turn-taking active, encouraging the citizen to answer your question.`;
 
-      const xaiApiKey =
-        (import.meta as any).env?.VITE_XAI_API_KEY ||
-        (window as any).__XAI_API_KEY__ ||
-        'xai-HGfw0p7ZC3kABWgf29QA7wfqDQvNFQqfu8H336JL5auLBZFI0t1R5ll1DFmTGBPLU025MzsIhhqvhENP';
+      const xaiApiKey = (import.meta as any).env?.VITE_XAI_API_KEY || (window as any).__XAI_API_KEY__;
 
       const apiKey =
         (import.meta as any).env?.VITE_GEMINI_API_KEY ||
-        (window as any).__GEMINI_API_KEY__ ||
-        'AQ.Ab8RN6JSV7z-KRN41yTnI3bUKbzFOGsw5ekHPVh5zSeoMt7DqA';
+        (window as any).__GEMINI_API_KEY__;
 
       // 1. Try xAI Grok API first if key exists
       if (xaiApiKey) {
@@ -1123,6 +1107,9 @@ CRITICAL VOICE RULES:
   }
 
   public setLanguage(languageId: string): void {
+    if (this.currentLanguageId !== languageId) {
+      this.conversationHistory = [];
+    }
     this.currentLanguageId = languageId;
     this.selectedVoice = this.getGeminiVoiceForLanguage(languageId);
     const bcp47Map: Record<string, string> = {

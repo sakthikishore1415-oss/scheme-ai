@@ -2,15 +2,16 @@ import { SUPPORTED_LANGUAGES } from '../data/languages';
 
 class SpeechService {
   private isSynthesizing = false;
-  private currentUtterance: SpeechSynthesisUtterance | null = null;
+  private activeUtterances: Set<SpeechSynthesisUtterance> = new Set();
   private currentAudioElement: HTMLAudioElement | null = null;
   private audioContext: AudioContext | null = null;
   private speechRate: number = 1.05; // Conversational pace
   private cachedVoices: SpeechSynthesisVoice[] = [];
+  private resumeHeartbeat: any = null;
+  private isAudioUnlocked: boolean = false;
 
   constructor() {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      // Warm up voices on browser load
       this.getVoices();
       if (window.speechSynthesis.onvoiceschanged !== undefined) {
         window.speechSynthesis.onvoiceschanged = () => {
@@ -37,26 +38,28 @@ class SpeechService {
 
   /**
    * Selects the best available voice for the specified language ID.
-   * If an exact regional voice is unavailable, uses an appropriate voice from the same language family
-   * rather than falling back directly to English.
+   * Priority:
+   * 1. Exact locale match (e.g., "ta-IN", "hi-IN", "te-IN")
+   * 2. Base language prefix match (e.g., "ta", "hi", "te")
+   * 3. Matching voice name or native script name (e.g., "Google தமிழ்", "Microsoft Swara")
+   * 4. Indic / regional family fallback for Indian languages if specific locale voice is missing
+   * 5. English fallback for English locale requests
    */
   public getBestVoice(langId: string): SpeechSynthesisVoice | null {
     const voices = this.getVoices();
     if (!voices || voices.length === 0) return null;
 
-    const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
-    const bcp47 = (langConfig.bcp47Code || 'ta-IN').toLowerCase();
-    const langPrefix = (langConfig.id || langId || 'ta').toLowerCase();
-    const langName = (langConfig.name || '').toLowerCase();
-    const nativeName = (langConfig.nativeName || '').toLowerCase();
+    const langConfig = SUPPORTED_LANGUAGES[langId];
+    const bcp47 = (langConfig?.bcp47Code || langId || 'en-IN').toLowerCase().replace('_', '-');
+    const langPrefix = langId.toLowerCase().split('-')[0].split('_')[0];
+    const langName = (langConfig?.name || '').toLowerCase();
+    const nativeName = (langConfig?.nativeName || '').toLowerCase();
 
     const isEnglish = langPrefix === 'en';
 
-    // 1. Exact match on BCP-47 locale code (e.g., "ta-in", "hi-in", "te-in", "kn-in", "ml-in", "mr-in", "bn-in", "gu-in", "or-in", "pa-in", "as-in")
+    // 1. Exact match on full locale tag (e.g., "ta-in", "hi-in", "te-in", "kn-in", "ml-in", "mr-in", "bn-in", "gu-in", "or-in", "pa-in", "as-in")
     let best = voices.find(
-      (v) =>
-        v.lang.toLowerCase() === bcp47 ||
-        v.lang.toLowerCase().replace('_', '-') === bcp47
+      (v) => v.lang.toLowerCase().replace('_', '-') === bcp47
     );
     if (best) return best;
 
@@ -64,7 +67,7 @@ class SpeechService {
     best = voices.find(
       (v) =>
         v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix + '-') ||
-        v.lang.toLowerCase() === langPrefix
+        v.lang.toLowerCase().replace('_', '-') === langPrefix
     );
     if (best) return best;
 
@@ -86,24 +89,24 @@ class SpeechService {
       if (best) return best;
 
       // 5. Fallback for Indian regional languages when specific regional voice is missing:
-      // Look for any available Indic language voice (hi, ta, te, kn, ml, mr, bn, gu, pa, as)
-      // so it speaks using an Indic phoneme engine instead of falling back to English!
-      const indicPrefixes = ['hi', 'ta', 'te', 'kn', 'ml', 'mr', 'bn', 'gu', 'or', 'pa', 'as'];
-      best = voices.find((v) => {
-        const vl = v.lang.toLowerCase().replace('_', '-');
-        return indicPrefixes.some((pref) => vl.startsWith(pref + '-') || vl === pref);
-      });
-      if (best) return best;
+      // Look for any available Indic language voice (hi, ta, te, kn, ml, mr, bn, gu, pa, as, ur)
+      const indicPrefixes = ['hi', 'ta', 'te', 'kn', 'ml', 'mr', 'bn', 'gu', 'or', 'pa', 'as', 'ur'];
+      if (indicPrefixes.includes(langPrefix)) {
+        best = voices.find((v) => {
+          const vl = v.lang.toLowerCase().replace('_', '-');
+          return indicPrefixes.some((pref) => vl.startsWith(pref + '-') || vl === pref);
+        });
+        if (best) return best;
 
-      // Also check voices with "India" or "-IN" in lang/name excluding default English voices
-      best = voices.find(
-        (v) =>
-          (v.lang.toLowerCase().includes('-in') || v.name.toLowerCase().includes('india')) &&
-          !v.name.toLowerCase().includes('david') &&
-          !v.name.toLowerCase().includes('zira') &&
-          !v.name.toLowerCase().includes('mark')
-      );
-      if (best) return best;
+        best = voices.find(
+          (v) =>
+            (v.lang.toLowerCase().includes('-in') || v.name.toLowerCase().includes('india')) &&
+            !v.name.toLowerCase().includes('david') &&
+            !v.name.toLowerCase().includes('zira') &&
+            !v.name.toLowerCase().includes('mark')
+        );
+        if (best) return best;
+      }
     }
 
     // 6. For English, return any English voice (preferably en-IN)
@@ -135,12 +138,37 @@ class SpeechService {
         if (window.speechSynthesis.paused) {
           window.speechSynthesis.resume();
         }
+        if (!this.isAudioUnlocked) {
+          this.isAudioUnlocked = true;
+          // Silent micro-utterance to prime browser speech synthesis playback pipeline
+          const dummy = new SpeechSynthesisUtterance('');
+          dummy.volume = 0.01;
+          window.speechSynthesis.speak(dummy);
+        }
       } catch (_) {}
     }
     if (this.audioContext && this.audioContext.state === 'suspended') {
       try {
         this.audioContext.resume();
       } catch (_) {}
+    }
+  }
+
+  private startResumeHeartbeat() {
+    this.stopResumeHeartbeat();
+    this.resumeHeartbeat = setInterval(() => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        if (this.isSynthesizing && window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+      }
+    }, 250);
+  }
+
+  private stopResumeHeartbeat() {
+    if (this.resumeHeartbeat) {
+      clearInterval(this.resumeHeartbeat);
+      this.resumeHeartbeat = null;
     }
   }
 
@@ -162,7 +190,14 @@ class SpeechService {
       return;
     }
 
-    this.stop();
+    if (this.currentAudioElement) {
+      try {
+        this.currentAudioElement.pause();
+        this.currentAudioElement.currentTime = 0;
+      } catch (_) {}
+      this.currentAudioElement = null;
+    }
+
     this.unlockAudio();
 
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
@@ -174,17 +209,20 @@ class SpeechService {
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume();
       }
-      window.speechSynthesis.cancel();
+
+      try {
+        window.speechSynthesis.cancel();
+      } catch (_) {}
 
       const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
       const utterance = new SpeechSynthesisUtterance(cleanText);
-      const bcp47 = langConfig.bcp47Code || 'ta-IN';
+      const bcp47 = langConfig?.bcp47Code || 'ta-IN';
       utterance.lang = bcp47;
       utterance.rate = overrideRate || this.speechRate;
       utterance.pitch = 1.0;
-      utterance.volume = 1.0;
+      utterance.volume = 1.0; // 100% Audible volume
 
-      // Select best voice for the language and assign explicitly
+      // Select best voice for the requested language and assign explicitly
       const matchingVoice = this.getBestVoice(langId);
       if (matchingVoice) {
         utterance.voice = matchingVoice;
@@ -193,43 +231,37 @@ class SpeechService {
         }
       }
 
-      let hasFinished = false;
-      let watchdogTimer: any = null;
+      // Store in activeUtterances Set to prevent V8 garbage collection while speaking!
+      this.activeUtterances.add(utterance);
 
-      const finishUtterance = () => {
+      let hasFinished = false;
+
+      const finishUtterance = (source: string = 'normal') => {
         if (hasFinished) return;
         hasFinished = true;
-        if (watchdogTimer) clearTimeout(watchdogTimer);
         this.isSynthesizing = false;
-        this.currentUtterance = null;
+        this.stopResumeHeartbeat();
+        this.activeUtterances.delete(utterance);
         if (onEnd) onEnd();
       };
 
       utterance.onstart = () => {
         this.isSynthesizing = true;
+        this.startResumeHeartbeat();
         if (onStart) onStart();
       };
 
       utterance.onend = () => {
-        finishUtterance();
+        finishUtterance('onend');
       };
 
       utterance.onerror = (e) => {
-        console.warn('Speech synthesis utterance notice:', e);
-        finishUtterance();
+        console.warn(`SpeechSynthesis error (${e.error}):`, e);
+        finishUtterance('onerror');
         if (onError) onError(e);
       };
 
-      this.currentUtterance = utterance;
-
-      const expectedDurationMs = Math.max(3000, Math.min(15000, cleanText.length * 90));
-      watchdogTimer = setTimeout(() => {
-        if (!hasFinished && this.isSynthesizing) {
-          finishUtterance();
-        }
-      }, expectedDurationMs);
-
-      // Speak with safe microtask delay (60ms allows Chrome speech engine pipeline to reset after cancel)
+      // Safe microtask dispatch (50ms allows Chrome speech engine pipeline to reset after cancel)
       setTimeout(() => {
         try {
           if (window.speechSynthesis.paused) {
@@ -240,10 +272,10 @@ class SpeechService {
             window.speechSynthesis.resume();
           }
         } catch (err) {
-          console.warn('SpeechSynthesis speak fallback:', err);
-          finishUtterance();
+          console.warn('SpeechSynthesis speak fallback error:', err);
+          finishUtterance('catch');
         }
-      }, 60);
+      }, 50);
     } catch (err) {
       console.warn('Failed to initialize speech utterance:', err);
       if (onEnd) onEnd();
@@ -251,6 +283,8 @@ class SpeechService {
   }
 
   public stop() {
+    this.isSynthesizing = false;
+    this.stopResumeHeartbeat();
     if (this.currentAudioElement) {
       try {
         this.currentAudioElement.pause();
@@ -263,20 +297,19 @@ class SpeechService {
         window.speechSynthesis.cancel();
       } catch (_) {}
     }
-    this.isSynthesizing = false;
-    this.currentUtterance = null;
+    this.activeUtterances.clear();
   }
 
   public hasNativeVoice(langId: string): boolean {
     const voice = this.getBestVoice(langId);
     if (!voice) return false;
     const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
-    const langPrefix = (langConfig.id || langId || 'ta').toLowerCase();
+    const langPrefix = (langConfig?.id || langId || 'ta').toLowerCase();
     if (langPrefix === 'en') return voice.lang.toLowerCase().startsWith('en');
     return (
       voice.lang.toLowerCase().startsWith(langPrefix) ||
-      voice.name.toLowerCase().includes(langConfig.name.toLowerCase()) ||
-      voice.name.toLowerCase().includes(langConfig.nativeName.toLowerCase())
+      (langConfig?.name && voice.name.toLowerCase().includes(langConfig.name.toLowerCase())) ||
+      (langConfig?.nativeName && voice.name.toLowerCase().includes(langConfig.nativeName.toLowerCase()))
     );
   }
 

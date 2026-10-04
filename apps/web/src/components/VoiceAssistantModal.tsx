@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
+import { speechService } from '../utils/speech';
 import {
   geminiLiveVoiceService,
   GeminiLiveVoiceState,
@@ -165,6 +166,7 @@ export const VoiceAssistantModal: React.FC = () => {
    * One-Tap to Speak: Immediate 1-tap activation / interruption / commit.
    */
   const handleToggleListening = () => {
+    speechService.unlockAudio();
     if (voiceState === 'SPEAKING' || voiceState === 'THINKING') {
       geminiLiveVoiceService.stopEverything();
       return;
@@ -183,12 +185,14 @@ export const VoiceAssistantModal: React.FC = () => {
   const handleSendText = (e: React.FormEvent) => {
     e.preventDefault();
     if (!typedInput.trim()) return;
+    speechService.unlockAudio();
     const txt = typedInput;
     setTypedInput('');
     geminiLiveVoiceService.sendTextMessage(txt);
   };
 
   const handleLanguageSelect = (langId: string) => {
+    speechService.unlockAudio();
     setSelectedVoiceLanguageId(langId);
     geminiLiveVoiceService.setLanguage(langId);
   };

@@ -33,6 +33,7 @@ export const WhyMeExplanationModal: React.FC = () => {
   } = selectedWhyMeScheme;
 
   const handlePlayAudio = () => {
+    speechService.unlockAudio();
     if (isPlayingAudio) {
       speechService.stop();
       setIsPlayingAudio(false);

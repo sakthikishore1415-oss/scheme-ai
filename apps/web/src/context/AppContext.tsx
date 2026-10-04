@@ -13,6 +13,7 @@ import {
 import { STATES_CONFIG } from '../data/states';
 import { SUPPORTED_LANGUAGES } from '../data/languages';
 import { defaultSchemeRepository } from '../services/schemeRepository';
+import { geminiLiveVoiceService } from '../services/geminiLiveVoiceService';
 import { matchUserSchemes } from '../engine/eligibilityEngine';
 import confetti from 'canvas-confetti';
 
@@ -182,6 +183,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const newConfig = STATES_CONFIG[stateId];
     if (newConfig) {
       setSelectedVoiceLanguageIdState(newConfig.defaultVoiceLanguage);
+      geminiLiveVoiceService.setLanguage(newConfig.defaultVoiceLanguage);
       try {
         localStorage.setItem('arivom_selected_lang', newConfig.defaultVoiceLanguage);
       } catch (_) {}
@@ -202,6 +204,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const setSelectedVoiceLanguageId = (langId: string) => {
     setSelectedVoiceLanguageIdState(langId);
+    geminiLiveVoiceService.setLanguage(langId);
     try {
       localStorage.setItem('arivom_selected_lang', langId);
     } catch (_) {}

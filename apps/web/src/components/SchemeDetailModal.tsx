@@ -52,6 +52,7 @@ export const SchemeDetailModal: React.FC = () => {
   const matchResult = activeMatches.find((m) => m.scheme.id === scheme.id);
 
   const handlePlayVoice = (text: string) => {
+    speechService.unlockAudio();
     if (isPlayingAudio) {
       speechService.stop();
       setIsPlayingAudio(false);
