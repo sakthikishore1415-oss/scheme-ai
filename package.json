@@ -2,14 +2,22 @@
   "name": "arivom-thittam",
   "private": true,
   "scripts": {
-    "dev": "pnpm --filter @arivom-thittam/web dev",
-    "build": "turbo run build && mkdir -p dist && cp -r apps/web/dist/* dist/",
+    "dev": "npm run dev --workspace=@arivom-thittam/web",
+    "build": "turbo run build && node scripts/collect_build_artifacts.js",
+    "build:web": "turbo run build --filter=@arivom-thittam/web",
+    "build:android": "turbo run build --filter=@arivom-thittam/android",
+    "build:ios": "turbo run build --filter=@arivom-thittam/ios",
+    "build:all": "turbo run build && node scripts/collect_build_artifacts.js",
     "lint": "turbo run lint",
     "clean": "turbo run clean",
     "export:schemes": "python3 scripts/export_schemes.py",
     "fetch-schemes": "python3 scripts/fetch_all_india_schemes.py"
   },
-  "packageManager": "pnpm@9.15.4",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "npm@11.19.0",
   "engines": {
     "node": ">=20.0.0"
   },

@@ -1,0 +1,405 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		10A001012D10000100000001 /* ArivomThittamApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001012D10000100000001 /* ArivomThittamApp.swift */; };
+		10A001022D10000100000002 /* CitizenProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001022D10000100000002 /* CitizenProfile.swift */; };
+		10A001032D10000100000003 /* Scheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001032D10000100000003 /* Scheme.swift */; };
+		10A001042D10000100000004 /* EligibilityResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001042D10000100000004 /* EligibilityResult.swift */; };
+		10A001052D10000100000005 /* DeterministicEligibilityEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001052D10000100000005 /* DeterministicEligibilityEngine.swift */; };
+		10A001062D10000100000006 /* TranslationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001062D10000100000006 /* TranslationManager.swift */; };
+		10A001072D10000100000007 /* SchemeRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001072D10000100000007 /* SchemeRepository.swift */; };
+		10A001082D10000100000008 /* DefaultSchemes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001082D10000100000008 /* DefaultSchemes.swift */; };
+		10A001092D10000100000009 /* LocalSchemeRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001092D10000100000009 /* LocalSchemeRepository.swift */; };
+		10A0010A2D1000010000000A /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B0010A2D1000010000000A /* AppState.swift */; };
+		10A0010B2D1000010000000B /* DashboardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B0010B2D1000010000000B /* DashboardViewModel.swift */; };
+		10A0010C2D1000010000000C /* EligibilityViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B0010C2D1000010000000C /* EligibilityViewModel.swift */; };
+		10A0010D2D1000010000000D /* BadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B0010D2D1000010000000D /* BadgeView.swift */; };
+		10A0010E2D1000010000000E /* CategoryChipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B0010E2D1000010000000E /* CategoryChipView.swift */; };
+		10A0010F2D1000010000000F /* SchemeCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B0010F2D1000010000000F /* SchemeCardView.swift */; };
+		10A001102D10000100000010 /* SchemeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001102D10000100000010 /* SchemeDetailView.swift */; };
+		10A001112D10000100000011 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001112D10000100000011 /* DashboardView.swift */; };
+		10A001122D10000100000012 /* EligibilityWizardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001122D10000100000012 /* EligibilityWizardView.swift */; };
+		10A001132D10000100000013 /* EligibilityResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001132D10000100000013 /* EligibilityResultView.swift */; };
+		10A001142D10000100000014 /* VoiceAssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001142D10000100000014 /* VoiceAssistantView.swift */; };
+		10A001152D10000100000015 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B001152D10000100000015 /* MainTabView.swift */; };
+		10A001162D10000100000016 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 10B001162D10000100000016 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		10A000012D10000100000000 /* ArivomThittam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ArivomThittam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		10B001012D10000100000001 /* ArivomThittamApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArivomThittamApp.swift; sourceTree = "<group>"; };
+		10B001022D10000100000002 /* CitizenProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CitizenProfile.swift; sourceTree = "<group>"; };
+		10B001032D10000100000003 /* Scheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheme.swift; sourceTree = "<group>"; };
+		10B001042D10000100000004 /* EligibilityResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EligibilityResult.swift; sourceTree = "<group>"; };
+		10B001052D10000100000005 /* DeterministicEligibilityEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeterministicEligibilityEngine.swift; sourceTree = "<group>"; };
+		10B001062D10000100000006 /* TranslationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationManager.swift; sourceTree = "<group>"; };
+		10B001072D10000100000007 /* SchemeRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemeRepository.swift; sourceTree = "<group>"; };
+		10B001082D10000100000008 /* DefaultSchemes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSchemes.swift; sourceTree = "<group>"; };
+		10B001092D10000100000009 /* LocalSchemeRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSchemeRepository.swift; sourceTree = "<group>"; };
+		10B0010A2D1000010000000A /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		10B0010B2D1000010000000B /* DashboardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewModel.swift; sourceTree = "<group>"; };
+		10B0010C2D1000010000000C /* EligibilityViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EligibilityViewModel.swift; sourceTree = "<group>"; };
+		10B0010D2D1000010000000D /* BadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BadgeView.swift; sourceTree = "<group>"; };
+		10B0010E2D1000010000000E /* CategoryChipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryChipView.swift; sourceTree = "<group>"; };
+		10B0010F2D1000010000000F /* SchemeCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemeCardView.swift; sourceTree = "<group>"; };
+		10B001102D10000100000010 /* SchemeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemeDetailView.swift; sourceTree = "<group>"; };
+		10B001112D10000100000011 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		10B001122D10000100000012 /* EligibilityWizardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EligibilityWizardView.swift; sourceTree = "<group>"; };
+		10B001132D10000100000013 /* EligibilityResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EligibilityResultView.swift; sourceTree = "<group>"; };
+		10B001142D10000100000014 /* VoiceAssistantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceAssistantView.swift; sourceTree = "<group>"; };
+		10B001152D10000100000015 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		10B001162D10000100000016 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		10B001172D10000100000017 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		10A000022D10000100000000 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		10C000012D10000100000001 = {
+			isa = PBXGroup;
+			children = (
+				10C000022D10000100000002 /* ArivomThittam */,
+				10C000032D10000100000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		10C000022D10000100000002 /* ArivomThittam */ = {
+			isa = PBXGroup;
+			children = (
+				10C000042D10000100000004 /* App */,
+				10C000052D10000100000005 /* Models */,
+				10C000062D10000100000006 /* Domain */,
+				10C000072D10000100000007 /* Repository */,
+				10C000082D10000100000008 /* ViewModels */,
+				10C000092D10000100000009 /* Views */,
+				10C0000A2D1000010000000A /* Resources */,
+			);
+			path = ArivomThittam;
+			sourceTree = "<group>";
+		};
+		10C000032D10000100000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				10A000012D10000100000000 /* ArivomThittam.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		10C000042D10000100000004 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				10B001012D10000100000001 /* ArivomThittamApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		10C000052D10000100000005 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				10B001022D10000100000002 /* CitizenProfile.swift */,
+				10B001032D10000100000003 /* Scheme.swift */,
+				10B001042D10000100000004 /* EligibilityResult.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		10C000062D10000100000006 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				10B001052D10000100000005 /* DeterministicEligibilityEngine.swift */,
+				10B001062D10000100000006 /* TranslationManager.swift */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		10C000072D10000100000007 /* Repository */ = {
+			isa = PBXGroup;
+			children = (
+				10B001072D10000100000007 /* SchemeRepository.swift */,
+				10B001082D10000100000008 /* DefaultSchemes.swift */,
+				10B001092D10000100000009 /* LocalSchemeRepository.swift */,
+			);
+			path = Repository;
+			sourceTree = "<group>";
+		};
+		10C000082D10000100000008 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				10B0010A2D1000010000000A /* AppState.swift */,
+				10B0010B2D1000010000000B /* DashboardViewModel.swift */,
+				10B0010C2D1000010000000C /* EligibilityViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		10C000092D10000100000009 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				10C0000B2D1000010000000B /* Components */,
+				10B0010F2D1000010000000F /* SchemeCardView.swift */,
+				10B001102D10000100000010 /* SchemeDetailView.swift */,
+				10B001112D10000100000011 /* DashboardView.swift */,
+				10B001122D10000100000012 /* EligibilityWizardView.swift */,
+				10B001132D10000100000013 /* EligibilityResultView.swift */,
+				10B001142D10000100000014 /* VoiceAssistantView.swift */,
+				10B001152D10000100000015 /* MainTabView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		10C0000B2D1000010000000B /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				10B0010D2D1000010000000D /* BadgeView.swift */,
+				10B0010E2D1000010000000E /* CategoryChipView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		10C0000A2D1000010000000A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				10B001162D10000100000016 /* Assets.xcassets */,
+				10B001172D10000100000017 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		10E000012D10000100000001 /* ArivomThittam */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 10F000012D10000100000001 /* Build configuration list for PBXNativeTarget "ArivomThittam" */;
+			buildPhases = (
+				10A000032D10000100000000 /* Sources */,
+				10A000022D10000100000000 /* Frameworks */,
+				10A000042D10000100000000 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ArivomThittam;
+			productName = ArivomThittam;
+			productReference = 10A000012D10000100000000 /* ArivomThittam.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		10F000022D10000100000002 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1520;
+				TargetAttributes = {
+					10E000012D10000100000001 = {
+						CreatedOnToolsVersion = 15.2;
+					};
+				};
+			};
+			buildConfigurationList = 10F000032D10000100000003 /* Build configuration list for PBXProject "ArivomThittam" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 10C000012D10000100000001;
+			productRefGroup = 10C000032D10000100000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				10E000012D10000100000001 /* ArivomThittam */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		10A000042D10000100000000 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10A001162D10000100000016 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		10A000032D10000100000000 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10A001012D10000100000001 /* ArivomThittamApp.swift in Sources */,
+				10A001022D10000100000002 /* CitizenProfile.swift in Sources */,
+				10A001032D10000100000003 /* Scheme.swift in Sources */,
+				10A001042D10000100000004 /* EligibilityResult.swift in Sources */,
+				10A001052D10000100000005 /* DeterministicEligibilityEngine.swift in Sources */,
+				10A001062D10000100000006 /* TranslationManager.swift in Sources */,
+				10A001072D10000100000007 /* SchemeRepository.swift in Sources */,
+				10A001082D10000100000008 /* DefaultSchemes.swift in Sources */,
+				10A001092D10000100000009 /* LocalSchemeRepository.swift in Sources */,
+				10A0010A2D1000010000000A /* AppState.swift in Sources */,
+				10A0010B2D1000010000000B /* DashboardViewModel.swift in Sources */,
+				10A0010C2D1000010000000C /* EligibilityViewModel.swift in Sources */,
+				10A0010D2D1000010000000D /* BadgeView.swift in Sources */,
+				10A0010E2D1000010000000E /* CategoryChipView.swift in Sources */,
+				10A0010F2D1000010000000F /* SchemeCardView.swift in Sources */,
+				10A001102D10000100000010 /* SchemeDetailView.swift in Sources */,
+				10A001112D10000100000011 /* DashboardView.swift in Sources */,
+				10A001122D10000100000012 /* EligibilityWizardView.swift in Sources */,
+				10A001132D10000100000013 /* EligibilityResultView.swift in Sources */,
+				10A001142D10000100000014 /* VoiceAssistantView.swift in Sources */,
+				10A001152D10000100000015 /* MainTabView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		10F000042D10000100000004 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		10F000052D10000100000005 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		10F000062D10000100000006 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = ArivomThittam/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.arivomthittam.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		10F000072D10000100000007 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = ArivomThittam/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.arivomthittam.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		10F000012D10000100000001 /* Build configuration list for PBXNativeTarget "ArivomThittam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10F000062D10000100000006 /* Debug */,
+				10F000072D10000100000007 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		10F000032D10000100000003 /* Build configuration list for PBXProject "ArivomThittam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10F000042D10000100000004 /* Debug */,
+				10F000052D10000100000005 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 10F000022D10000100000002 /* Project object */;
+}

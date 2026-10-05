@@ -22,3 +22,13 @@ local.properties
 arivom-thittam-android-apk/
 __pycache__/
 *.pyc
+
+# iOS & Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+xcuserdata/
+*.xcworkspace/
+!*.xcworkspace/contents.xcworkspacedata
+.build/
+DerivedData/
+

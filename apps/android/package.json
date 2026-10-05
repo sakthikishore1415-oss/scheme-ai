@@ -1,0 +1,9 @@
+{
+  "name": "@arivom-thittam/android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Native Android app (Kotlin + Jetpack Compose)",
+  "scripts": {
+    "build": "node ../../scripts/build_android.js"
+  }
+}

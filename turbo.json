@@ -17,6 +17,14 @@
       "dependsOn": ["^build"],
       "outputs": []
     },
+    "@arivom-thittam/android#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["build/outputs/apk/**", "dist/**"]
+    },
+    "@arivom-thittam/ios#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["build/**", "dist/**"]
+    },
     "lint": {
       "dependsOn": ["^build"]
     },
