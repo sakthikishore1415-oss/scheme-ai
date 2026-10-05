@@ -28,10 +28,13 @@ if (fs.existsSync(androidApk)) {
 }
 
 // 3. iOS
-const iosZip = path.join(distDir, 'ios', 'ArivomThittam-iOS-Simulator.zip');
+const iosIpa = path.join(distDir, 'ios', 'arivom-thittam.ipa');
+const iosZip = path.join(distDir, 'ios', 'arivom-thittam-ios-simulator.zip');
 let iosStatus = 'Verified (Ready for macOS / CI build)';
-if (fs.existsSync(iosZip)) {
-  iosStatus = '✓ Built (dist/ios/ArivomThittam-iOS-Simulator.zip)';
+if (fs.existsSync(iosIpa)) {
+  iosStatus = '✓ Built (dist/ios/arivom-thittam.ipa)';
+} else if (fs.existsSync(iosZip)) {
+  iosStatus = '✓ Built (dist/ios/arivom-thittam-ios-simulator.zip)';
 }
 
 console.log('Target Summary:');

@@ -135,17 +135,15 @@ xcodebuild \
 
 ---
 
-## 🤖 GitHub Actions Automated CI/CD Workflows
+## 🤖 Unified Mobile CI/CD Workflow (GitHub Actions)
 
-Automated workflows are available under [`.github/workflows/`](.github/workflows):
+An automated unified workflow is provided at [`.github/workflows/build-mobile-release.yml`](.github/workflows/build-mobile-release.yml):
 
-1. **Android APK Build**: [`.github/workflows/build-android-release.yml`](.github/workflows/build-android-release.yml)
-   - Trigger: `workflow_dispatch`
-   - Sets up JDK 17, compiles debug/release APK, and creates a GitHub Release.
-
-2. **iOS App Build**: [`.github/workflows/build-ios-release.yml`](.github/workflows/build-ios-release.yml)
-   - Trigger: `workflow_dispatch`
-   - Runs on `macos-14`, builds the app bundle using `xcodebuild`, archives the simulator/app artifact, and publishes to GitHub Releases.
+- **Trigger**: Manual trigger via **`workflow_dispatch`** (from the GitHub Actions tab) or on version tags (`v*`).
+- **Parallel Compilation**:
+  1. **Android Job**: Runs on `ubuntu-latest` with JDK 17 & Gradle, producing `arivom-thittam.apk`.
+  2. **iOS Job**: Runs on `macos-14` with Xcode, producing installable `arivom-thittam.ipa` and `arivom-thittam-ios-simulator.zip`.
+- **Unified Release**: Automatically bundles and publishes all mobile binaries (APK + IPA) together in a single GitHub Release.
 
 ---
 
