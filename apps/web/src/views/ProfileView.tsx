@@ -42,23 +42,27 @@ export const ProfileView: React.FC = () => {
 
   // --- Step 1: Essentials ---
   const [formName, setFormName] = useState(userProfile?.name || '');
-  const [formAge, setFormAge] = useState<number | ''>(userProfile?.age || 35);
+  const [formAge, setFormAge] = useState<number | ''>(
+    userProfile?.age !== undefined && userProfile.age > 0 ? userProfile.age : ''
+  );
   const [formGender, setFormGender] = useState<'female' | 'male' | 'other' | 'unspecified'>(
     userProfile?.gender || 'unspecified'
   );
   const [formDistrict, setFormDistrict] = useState(userProfile?.district || currentStateConfig.districts[0] || '');
   const [formIncome, setFormIncome] = useState<number | ''>(
-    userProfile?.annualIncome !== undefined && userProfile.annualIncome > 0 ? userProfile.annualIncome : 120000
+    userProfile?.annualIncome !== undefined && userProfile.annualIncome > 0 ? userProfile.annualIncome : ''
   );
   const [formNeed, setFormNeed] = useState<NeedCategory | 'general'>(userProfile?.need || 'general');
   const [selectedProfession, setSelectedProfession] = useState<string>(
-    userProfile?.occupation?.toLowerCase() || 'farmer'
+    userProfile?.occupation?.toLowerCase() || ''
   );
 
   // --- Step 2: Adaptive Questions ---
   // Farmer
   const [farmerLandOwnership, setFarmerLandOwnership] = useState('Own Land');
-  const [farmerLandAcres, setFarmerLandAcres] = useState<number | ''>(userProfile?.landHoldingAcres || 2.5);
+  const [farmerLandAcres, setFarmerLandAcres] = useState<number | ''>(
+    userProfile?.landHoldingAcres !== undefined && userProfile.landHoldingAcres > 0 ? userProfile.landHoldingAcres : ''
+  );
   const [farmerCropType, setFarmerCropType] = useState('Paddy / Rice');
   const [farmerIrrigation, setFarmerIrrigation] = useState('Borewell / Open Well');
   const [farmerRegistration, setFarmerRegistration] = useState('Yes (PM-KISAN / Uzhavan)');
@@ -116,12 +120,12 @@ export const ProfileView: React.FC = () => {
     e.preventDefault();
     updateUserProfile({
       name: formName.trim() || 'Citizen Profile',
-      age: formAge === '' ? 35 : Number(formAge),
+      age: formAge === '' ? 0 : Number(formAge),
       gender: formGender,
       state: selectedStateId,
       district: formDistrict,
       occupation: selectedProfession,
-      annualIncome: formIncome === '' ? 120000 : Number(formIncome),
+      annualIncome: formIncome === '' ? 0 : Number(formIncome),
       need: formNeed,
       landHoldingAcres: selectedProfession === 'farmer' ? (farmerLandAcres === '' ? 0 : Number(farmerLandAcres)) : 0,
       isStudent: selectedProfession === 'student',
@@ -269,7 +273,7 @@ export const ProfileView: React.FC = () => {
                 {currentStep === 1
                   ? 'Step 1 of 3: Shared Essentials'
                   : currentStep === 2
-                  ? `Step 2 of 3: ${professions.find((p) => p.id === selectedProfession)?.label} Specifics`
+                  ? `Step 2 of 3: ${professions.find((p) => p.id === selectedProfession)?.label || 'Profession'} Specifics`
                   : 'Step 3 of 3: Verification & Privacy'}
               </span>
               <span className="text-[#514346] font-normal">{currentStep * 33}% Completed</span>
@@ -943,7 +947,12 @@ export const ProfileView: React.FC = () => {
               {currentStep < 3 ? (
                 <button
                   type="button"
-                  onClick={() => setCurrentStep(currentStep + 1)}
+                  onClick={() => {
+                    if (currentStep === 1 && !selectedProfession) {
+                      setSelectedProfession('other');
+                    }
+                    setCurrentStep(currentStep + 1);
+                  }}
                   className="px-6 py-2.5 rounded-xl bg-[#4a1f2d] hover:bg-[#310a18] text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer transition-colors shadow-xs"
                 >
                   <span>

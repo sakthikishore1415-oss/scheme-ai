@@ -1,5 +1,20 @@
 import { SUPPORTED_LANGUAGES } from '../data/languages';
 
+const LANGUAGE_VOICE_MAP: Record<string, string> = {
+  ta: 'Aoede',
+  hi: 'Kore',
+  te: 'Fenrir',
+  kn: 'Aoede',
+  ml: 'Charon',
+  mr: 'Kore',
+  bn: 'Puck',
+  gu: 'Zephyr',
+  or: 'Kore',
+  pa: 'Fenrir',
+  as: 'Aoede',
+  en: 'Kore',
+};
+
 class SpeechService {
   private isSynthesizing = false;
   private activeUtterances: Set<SpeechSynthesisUtterance> = new Set();
@@ -38,12 +53,6 @@ class SpeechService {
 
   /**
    * Selects the best available voice for the specified language ID.
-   * Priority:
-   * 1. Exact locale match (e.g., "ta-IN", "hi-IN", "te-IN")
-   * 2. Base language prefix match (e.g., "ta", "hi", "te")
-   * 3. Matching voice name or native script name (e.g., "Google தமிழ்", "Microsoft Swara")
-   * 4. Indic / regional family fallback for Indian languages if specific locale voice is missing
-   * 5. English fallback for English locale requests
    */
   public getBestVoice(langId: string): SpeechSynthesisVoice | null {
     const voices = this.getVoices();
@@ -57,13 +66,13 @@ class SpeechService {
 
     const isEnglish = langPrefix === 'en';
 
-    // 1. Exact match on full locale tag (e.g., "ta-in", "hi-in", "te-in", "kn-in", "ml-in", "mr-in", "bn-in", "gu-in", "or-in", "pa-in", "as-in")
+    // 1. Exact match on full locale tag
     let best = voices.find(
       (v) => v.lang.toLowerCase().replace('_', '-') === bcp47
     );
     if (best) return best;
 
-    // 2. Match on language prefix (e.g., "ta-", "hi-", "te-", "kn-", "ml-", "mr-", "bn-", "gu-", "or-", "pa-", "as-")
+    // 2. Match on language prefix
     best = voices.find(
       (v) =>
         v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix + '-') ||
@@ -71,7 +80,7 @@ class SpeechService {
     );
     if (best) return best;
 
-    // 3. Match on voice name or native name (e.g., "Google தமிழ்", "Microsoft Swara - Hindi", "Google Hindi")
+    // 3. Match on voice name or native name
     best = voices.find(
       (v) =>
         (langName && v.name.toLowerCase().includes(langName)) ||
@@ -79,7 +88,7 @@ class SpeechService {
     );
     if (best) return best;
 
-    // 4. Substring match on lang tag (excluding English voices when looking for non-English)
+    // 4. Substring match on lang tag
     if (!isEnglish) {
       best = voices.find(
         (v) =>
@@ -88,8 +97,7 @@ class SpeechService {
       );
       if (best) return best;
 
-      // 5. Fallback for Indian regional languages when specific regional voice is missing:
-      // Look for any available Indic language voice (hi, ta, te, kn, ml, mr, bn, gu, pa, as, ur)
+      // 5. Fallback for Indian regional languages
       const indicPrefixes = ['hi', 'ta', 'te', 'kn', 'ml', 'mr', 'bn', 'gu', 'or', 'pa', 'as', 'ur'];
       if (indicPrefixes.includes(langPrefix)) {
         best = voices.find((v) => {
@@ -138,20 +146,20 @@ class SpeechService {
         if (window.speechSynthesis.paused) {
           window.speechSynthesis.resume();
         }
-        if (!this.isAudioUnlocked) {
-          this.isAudioUnlocked = true;
-          // Silent micro-utterance to prime browser speech synthesis playback pipeline
-          const dummy = new SpeechSynthesisUtterance('');
-          dummy.volume = 0.01;
-          window.speechSynthesis.speak(dummy);
+        this.isAudioUnlocked = true;
+      } catch (_) {}
+    }
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioCtx) {
+        if (!this.audioContext) {
+          this.audioContext = new AudioCtx();
         }
-      } catch (_) {}
-    }
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      try {
-        this.audioContext.resume();
-      } catch (_) {}
-    }
+        if (this.audioContext.state === 'suspended') {
+          this.audioContext.resume().catch(() => {});
+        }
+      }
+    } catch (_) {}
   }
 
   private startResumeHeartbeat() {
@@ -172,7 +180,13 @@ class SpeechService {
     }
   }
 
-  public speak(
+  /**
+   * Primary voice speech dispatcher:
+   * 1. If Gemini TTS endpoint is available or browser lacks native voice, use Gemini TTS.
+   * 2. Otherwise use local browser SpeechSynthesis.
+   * 3. Fallback to harmonic audio tones if both fail, so audio is NEVER dead.
+   */
+  public async speak(
     text: string,
     langId: string = 'ta',
     onStart?: () => void,
@@ -190,96 +204,153 @@ class SpeechService {
       return;
     }
 
-    if (this.currentAudioElement) {
-      try {
-        this.currentAudioElement.pause();
-        this.currentAudioElement.currentTime = 0;
-      } catch (_) {}
-      this.currentAudioElement = null;
-    }
-
+    this.stop();
     this.unlockAudio();
 
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-      this.simulateSpeechAudio(cleanText, onStart, onEnd);
-      return;
+    // 1. If language is not English and browser has no native voice for this language, try Gemini TTS first!
+    const hasNative = this.hasNativeVoice(langId);
+    if (!hasNative || langId !== 'en') {
+      const ttsSuccess = await this.tryGeminiTTS(cleanText, langId, onStart, onEnd);
+      if (ttsSuccess) return;
     }
 
-    try {
-      if (window.speechSynthesis.paused) {
-        window.speechSynthesis.resume();
-      }
-
+    // 2. Use browser SpeechSynthesis
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       try {
-        window.speechSynthesis.cancel();
-      } catch (_) {}
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
 
-      const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
-      const utterance = new SpeechSynthesisUtterance(cleanText);
-      const bcp47 = langConfig?.bcp47Code || 'ta-IN';
-      utterance.lang = bcp47;
-      utterance.rate = overrideRate || this.speechRate;
-      utterance.pitch = 1.0;
-      utterance.volume = 1.0; // 100% Audible volume
+        try {
+          window.speechSynthesis.cancel();
+        } catch (_) {}
 
-      // Select best voice for the requested language and assign explicitly
-      const matchingVoice = this.getBestVoice(langId);
-      if (matchingVoice) {
-        utterance.voice = matchingVoice;
-        if (matchingVoice.lang) {
-          utterance.lang = matchingVoice.lang;
+        const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        const bcp47 = langConfig?.bcp47Code || 'ta-IN';
+        utterance.lang = bcp47;
+        utterance.rate = overrideRate || this.speechRate;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        const matchingVoice = this.getBestVoice(langId);
+        if (matchingVoice) {
+          utterance.voice = matchingVoice;
+          if (matchingVoice.lang) {
+            utterance.lang = matchingVoice.lang;
+          }
+        }
+
+        this.activeUtterances.add(utterance);
+        let hasFinished = false;
+
+        const finishUtterance = (source: string = 'normal') => {
+          if (hasFinished) return;
+          hasFinished = true;
+          this.isSynthesizing = false;
+          this.stopResumeHeartbeat();
+          this.activeUtterances.delete(utterance);
+          if (onEnd) onEnd();
+        };
+
+        utterance.onstart = () => {
+          this.isSynthesizing = true;
+          this.startResumeHeartbeat();
+          if (onStart) onStart();
+        };
+
+        utterance.onend = () => {
+          finishUtterance('onend');
+        };
+
+        utterance.onerror = (e) => {
+          console.warn(`SpeechSynthesis error (${e.error}):`, e);
+          finishUtterance('onerror');
+          // If browser speech synthesis fails, simulate tone so citizen knows system replied
+          this.simulateSpeechAudio(cleanText, onStart, onEnd);
+          if (onError) onError(e);
+        };
+
+        setTimeout(() => {
+          try {
+            if (window.speechSynthesis.paused) {
+              window.speechSynthesis.resume();
+            }
+            window.speechSynthesis.speak(utterance);
+            if (window.speechSynthesis.paused) {
+              window.speechSynthesis.resume();
+            }
+          } catch (err) {
+            console.warn('SpeechSynthesis speak fallback error:', err);
+            finishUtterance('catch');
+            this.simulateSpeechAudio(cleanText, onStart, onEnd);
+          }
+        }, 50);
+        return;
+      } catch (err) {
+        console.warn('Failed to initialize speech utterance:', err);
+      }
+    }
+
+    // 3. Fallback to pleasant tone audio
+    this.simulateSpeechAudio(cleanText, onStart, onEnd);
+  }
+
+  /**
+   * Attempts to play speech using Gemini TTS
+   */
+  private async tryGeminiTTS(
+    text: string,
+    langId: string,
+    onStart?: () => void,
+    onEnd?: () => void
+  ): Promise<boolean> {
+    try {
+      const voiceName = LANGUAGE_VOICE_MAP[langId] || 'Aoede';
+      const res = await fetch('/api/gemini-tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          voiceName,
+          languageId: langId,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.audio) {
+          const audio = new Audio(data.audio);
+          this.currentAudioElement = audio;
+
+          return new Promise<boolean>((resolve) => {
+            audio.onplay = () => {
+              this.isSynthesizing = true;
+              if (onStart) onStart();
+            };
+            audio.onended = () => {
+              this.isSynthesizing = false;
+              this.currentAudioElement = null;
+              if (onEnd) onEnd();
+              resolve(true);
+            };
+            audio.onerror = () => {
+              this.isSynthesizing = false;
+              this.currentAudioElement = null;
+              resolve(false);
+            };
+            audio.play().catch(() => {
+              this.isSynthesizing = false;
+              this.currentAudioElement = null;
+              resolve(false);
+            });
+          });
         }
       }
-
-      // Store in activeUtterances Set to prevent V8 garbage collection while speaking!
-      this.activeUtterances.add(utterance);
-
-      let hasFinished = false;
-
-      const finishUtterance = (source: string = 'normal') => {
-        if (hasFinished) return;
-        hasFinished = true;
-        this.isSynthesizing = false;
-        this.stopResumeHeartbeat();
-        this.activeUtterances.delete(utterance);
-        if (onEnd) onEnd();
-      };
-
-      utterance.onstart = () => {
-        this.isSynthesizing = true;
-        this.startResumeHeartbeat();
-        if (onStart) onStart();
-      };
-
-      utterance.onend = () => {
-        finishUtterance('onend');
-      };
-
-      utterance.onerror = (e) => {
-        console.warn(`SpeechSynthesis error (${e.error}):`, e);
-        finishUtterance('onerror');
-        if (onError) onError(e);
-      };
-
-      // Safe microtask dispatch (50ms allows Chrome speech engine pipeline to reset after cancel)
-      setTimeout(() => {
-        try {
-          if (window.speechSynthesis.paused) {
-            window.speechSynthesis.resume();
-          }
-          window.speechSynthesis.speak(utterance);
-          if (window.speechSynthesis.paused) {
-            window.speechSynthesis.resume();
-          }
-        } catch (err) {
-          console.warn('SpeechSynthesis speak fallback error:', err);
-          finishUtterance('catch');
-        }
-      }, 50);
-    } catch (err) {
-      console.warn('Failed to initialize speech utterance:', err);
-      if (onEnd) onEnd();
+    } catch (_) {
+      // Fall through to browser speech synthesis
     }
+    return false;
   }
 
   public stop() {
@@ -322,14 +393,14 @@ class SpeechService {
   }
 
   // Audio tone simulation fallback so audio is NEVER dead
-  private simulateSpeechAudio(text: string, onStart?: () => void, onEnd?: () => void) {
+  public simulateSpeechAudio(text: string, onStart?: () => void, onEnd?: () => void) {
     try {
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioContextClass) {
         if (onStart) onStart();
         setTimeout(() => {
           if (onEnd) onEnd();
-        }, 1500);
+        }, 1200);
         return;
       }
 
@@ -338,7 +409,7 @@ class SpeechService {
       }
 
       if (this.audioContext.state === 'suspended') {
-        this.audioContext.resume();
+        this.audioContext.resume().catch(() => {});
       }
 
       if (onStart) onStart();
@@ -361,12 +432,12 @@ class SpeechService {
 
       setTimeout(() => {
         if (onEnd) onEnd();
-      }, 1000);
+      }, 800);
     } catch (e) {
       if (onStart) onStart();
       setTimeout(() => {
         if (onEnd) onEnd();
-      }, 1000);
+      }, 800);
     }
   }
 }

@@ -95,28 +95,6 @@ export const SmsSimulator: React.FC = () => {
         <span>ℹ️ Simulation only — no real SMS was sent. Operates against connected scheme repository.</span>
       </div>
 
-      {/* Preset Quick Chips */}
-      <div className="flex items-center gap-2 flex-wrap text-xs">
-        <span className="text-slate-400 font-semibold">Try Query:</span>
-        <button
-          onClick={() => handleSend('SCHEME AGRICULTURE TN')}
-          className="px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs font-mono border border-slate-700 cursor-pointer"
-        >
-          SCHEME AGRICULTURE TN
-        </button>
-        <button
-          onClick={() => handleSend('SCHEME EDUCATION KL')}
-          className="px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-mono border border-slate-700 cursor-pointer"
-        >
-          SCHEME EDUCATION KL
-        </button>
-        <button
-          onClick={() => handleSend('SCHEME WOMEN')}
-          className="px-3 py-1 rounded-full bg-slate-800 hover:bg-slate-700 text-rose-300 text-xs font-mono border border-slate-700 cursor-pointer"
-        >
-          SCHEME WOMEN
-        </button>
-      </div>
 
       {/* Chat Messages Container */}
       <div className="bg-slate-950 rounded-2xl p-4 h-80 overflow-y-auto space-y-3 border border-slate-800 font-sans text-xs flex flex-col justify-end">

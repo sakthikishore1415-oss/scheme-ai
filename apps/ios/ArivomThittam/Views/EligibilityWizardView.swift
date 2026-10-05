@@ -5,12 +5,12 @@ public struct EligibilityWizardView: View {
     @EnvironmentObject var appState: AppState
     @ObservedObject var translationManager = TranslationManager.shared
 
-    @State private var age: Int = 28
-    @State private var gender: String = "female"
+    @State private var age: Int = 0
+    @State private var gender: String = "all"
     @State private var state: String = "TN"
-    @State private var occupation: String = "farmer"
-    @State private var annualIncome: Double = 120000
-    @State private var landHoldingAcres: Double = 2.5
+    @State private var occupation: String = "other"
+    @State private var annualIncome: Double = 0
+    @State private var landHoldingAcres: Double = 0.0
     @State private var disability: Bool = false
     @State private var showingResults = false
 

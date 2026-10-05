@@ -8,17 +8,7 @@ public class AppState: ObservableObject {
     @Published public var eligibilityResults: [EligibilityResult] = []
 
     public init() {
-        self.citizenProfile = CitizenProfile(
-            name: "Citizen",
-            age: 28,
-            gender: "female",
-            state: "TN",
-            district: "Chennai",
-            occupation: "farmer",
-            annualIncome: 120000,
-            landHoldingAcres: 2.5,
-            disability: false
-        )
+        self.citizenProfile = CitizenProfile()
     }
 
     public func toggleBookmark(schemeId: String) {

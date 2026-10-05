@@ -77,8 +77,8 @@ object GeminiVoiceService {
         isFastMode: Boolean = true,
         history: List<Pair<String, String>> = emptyList()
     ): String = withContext(Dispatchers.IO) {
-        val xaiKey = if (BuildConfig.XAI_API_KEY.isNotBlank()) BuildConfig.XAI_API_KEY else "xai-HGfw0p7ZC3kABWgf29QA7wfqDQvNFQqfu8H336JL5auLBZFI0t1R5ll1DFmTGBPLU025MzsIhhqvhENP"
-        val apiKey = if (BuildConfig.GEMINI_API_KEY.isNotBlank()) BuildConfig.GEMINI_API_KEY else "AQ.Ab8RN6JSV7z-KRN41yTnI3bUKbzFOGsw5ekHPVh5zSeoMt7DqA"
+        val xaiKey = BuildConfig.XAI_API_KEY
+        val apiKey = BuildConfig.GEMINI_API_KEY
 
         val systemInstruction = when (language) {
             "ta" -> "நீங்கள் அறிவோம் (Arivom) மக்கள் குரல் வழிகாட்டி. வெறும் பதிலை மட்டும் கூறி நிறுத்தாமல், தொடர்ந்து உரையாடுங்கள்! 1 அல்லது 2 எளிய வாக்கியங்களில் நேரடி ஆலோசனை வழங்கி, அவர்களின் தகுதியை அறிய ஒரு தொடர் கேள்வியைக் (Follow-up Question) கேளுங்கள். இயல்பான தமிழில் மட்டும் பேசவும்."
@@ -137,7 +137,7 @@ object GeminiVoiceService {
         } catch (_: Exception) {}
 
         // 2. Google Gemini Models with Instant Failover
-        val candidateModels = listOf("gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-3-flash-preview", "gemini-3.6-flash")
+        val candidateModels = listOf("gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.1-flash-lite", "gemini-3.5-flash")
 
         val contentsArray = JSONArray().apply {
             history.takeLast(6).forEach { (role, txt) ->

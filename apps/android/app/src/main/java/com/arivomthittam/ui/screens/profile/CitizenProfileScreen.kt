@@ -91,11 +91,11 @@ fun CitizenProfileScreen(
 
     // --- STEP 1: Shared Essentials ---
     var name by remember { mutableStateOf(currentProfile?.name ?: "") }
-    var ageText by remember { mutableStateOf(if ((currentProfile?.age ?: 0) > 0) currentProfile!!.age.toString() else "35") }
+    var ageText by remember { mutableStateOf(if ((currentProfile?.age ?: 0) > 0) currentProfile!!.age.toString() else "") }
     var selectedGender by remember { mutableStateOf(currentProfile?.gender ?: "all") }
     var selectedState by remember { mutableStateOf(currentProfile?.state ?: currentState) }
     var district by remember { mutableStateOf(currentProfile?.district ?: "") }
-    var annualIncomeText by remember { mutableStateOf(if ((currentProfile?.annualIncome ?: 0) > 0) currentProfile!!.annualIncome.toString() else "120000") }
+    var annualIncomeText by remember { mutableStateOf(if ((currentProfile?.annualIncome ?: 0) > 0) currentProfile!!.annualIncome.toString() else "") }
     var selectedNeed by remember { mutableStateOf(currentProfile?.need ?: "general") }
     var selectedProfession by remember {
         mutableStateOf(
@@ -107,7 +107,7 @@ fun CitizenProfileScreen(
     // --- STEP 2: Profession-Adaptive Questions ---
     // Farmer fields
     var farmerLandOwnership by remember { mutableStateOf("Own Land") }
-    var farmerLandAcres by remember { mutableStateOf(currentProfile?.landHoldingAcres?.toString() ?: "2.5") }
+    var farmerLandAcres by remember { mutableStateOf(if ((currentProfile?.landHoldingAcres ?: 0.0) > 0.0) currentProfile!!.landHoldingAcres.toString() else "") }
     var farmerCropType by remember { mutableStateOf("Paddy / Rice") }
     var farmerIrrigation by remember { mutableStateOf("Borewell / Well") }
     var farmerRegistration by remember { mutableStateOf("Yes (PM-KISAN / Uzhavan)") }

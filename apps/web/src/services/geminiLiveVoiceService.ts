@@ -569,13 +569,39 @@ CRITICAL VOICE RULES:
 3. NEVER output bullet points, asterisks, formatting tags, URLs, or markdown symbols.
 4. Keep the turn-taking active, encouraging the citizen to answer your question.`;
 
+      // 1. Try local Vite dev server /api/gemini-generate endpoint first
+      try {
+        const localRes = await fetch('/api/gemini-generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: this.currentAbortController?.signal,
+          body: JSON.stringify({
+            prompt: spokenText,
+            systemInstruction,
+            history: this.conversationHistory.slice(-6),
+          }),
+        });
+        if (localRes.ok) {
+          const localData = await localRes.json();
+          if (localData.text) {
+            return localData.text
+              .replace(/[*_#`[\]()]/g, '')
+              .replace(/\s+/g, ' ')
+              .trim();
+          }
+        }
+      } catch (_) {
+        // Fall through to direct Google Gemini API call
+      }
+
       const xaiApiKey = (import.meta as any).env?.VITE_XAI_API_KEY || (window as any).__XAI_API_KEY__;
 
       const apiKey =
         (import.meta as any).env?.VITE_GEMINI_API_KEY ||
-        (window as any).__GEMINI_API_KEY__;
+        (window as any).__GEMINI_API_KEY__ ||
+        '';
 
-      // 1. Try xAI Grok API first if key exists
+      // 2. Try xAI Grok API if key exists
       if (xaiApiKey) {
         try {
           const xaiRes = await fetch('https://api.x.ai/v1/chat/completions', {
@@ -614,7 +640,7 @@ CRITICAL VOICE RULES:
         }
       }
 
-      // Build true multi-turn conversational turns
+      // Build multi-turn conversational turns
       const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
       const historyTurns = this.conversationHistory.slice(-8);
       for (const h of historyTurns) {
@@ -624,7 +650,6 @@ CRITICAL VOICE RULES:
         });
       }
 
-      // Ensure last turn is the user's latest query
       if (contents.length === 0 || contents[contents.length - 1].role !== 'user') {
         contents.push({
           role: 'user',
@@ -638,17 +663,16 @@ CRITICAL VOICE RULES:
         },
         contents,
         generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 1000,
+          temperature: 0.6,
+          maxOutputTokens: 250,
         },
       };
 
-      // Candidate models for ultra-reliable zero-downtime execution
+      // Verified working models with priority on gemini-3.6-flash
       const candidateModels = [
-        'gemini-3.5-flash',
-        'gemini-3.1-flash-lite',
-        'gemini-3-flash-preview',
         'gemini-3.6-flash',
+        'gemini-3.8-flash',
+        'gemini-3.1-flash-lite',
       ];
 
       for (const model of candidateModels) {
@@ -1058,27 +1082,60 @@ CRITICAL VOICE RULES:
     return this.isListeningActive && (this.state === 'LISTENING' || this.state === 'USER_SPEAKING');
   }
 
-  public startListening(): boolean {
+  public async ensureMicrophoneStream(): Promise<boolean> {
+    if (this.localStream && this.localStream.active) {
+      return true;
+    }
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      return false;
+    }
+    try {
+      this.localStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+      this.setupAudioAnalyser(this.localStream);
+      return true;
+    } catch (err: any) {
+      console.warn('Microphone permission notice:', err);
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        this.callbacks?.onError?.('Microphone access was blocked. Please grant microphone permission in your browser to speak.');
+      }
+      return false;
+    }
+  }
+
+  public async startListening(): Promise<boolean> {
     if (this.pauseSilenceTimer !== null) {
       clearTimeout(this.pauseSilenceTimer);
       this.pauseSilenceTimer = null;
     }
     this.accumulatedQueryText = '';
     this.currentInterimText = '';
-    if (!this.recognition) return false;
     this.isListeningActive = true;
     this.isMuted = false;
-    try {
-      this.recognition.start();
-      this.setState('LISTENING');
-      return true;
-    } catch (e: any) {
-      if (e.name !== 'InvalidStateError') {
-        console.warn('Speech recognition start notice:', e);
+
+    // Ensure audio unlocking and active microphone stream with real visualizer feedback
+    speechService.unlockAudio();
+    await this.ensureMicrophoneStream();
+
+    this.setState('LISTENING');
+
+    if (this.recognition) {
+      try {
+        this.recognition.start();
+        return true;
+      } catch (e: any) {
+        if (e.name !== 'InvalidStateError') {
+          console.warn('Speech recognition start notice:', e);
+        }
+        return true;
       }
-      this.setState('LISTENING');
-      return true;
     }
+    return true;
   }
 
   /**

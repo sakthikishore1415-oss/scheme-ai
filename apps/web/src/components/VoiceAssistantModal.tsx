@@ -165,7 +165,7 @@ export const VoiceAssistantModal: React.FC = () => {
   /**
    * One-Tap to Speak: Immediate 1-tap activation / interruption / commit.
    */
-  const handleToggleListening = () => {
+  const handleToggleListening = async () => {
     speechService.unlockAudio();
     if (voiceState === 'SPEAKING' || voiceState === 'THINKING') {
       geminiLiveVoiceService.stopEverything();
@@ -179,7 +179,7 @@ export const VoiceAssistantModal: React.FC = () => {
       geminiLiveVoiceService.stopListening('manual');
       return;
     }
-    geminiLiveVoiceService.startListening();
+    await geminiLiveVoiceService.startListening();
   };
 
   const handleSendText = (e: React.FormEvent) => {
@@ -407,9 +407,24 @@ export const VoiceAssistantModal: React.FC = () => {
             </div>
 
             {lastError && (
-              <p className="text-[11px] text-[#b91c1c] bg-[#fef2f2] border border-[#fecaca] px-3 py-1 rounded-xl max-w-xs mt-2">
-                {lastError}
-              </p>
+              <div className="space-y-1.5 mt-2 max-w-xs">
+                <p className="text-[11px] text-[#b91c1c] bg-[#fef2f2] border border-[#fecaca] px-3 py-1.5 rounded-xl">
+                  {lastError}
+                </p>
+                {lastError.toLowerCase().includes('micro') && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setLastError(null);
+                      await geminiLiveVoiceService.ensureMicrophoneStream();
+                      await geminiLiveVoiceService.startListening();
+                    }}
+                    className="w-full py-1.5 px-3 rounded-xl bg-[#4a1f2d] text-white text-xs font-bold hover:bg-[#310a18] transition-colors cursor-pointer shadow-xs"
+                  >
+                    🎤 Grant Microphone Permission
+                  </button>
+                )}
+              </div>
             )}
           </div>
 
