@@ -12,6 +12,9 @@ bun.lockb
 design_system/
 web_design_system/
 *.zip
+pnpm-lock.yaml
+pnpm-workspace.yaml
+.pnpm-store/
 
 # Android & Gradle
 .gradle/

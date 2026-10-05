@@ -142,7 +142,7 @@ An automated unified workflow is provided at [`.github/workflows/build-mobile-re
 - **Trigger**: Manual trigger via **`workflow_dispatch`** (from the GitHub Actions tab) or on version tags (`v*`).
 - **Parallel Compilation**:
   1. **Android Job**: Runs on `ubuntu-latest` with JDK 17 & Gradle, producing `arivom-thittam.apk`.
-  2. **iOS Job**: Runs on `macos-14` with Xcode, producing installable `arivom-thittam.ipa` and `arivom-thittam-ios-simulator.zip`.
+  2. **iOS Job**: Runs on `macos-14` with Xcode, producing installable `arivom-thittam.ipa`.
 - **Unified Release**: Automatically bundles and publishes all mobile binaries (APK + IPA) together in a single GitHub Release.
 
 ---

@@ -85,7 +85,7 @@ xcodebuild \
 
 ## 🤖 Automated CI Workflow (GitHub Actions)
 
-An automated GitHub Actions workflow is provided at `.github/workflows/build-ios-release.yml`.
-- Runs on `macos-14` / `macos-15` runner.
-- Builds the application using `xcodebuild`.
-- Archives the application as a GitHub Release and downloadable artifact.
+An automated unified workflow is provided at `.github/workflows/build-mobile-release.yml`.
+- Runs on `macos-14` runner.
+- Builds the application using `xcodebuild -sdk iphoneos`.
+- Packages and archives an installable `arivom-thittam.ipa` as a GitHub Release and downloadable artifact.

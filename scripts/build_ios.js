@@ -47,12 +47,11 @@ if (isDarwin) {
 
 // 3. Compile if on macOS with Xcode
 if (isDarwin && xcodeAvailable) {
-  console.log('⚙️ Compiling iOS app using xcodebuild (Device SDK / iphoneos & Simulator)...');
+  console.log('⚙️ Compiling iOS app using xcodebuild (Device SDK / iphoneos)...');
   try {
     const destDir = path.join(rootDir, 'dist', 'ios');
     fs.mkdirSync(destDir, { recursive: true });
 
-    // A. Build Device SDK / iphoneos for Installable IPA
     console.log('📱 Building iOS Device SDK (for .ipa package)...');
     execSync(
       'xcodebuild -project ArivomThittam.xcodeproj -scheme ArivomThittam -configuration Release -sdk iphoneos CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED=NO build',
@@ -77,31 +76,7 @@ if (isDarwin && xcodeAvailable) {
           stdio: 'inherit'
         });
         fs.rmSync(payloadDir, { recursive: true, force: true });
-        console.log(`\n🎉 iOS Installable IPA built: dist/ios/arivom-thittam.ipa`);
-      }
-    }
-
-    // B. Build Simulator SDK
-    console.log('💻 Building iOS Simulator build (for Mac preview)...');
-    execSync(
-      'xcodebuild -project ArivomThittam.xcodeproj -scheme ArivomThittam -destination "generic/platform=iOS Simulator" -configuration Release CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED=NO build',
-      { cwd: iosDir, stdio: 'inherit', env: process.env }
-    );
-
-    const simSettings = execSync(
-      'xcodebuild -project ArivomThittam.xcodeproj -scheme ArivomThittam -destination "generic/platform=iOS Simulator" -configuration Release -showBuildSettings',
-      { cwd: iosDir, encoding: 'utf-8' }
-    );
-    const simMatch = simSettings.match(/\sBUILT_PRODUCTS_DIR\s=\s(.*)/);
-    if (simMatch && simMatch[1]) {
-      const simBuildDir = simMatch[1].trim();
-      const simApp = path.join(simBuildDir, 'ArivomThittam.app');
-      if (fs.existsSync(simApp)) {
-        execSync(`zip -qr "${path.join(destDir, 'arivom-thittam-ios-simulator.zip')}" ArivomThittam.app`, {
-          cwd: simBuildDir,
-          stdio: 'inherit'
-        });
-        console.log(`🎉 iOS Simulator bundle archived: dist/ios/arivom-thittam-ios-simulator.zip\n`);
+        console.log(`\n🎉 iOS Installable IPA built: dist/ios/arivom-thittam.ipa\n`);
       }
     }
   } catch (err) {
