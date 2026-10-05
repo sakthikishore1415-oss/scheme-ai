@@ -1,7 +1,30 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import fs from 'fs';
 import { defineConfig, Plugin } from 'vite';
+
+function getApiKey(): string {
+  if (process.env.GEMINI_API_KEY) return process.env.GEMINI_API_KEY;
+  if (process.env.VITE_GEMINI_API_KEY) return process.env.VITE_GEMINI_API_KEY;
+
+  const candidatePaths = [
+    path.resolve(__dirname, '.env'),
+    path.resolve(__dirname, '../../.env'),
+  ];
+  for (const p of candidatePaths) {
+    try {
+      if (fs.existsSync(p)) {
+        const content = fs.readFileSync(p, 'utf-8');
+        const match = content.match(/^(?:VITE_)?GEMINI_API_KEY=(.+)$/m);
+        if (match && match[1]) {
+          return match[1].trim().replace(/^['"]|['"]$/g, '');
+        }
+      }
+    } catch (_) {}
+  }
+  return '';
+}
 
 function pcmToWav(pcmBuffer: Buffer, sampleRate = 24000, numChannels = 1): Buffer {
   const byteRate = sampleRate * numChannels * 2;
@@ -31,7 +54,7 @@ function geminiLiveServerPlugin(): Plugin {
     name: 'gemini-live-backend-gateway',
     configureServer(server) {
       server.middlewares.use('/api/gemini-token', (req, res) => {
-        const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+        const apiKey = getApiKey();
         if (!apiKey) {
           res.statusCode = 503;
           res.setHeader('Content-Type', 'application/json');
@@ -59,7 +82,7 @@ function geminiLiveServerPlugin(): Plugin {
 
         req.on('end', async () => {
           try {
-            const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+            const apiKey = getApiKey();
             if (!apiKey) {
               res.statusCode = 503;
               res.setHeader('Content-Type', 'application/json');
@@ -87,47 +110,66 @@ function geminiLiveServerPlugin(): Plugin {
             } else {
               contents = [
                 {
-                  role: 'user',
-                  parts: [{ text: parsed.prompt || 'Hello' }],
-                },
-              ];
-            }
+                    role: 'user',
+                    parts: [{ text: parsed.prompt || 'Hello' }],
+                  },
+                ];
+              }
 
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
-            const apiRes = await fetch(endpoint, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                systemInstruction: {
-                  parts: [{ text: systemInstructionText }],
-                },
-                contents,
-                generationConfig: {
-                  temperature: 0.5,
-                  maxOutputTokens: 120, // Crisp 1-2 sentence response for fast voice turn
-                },
-              }),
-            });
+              const candidateModels = ['gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-3.1-flash-lite'];
+              let generatedText = '';
+              let lastStatus = 500;
+              let lastErrText = '';
 
-            if (!apiRes.ok) {
-              const errText = await apiRes.text();
-              res.statusCode = apiRes.status;
+              for (const model of candidateModels) {
+                try {
+                  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                  const apiRes = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      systemInstruction: {
+                        parts: [{ text: systemInstructionText }],
+                      },
+                      contents,
+                      generationConfig: {
+                        temperature: 0.5,
+                        maxOutputTokens: 600,
+                      },
+                    }),
+                  });
+
+                  if (apiRes.ok) {
+                    const data: any = await apiRes.json();
+                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                    if (text) {
+                      generatedText = text;
+                      break;
+                    }
+                  } else {
+                    lastStatus = apiRes.status;
+                    lastErrText = await apiRes.text();
+                  }
+                } catch (err: any) {
+                  lastErrText = err?.message || 'Network error';
+                }
+              }
+
+              if (generatedText) {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ text: generatedText }));
+              } else {
+                res.statusCode = lastStatus;
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ error: lastErrText || 'All models unavailable' }));
+              }
+            } catch (err: any) {
+              res.statusCode = 500;
               res.setHeader('Content-Type', 'application/json');
-              res.end(JSON.stringify({ error: errText }));
-              return;
+              res.end(JSON.stringify({ error: err?.message || 'Server error' }));
             }
-
-            const data: any = await apiRes.json();
-            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ text }));
-          } catch (err: any) {
-            res.statusCode = 500;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({ error: err?.message || 'Server error' }));
-          }
-        });
+          });
       });
 
       // 1b. Ultra-Low Latency Streaming Generation (Stream-to-Speech)
@@ -145,7 +187,7 @@ function geminiLiveServerPlugin(): Plugin {
 
         req.on('end', async () => {
           try {
-            const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+            const apiKey = getApiKey();
             if (!apiKey) {
               res.statusCode = 503;
               res.setHeader('Content-Type', 'application/json');
@@ -244,7 +286,7 @@ function geminiLiveServerPlugin(): Plugin {
 
         req.on('end', async () => {
           try {
-            const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+            const apiKey = getApiKey();
             if (!apiKey) {
               res.statusCode = 503;
               res.setHeader('Content-Type', 'application/json');
@@ -283,21 +325,36 @@ function geminiLiveServerPlugin(): Plugin {
             }
 
             const ttsEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent?key=${apiKey}`;
-            const apiRes = await fetch(ttsEndpoint, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                contents: [{ parts: [{ text: textToSpeak }] }],
-                generationConfig: {
-                  responseModalities: ['AUDIO'],
-                  speechConfig: {
-                    voiceConfig: {
-                      prebuiltVoiceConfig: { voiceName },
+            let apiRes: any = null;
+            for (let attempt = 0; attempt < 2; attempt++) {
+              try {
+                apiRes = await fetch(ttsEndpoint, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    contents: [{ parts: [{ text: textToSpeak }] }],
+                    generationConfig: {
+                      responseModalities: ['AUDIO'],
+                      speechConfig: {
+                        voiceConfig: {
+                          prebuiltVoiceConfig: { voiceName },
+                        },
+                      },
                     },
-                  },
-                },
-              }),
-            });
+                  }),
+                });
+                if (apiRes && apiRes.ok) break;
+              } catch (_) {
+                if (attempt === 0) await new Promise((r) => setTimeout(r, 200));
+              }
+            }
+
+            if (!apiRes) {
+              res.statusCode = 502;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ error: 'TTS request network error' }));
+              return;
+            }
 
             if (!apiRes.ok) {
               const errText = await apiRes.text();
@@ -346,6 +403,10 @@ function geminiLiveServerPlugin(): Plugin {
 export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss(), geminiLiveServerPlugin()],
+    define: {
+      'import.meta.env.VITE_GEMINI_API_KEY': JSON.stringify(getApiKey()),
+      '__GEMINI_API_KEY__': JSON.stringify(getApiKey()),
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

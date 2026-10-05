@@ -9,10 +9,37 @@ import {
   FolderHeart,
 } from 'lucide-react';
 
-export const SavedSchemesView: React.FC = () => {
-  const { savedSchemeIds, activeMatches, userDocuments, setActiveTab, t } = useApp();
+import { MatchResult } from '../types';
 
-  const savedMatches = activeMatches.filter((m) => savedSchemeIds.includes(m.scheme.id));
+export const SavedSchemesView: React.FC = () => {
+  const { savedSchemeIds, activeMatches, schemes, userProfile, userDocuments, setActiveTab, t } = useApp();
+
+  const savedMatches: MatchResult[] = schemes
+    .filter((s) => savedSchemeIds.includes(s.id))
+    .map((s) => {
+      const match = activeMatches.find((m) => m.scheme.id === s.id);
+      if (match) return match;
+      return {
+        scheme: s,
+        score: 0,
+        matchLevel: 'MORE_INFO' as const,
+        status: 'NO_DATA' as const,
+        criteriaBreakdown: {
+          age: false,
+          income: false,
+          occupation: false,
+          location: true,
+          gender: false,
+          documents: 'MISSING' as const,
+        },
+        whyMeEnglish: ['Complete your profile to evaluate eligibility.'],
+        whyMeRegional: ['தகுதி அறிய உங்கள் விவரங்களை பதிவு செய்யவும்.'],
+        matchedPoints: [],
+        pendingPoints: ['Profile setup required'],
+        simpleExplanationEnglish: s.summarySimple || '',
+        simpleExplanationRegional: '',
+      };
+    });
 
   // Compute document readiness
   const totalRequiredDocs = Array.from(

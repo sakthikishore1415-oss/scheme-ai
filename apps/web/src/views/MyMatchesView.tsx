@@ -13,15 +13,60 @@ import {
   Landmark,
   Layers,
   Filter,
+  ArrowRight,
 } from 'lucide-react';
+import { MatchResult } from '../types';
 
 export const MyMatchesView: React.FC = () => {
-  const { activeMatches, userProfile, currentStateConfig, easyMode, setActiveTab, t } = useApp();
+  const {
+    activeMatches,
+    schemes,
+    selectedStateId,
+    userProfile,
+    currentStateConfig,
+    easyMode,
+    setActiveTab,
+    setShowVoiceModal,
+    t,
+  } = useApp();
 
   const [filterType, setFilterType] = useState<'ALL' | 'STRONG' | 'POTENTIAL' | 'STATE' | 'CENTRAL'>('ALL');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showWizard, setShowWizard] = useState<boolean>(false);
+
+  // When userProfile exists, use actual activeMatches.
+  // When userProfile is null, generate clean catalog results for all schemes in this state / central government.
+  const applicableSchemes = schemes.filter(
+    (s) =>
+      s.stateId === 'ALL' ||
+      s.stateId === selectedStateId ||
+      s.state === 'ALL' ||
+      s.state === selectedStateId
+  );
+
+  const catalogMatches: MatchResult[] = applicableSchemes.map((s) => ({
+    scheme: s,
+    score: 0,
+    matchLevel: 'MORE_INFO' as const,
+    status: 'NO_DATA' as const,
+    criteriaBreakdown: {
+      age: false,
+      income: false,
+      occupation: false,
+      location: true,
+      gender: false,
+      documents: 'MISSING' as const,
+    },
+    whyMeEnglish: ['Complete your profile to check eligibility criteria.'],
+    whyMeRegional: ['தகுதி அறிய உங்கள் விவரங்களை பதிவு செய்யவும்.'],
+    matchedPoints: [],
+    pendingPoints: ['Citizen profile required to verify eligibility'],
+    simpleExplanationEnglish: s.summarySimple || '',
+    simpleExplanationRegional: '',
+  }));
+
+  const sourceMatches = userProfile ? activeMatches : catalogMatches;
 
   const categories = [
     { id: 'ALL', label: 'All Categories' },
@@ -37,7 +82,7 @@ export const MyMatchesView: React.FC = () => {
   ];
 
   // Apply filters
-  const filteredMatches = activeMatches.filter((res) => {
+  const filteredMatches = sourceMatches.filter((res) => {
     // 1. Level filter
     if (filterType === 'STRONG' && res.matchLevel !== 'STRONG') return false;
     if (filterType === 'POTENTIAL' && res.matchLevel !== 'POTENTIAL') return false;
@@ -77,7 +122,7 @@ export const MyMatchesView: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="bg-[#6b3548] text-[#ffd9e1] text-xs px-2.5 py-0.5 rounded-full font-bold border border-[#e8e1dc]/30 flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5 text-[#c8a96b]" />
-              {t('matches.title')}
+              {userProfile ? t('matches.title') : 'Government Welfare Schemes'}
             </span>
             <span className="text-xs text-[#c8a96b] font-mono font-bold">
               📍 {currentStateConfig.name}
@@ -85,7 +130,7 @@ export const MyMatchesView: React.FC = () => {
           </div>
 
           <h1 className={`font-black text-white tracking-tight mt-2 ${easyMode ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
-            {t('matches.title')}
+            {userProfile ? t('matches.title') : 'Official Schemes & Entitlements'}
           </h1>
 
           <p className="text-xs sm:text-sm text-[#ffd9e1] mt-1">
@@ -94,7 +139,7 @@ export const MyMatchesView: React.FC = () => {
                 {t('matches.subtitle')} (<strong>{userProfile.occupation || 'Citizen'}</strong>, {userProfile.district || currentStateConfig.name})
               </>
             ) : (
-              t('profile.subtitle')
+              `Explore official Central & ${currentStateConfig.name} state welfare entitlements.`
             )}
           </p>
         </div>
@@ -113,6 +158,41 @@ export const MyMatchesView: React.FC = () => {
       {showWizard && (
         <div className="animate-fade-in">
           <AdaptiveQuestionWizard />
+        </div>
+      )}
+
+      {/* If citizen has not created profile, show welcoming guidance banner */}
+      {!userProfile && (
+        <div className="bg-[#faf8f3] border border-[#e8e1dc] rounded-3xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-[#4a1f2d] text-white flex items-center justify-center font-bold shrink-0 shadow-xs">
+              <UserPlus className="w-6 h-6 text-[#c8a96b]" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm sm:text-base text-[#21191d]">
+                Want to check your exact scheme eligibility?
+              </h3>
+              <p className="text-xs text-[#756a6f] mt-0.5 max-w-xl leading-relaxed">
+                Complete your citizen profile in 60 seconds (or tap the Mic) to discover all schemes you qualify for. In the meantime, you can explore the complete catalog below.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto">
+            <button
+              onClick={() => setActiveTab('profile')}
+              className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-[#4a1f2d] hover:bg-[#310a18] text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-all"
+            >
+              <span>Create Profile</span>
+              <ArrowRight className="w-4 h-4 text-[#c8a96b]" />
+            </button>
+            <button
+              onClick={() => setShowVoiceModal(true)}
+              className="px-4 py-2.5 rounded-xl bg-white hover:bg-[#faf8f3] text-[#4a1f2d] border border-[#e8e1dc] font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+            >
+              <span>Ask Voice</span>
+            </button>
+          </div>
         </div>
       )}
 
@@ -166,7 +246,7 @@ export const MyMatchesView: React.FC = () => {
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>All Schemes ({activeMatches.length})</span>
+            <span>All Schemes ({sourceMatches.length})</span>
           </button>
 
           <button
@@ -193,27 +273,31 @@ export const MyMatchesView: React.FC = () => {
             <span>Central Government Schemes</span>
           </button>
 
-          <button
-            onClick={() => setFilterType('STRONG')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 ${
-              filterType === 'STRONG'
-                ? 'bg-[#15803d] text-white shadow-xs'
-                : 'bg-[#faf8f3] text-[#514346] hover:bg-[#eedfe4] border border-[#e8e1dc]'
-            }`}
-          >
-            <span>{t('matches.filterStrong')}</span>
-          </button>
+          {userProfile && (
+            <>
+              <button
+                onClick={() => setFilterType('STRONG')}
+                className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 ${
+                  filterType === 'STRONG'
+                    ? 'bg-[#15803d] text-white shadow-xs'
+                    : 'bg-[#faf8f3] text-[#514346] hover:bg-[#eedfe4] border border-[#e8e1dc]'
+                }`}
+              >
+                <span>{t('matches.filterStrong')}</span>
+              </button>
 
-          <button
-            onClick={() => setFilterType('POTENTIAL')}
-            className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 ${
-              filterType === 'POTENTIAL'
-                ? 'bg-[#b45309] text-white shadow-xs'
-                : 'bg-[#faf8f3] text-[#514346] hover:bg-[#eedfe4] border border-[#e8e1dc]'
-            }`}
-          >
-            <span>{t('matches.filterPotential')}</span>
-          </button>
+              <button
+                onClick={() => setFilterType('POTENTIAL')}
+                className={`px-3 py-1.5 rounded-xl font-bold transition-colors cursor-pointer shrink-0 ${
+                  filterType === 'POTENTIAL'
+                    ? 'bg-[#b45309] text-white shadow-xs'
+                    : 'bg-[#faf8f3] text-[#514346] hover:bg-[#eedfe4] border border-[#e8e1dc]'
+                }`}
+              >
+                <span>{t('matches.filterPotential')}</span>
+              </button>
+            </>
+          )}
         </div>
 
         {/* Row 3: Category Pills */}
@@ -243,7 +327,7 @@ export const MyMatchesView: React.FC = () => {
       {/* Results Header Summary */}
       <div className="flex items-center justify-between px-1 text-xs text-[#756a6f]">
         <span>
-          Showing <strong>{filteredMatches.length}</strong> matching schemes
+          Showing <strong>{filteredMatches.length}</strong> {userProfile ? 'matching schemes' : 'available schemes'}
         </span>
       </div>
 

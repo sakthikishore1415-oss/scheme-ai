@@ -28,8 +28,8 @@ export const AdaptiveQuestionWizard: React.FC = () => {
 
   const [tempNeed, setTempNeed] = useState<NeedCategory | 'general'>(userProfile?.need ?? 'general');
   const [tempOccupation, setTempOccupation] = useState<string>(userProfile?.occupation ?? '');
-  const [tempAge, setTempAge] = useState<number>(userProfile?.age ?? 35);
-  const [tempIncome, setTempIncome] = useState<number>(userProfile?.annualIncome ?? 120000);
+  const [tempAge, setTempAge] = useState<number>(userProfile?.age && userProfile.age > 0 ? userProfile.age : 25);
+  const [tempIncome, setTempIncome] = useState<number>(userProfile?.annualIncome && userProfile.annualIncome > 0 ? userProfile.annualIncome : 0);
   const [tempLand, setTempLand] = useState<number>(userProfile?.landHoldingAcres ?? 0);
 
   const speakQuestion = (text: string) => {

@@ -25,6 +25,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
     toggleSaveScheme,
     isSchemeSaved,
     easyMode,
+    userProfile,
   } = useApp();
 
   const { scheme, score, matchLevel, criteriaBreakdown } = matchResult;
@@ -59,14 +60,21 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
       <div>
         <div className="flex items-center justify-between gap-2 mb-2.5">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span
-              className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg border flex items-center gap-1 ${getScoreBadgeStyles(
-                matchLevel
-              )}`}
-            >
-              <Sparkles className="w-3 h-3" />
-              {score}% PROFILE MATCH
-            </span>
+            {userProfile ? (
+              <span
+                className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg border flex items-center gap-1 ${getScoreBadgeStyles(
+                  matchLevel
+                )}`}
+              >
+                <Sparkles className="w-3 h-3" />
+                {score}% PROFILE MATCH
+              </span>
+            ) : (
+              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-lg border flex items-center gap-1 bg-[#faf8f3] text-[#4a1f2d] border-[#e8e1dc]">
+                <Sparkles className="w-3 h-3 text-[#c8a96b]" />
+                OFFICIAL SCHEME
+              </span>
+            )}
 
             <span
               className={`text-[10px] font-bold px-2.5 py-0.5 rounded-lg uppercase tracking-wider ${
@@ -133,58 +141,81 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
         </div>
 
         {/* Criteria Matching Summary Chips */}
-        <div className="mt-3 flex items-center gap-2 flex-wrap text-[11px]">
-          <span className="inline-flex items-center gap-1 text-[#514346] font-medium">
-            {criteriaBreakdown?.age ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#71806b] shrink-0" />
-            ) : (
-              <AlertTriangle className="w-3.5 h-3.5 text-[#c8a96b] shrink-0" />
-            )}
-            Age
-          </span>
-          <span className="text-[#e8e1dc]">•</span>
-          <span className="inline-flex items-center gap-1 text-[#514346] font-medium">
-            {criteriaBreakdown?.income ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#71806b] shrink-0" />
-            ) : (
-              <AlertTriangle className="w-3.5 h-3.5 text-[#c8a96b] shrink-0" />
-            )}
-            Income
-          </span>
-          <span className="text-[#e8e1dc]">•</span>
-          <span className="inline-flex items-center gap-1 text-[#514346] font-medium">
-            {criteriaBreakdown?.occupation ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#71806b] shrink-0" />
-            ) : (
-              <AlertTriangle className="w-3.5 h-3.5 text-[#c8a96b] shrink-0" />
-            )}
-            Occupation
-          </span>
-          <span className="text-[#e8e1dc]">•</span>
-          <span className="inline-flex items-center gap-1 text-[#514346] font-medium">
-            {criteriaBreakdown?.location ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#71806b] shrink-0" />
-            ) : (
-              <AlertTriangle className="w-3.5 h-3.5 text-[#c8a96b] shrink-0" />
-            )}
-            State
-          </span>
-        </div>
+        {userProfile ? (
+          <div className="mt-3 flex items-center gap-2 flex-wrap text-[11px]">
+            <span className="inline-flex items-center gap-1 text-[#514346] font-medium">
+              {criteriaBreakdown?.age ? (
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#71806b] shrink-0" />
+              ) : (
+                <AlertTriangle className="w-3.5 h-3.5 text-[#c8a96b] shrink-0" />
+              )}
+              Age
+            </span>
+            <span className="text-[#e8e1dc]">•</span>
+            <span className="inline-flex items-center gap-1 text-[#514346] font-medium">
+              {criteriaBreakdown?.income ? (
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#71806b] shrink-0" />
+              ) : (
+                <AlertTriangle className="w-3.5 h-3.5 text-[#c8a96b] shrink-0" />
+              )}
+              Income
+            </span>
+            <span className="text-[#e8e1dc]">•</span>
+            <span className="inline-flex items-center gap-1 text-[#514346] font-medium">
+              {criteriaBreakdown?.occupation ? (
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#71806b] shrink-0" />
+              ) : (
+                <AlertTriangle className="w-3.5 h-3.5 text-[#c8a96b] shrink-0" />
+              )}
+              Occupation
+            </span>
+            <span className="text-[#e8e1dc]">•</span>
+            <span className="inline-flex items-center gap-1 text-[#514346] font-medium">
+              {criteriaBreakdown?.location ? (
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#71806b] shrink-0" />
+              ) : (
+                <AlertTriangle className="w-3.5 h-3.5 text-[#c8a96b] shrink-0" />
+              )}
+              State
+            </span>
+          </div>
+        ) : (
+          <div className="mt-3 flex items-center gap-2 flex-wrap text-[11px]">
+            <span className="text-[#756a6f] font-medium">
+              Category: <strong className="text-[#4a1f2d] capitalize">{scheme.category || 'General'}</strong>
+            </span>
+            <span className="text-[#e8e1dc]">•</span>
+            <span className="text-[#756a6f]">
+              {scheme.documents?.length || 0} Required Docs
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Action Buttons Bar */}
       <div className="mt-4 pt-3 border-t border-[#e8e1dc] flex items-center justify-between gap-1.5 flex-wrap">
         <div className="flex items-center gap-1.5">
-          {/* Why Me Button */}
-          <button
-            id={`why-me-btn-${scheme.id}`}
-            onClick={() => setSelectedWhyMeScheme(matchResult)}
-            className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#faf8f3] text-[#4a1f2d] font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-[#e8e1dc]"
-            title="Explain why this scheme matches your profile"
-          >
-            <HelpCircle className="w-3.5 h-3.5 text-[#4a1f2d]" />
-            <span>WHY ME?</span>
-          </button>
+          {userProfile ? (
+            <button
+              id={`why-me-btn-${scheme.id}`}
+              onClick={() => setSelectedWhyMeScheme(matchResult)}
+              className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#faf8f3] text-[#4a1f2d] font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-[#e8e1dc]"
+              title="Explain why this scheme matches your profile"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-[#4a1f2d]" />
+              <span>WHY ME?</span>
+            </button>
+          ) : (
+            <button
+              id={`criteria-btn-${scheme.id}`}
+              onClick={() => setSelectedSchemeDetail(scheme)}
+              className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#faf8f3] text-[#4a1f2d] font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-[#e8e1dc]"
+              title="View eligibility criteria for this scheme"
+            >
+              <HelpCircle className="w-3.5 h-3.5 text-[#4a1f2d]" />
+              <span>CRITERIA</span>
+            </button>
+          )}
 
           {/* Voice Assistant Explanation Button */}
           <button

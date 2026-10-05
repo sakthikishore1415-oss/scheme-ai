@@ -13,7 +13,7 @@ import {
 import { ViewTab } from '../types';
 
 export const BottomNav: React.FC = () => {
-  const { activeTab, setActiveTab, setShowVoiceModal, activeMatches, savedSchemeIds, t } =
+  const { activeTab, setActiveTab, setShowVoiceModal, activeMatches, savedSchemeIds, userProfile, t } =
     useApp();
 
   const strongMatchesCount = activeMatches.filter((m) => m.matchLevel !== 'MORE_INFO').length;
@@ -30,7 +30,7 @@ export const BottomNav: React.FC = () => {
       id: 'matches',
       label: t('nav.matches'),
       icon: <Sparkles className="w-4 h-4" />,
-      badge: strongMatchesCount,
+      badge: userProfile && strongMatchesCount > 0 ? strongMatchesCount : undefined,
     },
     {
       id: 'saved',
@@ -100,7 +100,7 @@ export const BottomNav: React.FC = () => {
 };
 
 export const DesktopSidebar: React.FC = () => {
-  const { activeTab, setActiveTab, setShowVoiceModal, activeMatches, savedSchemeIds, t } =
+  const { activeTab, setActiveTab, setShowVoiceModal, activeMatches, savedSchemeIds, userProfile, t } =
     useApp();
   const [isExpanded, setIsExpanded] = React.useState<boolean>(false);
 
@@ -112,7 +112,7 @@ export const DesktopSidebar: React.FC = () => {
       id: 'matches',
       label: t('nav.matches'),
       icon: <Sparkles className="w-4 h-4 shrink-0" />,
-      badge: strongMatchesCount,
+      badge: userProfile && strongMatchesCount > 0 ? strongMatchesCount : undefined,
       description: 'Eligible Schemes',
     },
     {

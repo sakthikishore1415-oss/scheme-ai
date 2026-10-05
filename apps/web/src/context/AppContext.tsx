@@ -249,27 +249,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setActiveFamilyMemberId(null);
   };
 
-  // Evaluate schemes deterministically against loaded schemes
-  const effectiveProfile: UserProfile = userProfile || {
-    userId: 'guest',
-    name: '',
-    age: 35,
-    gender: 'unspecified',
-    state: selectedStateId,
-    district: currentStateConfig.districts[0] || '',
-    occupation: '',
-    annualIncome: 150000,
-    education: 'other',
-    maritalStatus: 'unspecified',
-    isStudent: false,
-    hasDisability: false,
-    landHoldingAcres: 0,
-    need: 'general',
-    voiceLanguage: selectedVoiceLanguageId,
-    familyRole: 'Self',
-  };
-
-  const activeMatches = matchUserSchemes(effectiveProfile, schemes);
+  // Evaluate schemes deterministically only when a real citizen profile exists
+  const activeMatches = userProfile ? matchUserSchemes(userProfile, schemes) : [];
 
   // Save/Unsave Schemes
   const toggleSaveScheme = (schemeId: string) => {
@@ -320,7 +301,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       profile: { ...(userProfile || {}), ...(sessionUpdate.profile || {}) },
       matchesCount: sessionUpdate.matchesCount || activeMatches.filter((m) => m.matchLevel !== 'MORE_INFO').length,
       topMatchName: sessionUpdate.topMatchName || (activeMatches[0]?.scheme.name ?? 'None'),
-      topMatchBenefit: sessionUpdate.topMatchBenefit || (activeMatches[0]?.scheme.benefits.amount ?? 'N/A'),
+      topMatchBenefit: sessionUpdate.topMatchBenefit || (activeMatches[0]?.scheme.benefits?.amount ?? 'N/A'),
       status: sessionUpdate.status || 'Active',
       timestamp: 'Just now',
       ivrSteps: sessionUpdate.ivrSteps || [],
