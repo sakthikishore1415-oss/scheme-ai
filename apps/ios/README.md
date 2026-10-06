@@ -1,7 +1,6 @@
 # PACS Sahayak — Native iOS Application (Swift & SwiftUI)
 
 > **Know Your Schemes. Claim Your Benefits.**  
-> *அரசு திட்டங்களை அறிவோம். உரிமைகளைப் பெறுவோம்.*
 
 A genuine native iOS application built with **Swift 5.9+ and SwiftUI**, maintaining 100% architectural and rule parity with the Web and Android apps.
 
@@ -38,7 +37,7 @@ apps/ios/
     │   ├── SchemeDetailView.swift    # Full details, roadmap, checklist & links
     │   ├── EligibilityWizardView.swift # Interactive citizen assessment form
     │   ├── EligibilityResultView.swift # Ranked results with "Why You Qualify"
-    │   ├── VoiceAssistantView.swift  # Civic voice guide in Tamil & English
+    │   ├── VoiceAssistantView.swift  # Civic voice guide in 12 Indian languages
     │   └── Components/
     │       ├── BadgeView.swift       # Status & match level pills
     │       └── CategoryChipView.swift # Horizontal scrolling filter chips
