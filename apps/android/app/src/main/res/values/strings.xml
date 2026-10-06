@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">PACS Sahayak</string>
-    <string name="app_name_tamil">பேக்ஸ் சகாயக்</string>
     <string name="app_tagline">Know Your Schemes. Claim Your Benefits.</string>
-    <string name="app_tagline_tamil">அரசு நலத்திட்டங்களை அறிந்து உரிமையோடு பெறுங்கள்.</string>
 </resources>
 

@@ -90,8 +90,15 @@ fun SplashScreen(
                 letterSpacing = (-0.02).sp
             )
 
+            val deviceLang = remember { com.pacssahayak.domain.language.LanguageDetectionHelper.detectDeviceLanguage() }
+            val subtitle = if (deviceLang != "en") {
+                com.pacssahayak.domain.language.AndroidTranslations.getString("app.name", deviceLang)
+            } else {
+                "Citizen Welfare Portal"
+            }
+
             Text(
-                text = "பேக்ஸ் சகாயக்",
+                text = subtitle,
                 color = PrimaryFixed,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,

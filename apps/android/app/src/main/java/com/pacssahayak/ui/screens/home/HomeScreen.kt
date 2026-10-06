@@ -65,19 +65,18 @@ import com.pacssahayak.viewmodel.UiState
 data class QuickNeed(
     val id: String,
     val title: String,
-    val tamilTitle: String,
     val icon: ImageVector
 )
 
 val QUICK_NEEDS = listOf(
-    QuickNeed("agriculture", "Agriculture", "விவசாயம்", Icons.Default.Agriculture),
-    QuickNeed("education", "Education", "கல்வி", Icons.Default.School),
-    QuickNeed("housing", "Housing", "வீட்டு வசதி", Icons.Default.Home),
-    QuickNeed("employment", "Employment", "வேலைவாய்ப்பு", Icons.Default.Work),
-    QuickNeed("women", "Women", "மகளிர் நலம்", Icons.Default.Woman),
-    QuickNeed("senior_citizens", "Senior Citizens", "முதியோர்", Icons.Default.Elderly),
-    QuickNeed("health", "Health", "மருத்துவம்", Icons.Default.LocalHospital),
-    QuickNeed("financial", "Financial Support", "நிதி உதவி", Icons.Default.AccountBalanceWallet)
+    QuickNeed("agriculture", "Agriculture", Icons.Default.Agriculture),
+    QuickNeed("education", "Education", Icons.Default.School),
+    QuickNeed("housing", "Housing", Icons.Default.Home),
+    QuickNeed("employment", "Employment", Icons.Default.Work),
+    QuickNeed("women", "Women", Icons.Default.Woman),
+    QuickNeed("senior_citizens", "Senior Citizens", Icons.Default.Elderly),
+    QuickNeed("health", "Health", Icons.Default.LocalHospital),
+    QuickNeed("financial", "Financial Support", Icons.Default.AccountBalanceWallet)
 )
 
 @Composable
