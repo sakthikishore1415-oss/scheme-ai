@@ -22,13 +22,14 @@ pnpm-workspace.yaml
 local.properties
 *.apk
 *.aab
-arivom-thittam-android-apk/
+pacs-sahayak-android-apk/
 __pycache__/
 *.pyc
 
 # iOS & Xcode
 *.xcodeproj/*
 !*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/**
 xcuserdata/
 *.xcworkspace/
 !*.xcworkspace/contents.xcworkspacedata

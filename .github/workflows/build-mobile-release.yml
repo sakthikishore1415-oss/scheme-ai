@@ -82,8 +82,8 @@ jobs:
         run: |
           mkdir -p build
           xcodebuild \
-            -project ArivomThittam.xcodeproj \
-            -scheme ArivomThittam \
+            -project PACSSahayak.xcodeproj \
+            -scheme PACSSahayak \
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath "$PWD/build/PACSSahayak.xcarchive" \
@@ -95,20 +95,20 @@ jobs:
       - name: Package & Verify Installable IPA
         working-directory: apps/ios
         run: |
-          ARCHIVE_APP="$PWD/build/PACSSahayak.xcarchive/Products/Applications/ArivomThittam.app"
+          ARCHIVE_APP="$PWD/build/PACSSahayak.xcarchive/Products/Applications/PACSSahayak.app"
           if [ ! -d "$ARCHIVE_APP" ]; then
-            echo "❌ ERROR: Built ArivomThittam.app not found in xcarchive at $ARCHIVE_APP"
+            echo "❌ ERROR: Built PACSSahayak.app not found in xcarchive at $ARCHIVE_APP"
             exit 1
           fi
 
           echo "✓ Verifying compiled Mach-O binary executable..."
-          if [ ! -f "$ARCHIVE_APP/ArivomThittam" ]; then
-            echo "❌ ERROR: Executable binary 'ArivomThittam' missing from .app bundle!"
+          if [ ! -f "$ARCHIVE_APP/PACSSahayak" ]; then
+            echo "❌ ERROR: Executable binary 'PACSSahayak' missing from .app bundle!"
             ls -la "$ARCHIVE_APP"
             exit 1
           fi
 
-          BINARY_SIZE=$(stat -f%z "$ARCHIVE_APP/ArivomThittam" 2>/dev/null || stat -c%s "$ARCHIVE_APP/ArivomThittam")
+          BINARY_SIZE=$(stat -f%z "$ARCHIVE_APP/PACSSahayak" 2>/dev/null || stat -c%s "$ARCHIVE_APP/PACSSahayak")
           echo "✓ Executable Mach-O binary size: $BINARY_SIZE bytes"
           if [ "$BINARY_SIZE" -lt 100000 ]; then
             echo "❌ ERROR: Binary size ($BINARY_SIZE bytes) is suspiciously small. Real compiled binary must be > 100KB."

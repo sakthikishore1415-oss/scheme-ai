@@ -11,18 +11,18 @@ A genuine native iOS application built with **Swift 5.9+ and SwiftUI**, maintain
 
 ```
 apps/ios/
-├── ArivomThittam.xcodeproj/          # Xcode Project Configuration
+├── PACSSahayak.xcodeproj/          # Xcode Project Configuration
 │   └── project.pbxproj
-└── ArivomThittam/
+└── PACSSahayak/
     ├── App/
-    │   └── ArivomThittamApp.swift    # App Entrypoint (@main)
+    │   └── PACSSahayakApp.swift    # App Entrypoint (@main)
     ├── Models/
     │   ├── CitizenProfile.swift      # Profile & family entities
     │   ├── Scheme.swift              # Scheme, benefit, rules, document models
     │   └── EligibilityResult.swift   # Match scores, breakdown, status enums
     ├── Domain/
     │   ├── DeterministicEligibilityEngine.swift  # Zero-hallucination evaluator
-    │   └── TranslationManager.swift  # English & Tamil dynamic localization
+    │   └── TranslationManager.swift  # Multi-language dynamic localization
     ├── Repository/
     │   ├── SchemeRepository.swift    # Async repository protocol
     │   ├── DefaultSchemes.swift      # Preloaded welfare scheme catalog
@@ -65,7 +65,7 @@ apps/ios/
 - iOS 17.0+ Simulator or Device
 
 ### In Xcode (GUI)
-1. Double-click `apps/ios/ArivomThittam.xcodeproj` to open in Xcode.
+1. Double-click `apps/ios/PACSSahayak.xcodeproj` to open in Xcode.
 2. Select your target simulator (e.g., iPhone 15 Pro, iPhone 16).
 3. Press `Cmd + R` to Build and Run.
 
@@ -75,8 +75,8 @@ cd apps/ios
 
 # Build for iOS Simulator
 xcodebuild \
-  -project ArivomThittam.xcodeproj \
-  -scheme ArivomThittam \
+  -project PACSSahayak.xcodeproj \
+  -scheme PACSSahayak \
   -destination 'platform=iOS Simulator,name=iPhone 16' \
   build
 ```

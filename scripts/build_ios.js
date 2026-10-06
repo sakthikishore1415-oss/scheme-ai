@@ -12,7 +12,7 @@ console.log('🍎 Building iOS App (@pacs-sahayak/ios)');
 console.log('========================================');
 
 // 1. Verify iOS workspace structure
-const xcodeProj = path.join(iosDir, 'ArivomThittam.xcodeproj', 'project.pbxproj');
+const xcodeProj = path.join(iosDir, 'PACSSahayak.xcodeproj', 'project.pbxproj');
 if (!fs.existsSync(xcodeProj)) {
   console.error('❌ Error: Xcode project file not found at:', xcodeProj);
   process.exit(1);
@@ -27,7 +27,7 @@ function scan(dir) {
     else if (entry.name.endsWith('.swift')) swiftFiles.push(entry.name);
   }
 }
-scan(path.join(iosDir, 'ArivomThittam'));
+scan(path.join(iosDir, 'PACSSahayak'));
 
 // 2. Check platform and xcodebuild availability
 const isDarwin = process.platform === 'darwin';
@@ -56,17 +56,17 @@ if (isDarwin && xcodeAvailable) {
 
     console.log('📱 Archiving iOS Release (for genuine .ipa package)...');
     execSync(
-      `xcodebuild -project ArivomThittam.xcodeproj -scheme ArivomThittam -configuration Release -destination "generic/platform=iOS" -archivePath "${archivePath}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO archive`,
+      `xcodebuild -project PACSSahayak.xcodeproj -scheme PACSSahayak -configuration Release -destination "generic/platform=iOS" -archivePath "${archivePath}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO archive`,
       { cwd: iosDir, stdio: 'inherit', env: process.env }
     );
 
-    const appPath = path.join(archivePath, 'Products', 'Applications', 'ArivomThittam.app');
+    const appPath = path.join(archivePath, 'Products', 'Applications', 'PACSSahayak.app');
     if (!fs.existsSync(appPath)) {
-      throw new Error(`ArivomThittam.app not found in xcarchive at ${appPath}`);
+      throw new Error(`PACSSahayak.app not found in xcarchive at ${appPath}`);
     }
 
     // Verify binary exists
-    const binPath = path.join(appPath, 'ArivomThittam');
+    const binPath = path.join(appPath, 'PACSSahayak');
     if (!fs.existsSync(binPath)) {
       throw new Error(`Executable Mach-O binary missing from .app at ${binPath}`);
     }
@@ -82,7 +82,7 @@ if (isDarwin && xcodeAvailable) {
     const payloadDir = path.join(destDir, 'Payload');
     fs.rmSync(payloadDir, { recursive: true, force: true });
     fs.mkdirSync(payloadDir, { recursive: true });
-    fs.cpSync(appPath, path.join(payloadDir, 'ArivomThittam.app'), { recursive: true });
+    fs.cpSync(appPath, path.join(payloadDir, 'PACSSahayak.app'), { recursive: true });
     const ipaPath = path.join(destDir, 'pacs-sahayak.ipa');
     execSync(`zip -qr9 "${ipaPath}" Payload`, {
       cwd: destDir,

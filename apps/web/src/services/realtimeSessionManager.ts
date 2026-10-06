@@ -231,5 +231,3 @@ When speaking with the user, be concise, warm, and conversational (strictly 1 to
 
 export const REALTIME_TOOLS = GEMINI_LIVE_TOOLS;
 export const getPacsSahayakSystemPrompt = getPacsSahayakGeminiSystemInstruction;
-export const getArivomSystemPrompt = getPacsSahayakSystemPrompt;
-export const getArivomGeminiSystemInstruction = getPacsSahayakGeminiSystemInstruction;

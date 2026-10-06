@@ -26,7 +26,7 @@ val xaiApiKey: String = localProperties.getProperty("XAI_API_KEY")
     ?: ""
 
 android {
-    namespace = "com.arivomthittam"
+    namespace = "com.pacssahayak"
     compileSdk = 35
 
     defaultConfig {

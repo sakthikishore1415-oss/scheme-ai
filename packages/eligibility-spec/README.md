@@ -3,7 +3,7 @@
 ## Principles
 1. **Zero Hallucination / No Generative Decision-Making**: AI/LLMs must NEVER decide eligibility.
 2. **Deterministic Gazette Matching**: Every criterion evaluates pure boolean/numeric conditions against published scheme rules.
-3. **Cross-Platform Parity**: The Web TypeScript engine (`apps/web/src/engine/eligibilityEngine.ts`) and Android Kotlin engine (`apps/android/app/src/main/java/com/arivomthittam/domain/eligibility/DeterministicEligibilityEngine.kt`) must execute the EXACT same scoring and matching rules.
+3. **Cross-Platform Parity**: The Web TypeScript engine (`apps/web/src/engine/eligibilityEngine.ts`) and Android Kotlin engine (`apps/android/app/src/main/java/com/pacssahayak/domain/eligibility/DeterministicEligibilityEngine.kt`) must execute the EXACT same scoring and matching rules.
 
 ---
 

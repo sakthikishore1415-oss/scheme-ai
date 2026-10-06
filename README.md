@@ -23,7 +23,7 @@ pacs-sahayak/
 │   │
 │   ├── android/                 # Native Kotlin + Jetpack Compose + Material 3
 │   │   ├── app/
-│   │   │   ├── src/main/java/com/arivomthittam/
+│   │   │   ├── src/main/java/com/pacssahayak/
 │   │   │   │   ├── data/model/          # Shared entity contracts
 │   │   │   │   ├── data/repository/     # Repository layer
 │   │   │   │   ├── domain/eligibility/  # Deterministic Kotlin Engine
@@ -42,9 +42,9 @@ pacs-sahayak/
 │   │   └── gradle.properties
 │   │
 │   └── ios/                     # Native Swift 5.9+ + SwiftUI
-│       ├── ArivomThittam.xcodeproj/     # Xcode Project
-│       └── ArivomThittam/
-│           ├── App/                     # ArivomThittamApp.swift (@main)
+│       ├── PACSSahayak.xcodeproj/       # Xcode Project
+│       └── PACSSahayak/
+│           ├── App/                     # PACSSahayakApp.swift (@main)
 │           ├── Models/                  # CitizenProfile, Scheme, EligibilityResult
 │           ├── Domain/                  # DeterministicEligibilityEngine, TranslationManager
 │           ├── Repository/              # SchemeRepository, DefaultSchemes, LocalSchemeRepository
@@ -122,13 +122,13 @@ The iOS app is a **genuine native Swift 5.9+ & SwiftUI application** located in 
 
 ```bash
 # Open directly in Xcode on macOS
-open apps/ios/ArivomThittam.xcodeproj
+open apps/ios/PACSSahayak.xcodeproj
 
 # Or build via command line with xcodebuild
 cd apps/ios
 xcodebuild \
-  -project ArivomThittam.xcodeproj \
-  -scheme ArivomThittam \
+  -project PACSSahayak.xcodeproj \
+  -scheme PACSSahayak \
   -destination 'platform=iOS Simulator,name=iPhone 16' \
   build
 ```

@@ -101,11 +101,11 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [selectedStateId, setSelectedStateIdState] = useState<string>(() => {
-    return localStorage.getItem('pacs_sahayak_selected_state') || localStorage.getItem('arivom_selected_state') || 'TN';
+    return localStorage.getItem('pacs_sahayak_selected_state') || 'TN';
   });
 
   const [selectedVoiceLanguageId, setSelectedVoiceLanguageIdState] = useState<string>(() => {
-    const saved = localStorage.getItem('pacs_sahayak_selected_lang') || localStorage.getItem('arivom_selected_lang');
+    const saved = localStorage.getItem('pacs_sahayak_selected_lang');
     if (saved && SUPPORTED_LANGUAGES[saved]) return saved;
     return detectBrowserLanguage();
   });
