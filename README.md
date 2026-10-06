@@ -1,7 +1,7 @@
 # PACS Sahayak (பேக்ஸ் சகாயக்) — Monorepo
 
 > **Know Your Schemes. Claim Your Benefits.**  
-> *அரசு திட்டங்களை அறிவோம். உரிமைகளைப் பெறுவோம்.*
+> *அரசு நலத்திட்டங்களை அறிந்து உரிமையோடு பெறுங்கள்.*
 
 A unified, multi-platform civic access platform designed to make government welfare schemes discoverable, transparent, and claimable by every Indian citizen across smartphone (Web, Android, iOS), voice, and zero-internet interfaces.
 

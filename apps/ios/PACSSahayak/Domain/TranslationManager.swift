@@ -81,7 +81,7 @@ public class TranslationManager: ObservableObject {
         ],
         .tamil: [
             "app_title": "பேக்ஸ் சகாயக்",
-            "tagline": "அரசு திட்டங்களை அறிவோம். உரிமைகளைப் பெறுவோம்.",
+            "tagline": "அரசு நலத்திட்டங்களை அறிந்து உரிமையோடு பெறுங்கள்.",
             "tab_schemes": "திட்டங்கள்",
             "tab_eligibility": "தகுதி சரிபார்ப்பு",
             "tab_voice": "குரல் உதவி",

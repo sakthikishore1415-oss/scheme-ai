@@ -122,7 +122,7 @@ object AndroidTranslations {
     private val TA_STRINGS = mapOf(
         // App & Navigation
         "app.name" to "பேக்ஸ் சகாயக்",
-        "app.tagline" to "அரசு திட்டங்களை அறிவோம். உரிமைகளைப் பெறுவோம்.",
+        "app.tagline" to "அரசு நலத்திட்டங்களை அறிந்து உரிமையோடு பெறுங்கள்.",
         "nav.home" to "முகப்பு",
         "nav.matches" to "திட்டங்கள்",
         "nav.saved" to "சேமித்தவை",
