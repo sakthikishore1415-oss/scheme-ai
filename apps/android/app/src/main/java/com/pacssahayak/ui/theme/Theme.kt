@@ -87,8 +87,3 @@ fun PacsSahayakTheme(
     )
 }
 
-@Composable
-fun PacsSahayakTheme(
-    darkTheme: Boolean = false,
-    content: @Composable () -> Unit
-) = PacsSahayakTheme(darkTheme = darkTheme, content = content)
