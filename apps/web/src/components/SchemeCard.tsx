@@ -26,12 +26,25 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
     isSchemeSaved,
     easyMode,
     userProfile,
+    selectedVoiceLanguageId,
     t,
     uiStrings,
   } = useApp();
 
   const { scheme, score, matchLevel, criteriaBreakdown } = matchResult;
   const isSaved = isSchemeSaved(scheme.id);
+
+  // Extract clean native name if bilingual slash exists
+  const getCleanNativeName = (native: string | undefined, lang: string): string => {
+    if (!native) return '';
+    if (!native.includes('/')) return native.trim();
+    const parts = native.split('/').map((p) => p.trim());
+    if (lang === 'ml' && parts[1]) return parts[1];
+    return parts[0];
+  };
+
+  const cleanNativeName = getCleanNativeName(scheme.nativeName, selectedVoiceLanguageId);
+  const isRegional = selectedVoiceLanguageId !== 'en' && !!cleanNativeName;
 
   const handlePlayVoice = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -85,7 +98,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
                   : 'bg-[#faf8f3] text-[#4a1f2d] border border-[#e8e1dc]'
               }`}
             >
-              {scheme.schemeType === 'central' ? 'Central Scheme' : `${scheme.stateId || scheme.state || 'State'} Scheme`}
+              {scheme.schemeType === 'central' ? t('scheme.centralScheme') : t('scheme.stateScheme')}
             </span>
           </div>
 
@@ -106,7 +119,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
           </button>
         </div>
 
-        {/* Scheme Title & Native Name */}
+        {/* Scheme Title & Native Name - Prioritizes Regional Native Name when selected */}
         <h3
           className={`font-bold text-[#241c20] leading-snug cursor-pointer hover:text-[#4a1f2d] transition-colors ${
             easyMode ? 'text-lg sm:text-xl' : 'text-base sm:text-lg'
@@ -115,7 +128,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
         >
           {scheme.name}
         </h3>
-        {scheme.nativeName && (
+        {scheme.nativeName && scheme.nativeName !== scheme.name && (
           <p className="text-xs text-[#756a6f] font-medium mt-0.5">
             {scheme.nativeName}
           </p>

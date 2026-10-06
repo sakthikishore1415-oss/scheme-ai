@@ -101,6 +101,49 @@ export interface TranslationDictionary {
   'scheme.save': string;
   'scheme.saved': string;
   'scheme.share': string;
+  'scheme.centralScheme': string;
+  'scheme.stateScheme': string;
+  'scheme.whatIsThis': string;
+  'scheme.sanctionedBenefits': string;
+  'scheme.benefitType': string;
+  'scheme.frequency': string;
+  'scheme.whoQualifies': string;
+  'scheme.ageLimit': string;
+  'scheme.incomeCeiling': string;
+  'scheme.targetOccupations': string;
+  'scheme.applicableLocation': string;
+  'scheme.requiredDocs': string;
+  'scheme.docsInstruction': string;
+  'scheme.onlinePortal': string;
+  'scheme.stepByStep': string;
+  'scheme.quickCheckTitle': string;
+  'scheme.hearInVoice': string;
+  'scheme.hear': string;
+  'scheme.overviewTab': string;
+  'scheme.docsTab': string;
+  'scheme.applyTab': string;
+  'scheme.explainSimplyTab': string;
+  'scheme.authority': string;
+  'scheme.ruleGazette': string;
+
+  // Filter & Search Controls
+  'filter.type': string;
+  'filter.reset': string;
+  'filter.allCategories': string;
+  'filter.stateSchemes': string;
+  'filter.centralSchemes': string;
+  'filter.showingMatches': string;
+  'filter.availableSchemes': string;
+  'filter.noMatches': string;
+  'filter.noMatchesDesc': string;
+
+  // Geographic Intelligence Map
+  'map.geoIntelligence': string;
+  'map.selectState': string;
+  'map.activeState': string;
+  'map.description': string;
+  'map.districts': string;
+  'map.voice': string;
 
   // Voice Assistant
   'voice.readyTitle': string;

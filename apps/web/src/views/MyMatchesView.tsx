@@ -69,16 +69,16 @@ export const MyMatchesView: React.FC = () => {
   const sourceMatches = userProfile ? activeMatches : catalogMatches;
 
   const categories = [
-    { id: 'ALL', label: 'All Categories' },
-    { id: 'agriculture', label: '🌾 Agriculture' },
-    { id: 'education', label: '🎓 Education' },
-    { id: 'housing', label: '🏡 Housing' },
-    { id: 'health', label: '🏥 Health' },
-    { id: 'women', label: '👩 Women' },
-    { id: 'senior_citizens', label: '👵 Senior Citizens' },
-    { id: 'employment', label: '💼 Employment' },
-    { id: 'business', label: '💰 Business & Loans' },
-    { id: 'disability', label: '♿ Disability' },
+    { id: 'ALL', label: t('filter.allCategories') },
+    { id: 'agriculture', label: `🌾 ${t('category.agriculture')}` },
+    { id: 'education', label: `🎓 ${t('category.education')}` },
+    { id: 'housing', label: `🏡 ${t('category.housing')}` },
+    { id: 'health', label: `🏥 ${t('category.health')}` },
+    { id: 'women', label: `👩 ${t('category.women')}` },
+    { id: 'senior_citizens', label: `👵 ${t('category.senior')}` },
+    { id: 'employment', label: `💼 ${t('category.employment')}` },
+    { id: 'business', label: `💰 ${t('category.financial')}` },
+    { id: 'disability', label: `♿ ${t('category.disability')}` },
   ];
 
   // Apply filters
@@ -225,7 +225,7 @@ export const MyMatchesView: React.FC = () => {
               className="px-3.5 py-2 rounded-xl bg-[#ffdad6] text-[#ba1a1a] hover:bg-[#fcd0cb] text-xs font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1 border border-[#ba1a1a]/30"
             >
               <X className="w-3.5 h-3.5" />
-              <span>Reset Filters</span>
+              <span>{t('filter.reset')}</span>
             </button>
           )}
         </div>
@@ -234,7 +234,7 @@ export const MyMatchesView: React.FC = () => {
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
           <span className="text-[11px] font-bold text-[#756a6f] flex items-center gap-1 mr-1 shrink-0">
             <Filter className="w-3 h-3 text-[#4a1f2d]" />
-            <span>Type:</span>
+            <span>{t('filter.type')}</span>
           </span>
 
           <button
@@ -258,7 +258,7 @@ export const MyMatchesView: React.FC = () => {
             }`}
           >
             <Building2 className="w-3.5 h-3.5" />
-            <span>{currentStateConfig.name} State Schemes</span>
+            <span>{currentStateConfig.name} {t('filter.stateSchemes')}</span>
           </button>
 
           <button
@@ -270,7 +270,7 @@ export const MyMatchesView: React.FC = () => {
             }`}
           >
             <Landmark className="w-3.5 h-3.5" />
-            <span>Central Government Schemes</span>
+            <span>{t('filter.centralSchemes')}</span>
           </button>
 
           {userProfile && (
@@ -327,7 +327,7 @@ export const MyMatchesView: React.FC = () => {
       {/* Results Header Summary */}
       <div className="flex items-center justify-between px-1 text-xs text-[#756a6f]">
         <span>
-          Showing <strong>{filteredMatches.length}</strong> {userProfile ? 'matching schemes' : 'available schemes'}
+          {t('filter.showingMatches')}: <strong>{filteredMatches.length}</strong> ({userProfile ? t('matches.title') : t('filter.availableSchemes')})
         </span>
       </div>
 
@@ -345,17 +345,17 @@ export const MyMatchesView: React.FC = () => {
           </div>
           <div className="space-y-1">
             <h3 className="text-base sm:text-lg font-bold text-[#21191d]">
-              No schemes match your filter
+              {t('filter.noMatches')}
             </h3>
             <p className="text-xs text-[#756a6f] max-w-md mx-auto leading-relaxed">
-              Try adjusting your category, keyword search, or resetting filters to view all available schemes.
+              {t('filter.noMatchesDesc')}
             </p>
           </div>
           <button
             onClick={handleResetFilters}
             className="px-6 py-2.5 rounded-xl bg-[#4a1f2d] hover:bg-[#310a18] text-white font-bold text-xs shadow-xs transition-all inline-flex items-center gap-2 cursor-pointer"
           >
-            <span>Reset All Filters</span>
+            <span>{t('filter.reset')}</span>
           </button>
         </div>
       )}

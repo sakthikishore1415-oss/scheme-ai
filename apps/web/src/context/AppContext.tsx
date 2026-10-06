@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import {
   UserProfile,
   StateConfig,
@@ -15,6 +15,7 @@ import { SUPPORTED_LANGUAGES } from '../data/languages';
 import { defaultSchemeRepository } from '../services/schemeRepository';
 import { geminiLiveVoiceService } from '../services/geminiLiveVoiceService';
 import { matchUserSchemes } from '../engine/eligibilityEngine';
+import { getLocalizedScheme } from '../translations/schemeLocalizations';
 import confetti from 'canvas-confetti';
 
 interface AppContextType {
@@ -250,8 +251,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setActiveFamilyMemberId(null);
   };
 
+  // Automatically localize schemes for the currently active language
+  const localizedSchemes = useMemo(() => {
+    return schemes.map((s) => getLocalizedScheme(s, selectedVoiceLanguageId));
+  }, [schemes, selectedVoiceLanguageId]);
+
   // Evaluate schemes deterministically only when a real citizen profile exists
-  const activeMatches = userProfile ? matchUserSchemes(userProfile, schemes) : [];
+  const activeMatches = userProfile ? matchUserSchemes(userProfile, localizedSchemes) : [];
+
+  const currentLocalizedSelectedDetail = useMemo(() => {
+    if (!selectedSchemeDetail) return null;
+    return getLocalizedScheme(selectedSchemeDetail, selectedVoiceLanguageId);
+  }, [selectedSchemeDetail, selectedVoiceLanguageId]);
 
   // Save/Unsave Schemes
   const toggleSaveScheme = (schemeId: string) => {
@@ -337,7 +348,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         selectedVoiceLanguageId,
         setSelectedVoiceLanguageId,
         currentLanguageConfig,
-        schemes,
+        schemes: localizedSchemes,
         schemesStatus,
         schemesErrorMessage,
         refreshSchemes,
@@ -354,7 +365,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         taggedSchemeForVoice,
         setTaggedSchemeForVoice,
         openVoiceAssistantForScheme,
-        selectedSchemeDetail,
+        selectedSchemeDetail: currentLocalizedSelectedDetail,
         setSelectedSchemeDetail,
         selectedWhyMeScheme,
         setSelectedWhyMeScheme,

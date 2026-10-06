@@ -142,18 +142,31 @@ fun SchemeCardItem(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Scheme Name & Native Title
+            // Scheme Name & Native Title (Prioritizes Regional Native Title)
+            val isRegional = language != "en"
+            val cleanNative = if (!scheme.nativeName.isNullOrBlank()) {
+                val parts = scheme.nativeName.split("/").map { it.trim() }
+                if (language == "ta") parts.find { it.any { ch -> ch in '\u0B80'..'\u0BFF' } } ?: parts.first()
+                else if (language == "hi") parts.find { it.any { ch -> ch in '\u0900'..'\u097F' } } ?: parts.first()
+                else if (language == "te") parts.find { it.any { ch -> ch in '\u0C00'..'\u0C7F' } } ?: parts.first()
+                else if (language == "ml") parts.find { it.any { ch -> ch in '\u0D00'..'\u0D7F' } } ?: parts.first()
+                else parts.first()
+            } else ""
+
+            val primaryTitle = if (isRegional && cleanNative.isNotBlank()) cleanNative else scheme.name
+            val secondaryTitle = if (isRegional && cleanNative.isNotBlank()) scheme.name else cleanNative
+
             Text(
-                text = scheme.name,
+                text = primaryTitle,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
                 color = PrimaryIndigo,
                 lineHeight = 24.sp
             )
 
-            if (!scheme.nativeName.isNullOrBlank()) {
+            if (secondaryTitle.isNotBlank()) {
                 Text(
-                    text = scheme.nativeName,
+                    text = secondaryTitle,
                     fontSize = 13.sp,
                     color = OnSurfaceVariant,
                     fontWeight = FontWeight.Medium,

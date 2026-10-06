@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <style>
+    :root {
+      --shield-bg: #3d1422;
+      --shield-rim: #e5c158;
+      --inner-plate: #521b2f;
+      --sheaf-color: #e5c158;
+      --hands-color: #f6d365;
+      --sprout-center: #22c55e;
+      --sprout-leaves: #16a34a;
+      --sprout-stem: #15803d;
+      --sun-color: #ffd572;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --shield-bg: #1a080f;
+        --shield-rim: #fcd34d;
+        --inner-plate: #2e0f1b;
+        --sheaf-color: #fcd34d;
+        --hands-color: #fde68a;
+        --sprout-center: #4ade80;
+        --sprout-leaves: #22c55e;
+        --sprout-stem: #16a34a;
+        --sun-color: #fef08a;
+      }
+    }
+  </style>
+  <rect width="100" height="100" rx="24" fill="var(--shield-bg)" />
+  <rect width="94" height="94" x="3" y="3" rx="22" fill="none" stroke="var(--shield-rim)" stroke-width="2.5" opacity="0.8" />
+  
+  <path d="M50 10 L52 18 L50 20 L48 18 Z" fill="var(--sun-color)" opacity="0.9" />
+  <path d="M38 14 L43 20 L41 21 L36 16 Z" fill="var(--sun-color)" opacity="0.75" />
+  <path d="M62 14 L64 16 L59 21 L57 20 Z" fill="var(--sun-color)" opacity="0.75" />
+
+  <path d="M22 66 C 18 52 22 34 34 24 C 30 30 28 39 30 48 C 25 45 23 41 23 37 C 22 43 24 50 27 55 C 23 53 21 50 21 46 C 20 53 23 60 27 66 Z" fill="var(--sheaf-color)" />
+  <path d="M78 66 C 82 52 78 34 66 24 C 70 30 72 39 70 48 C 75 45 77 41 77 37 C 78 43 76 50 73 55 C 77 53 79 50 79 46 C 80 53 77 60 73 66 Z" fill="var(--sheaf-color)" />
+
+  <path d="M50 20 L72 30 C 72 53 61 70 50 78 C 39 70 28 53 28 30 Z" fill="var(--inner-plate)" stroke="var(--shield-rim)" stroke-width="3" stroke-linejoin="round" />
+
+  <path d="M38 48 C 37 52 40 57 44 62 C 46 65 47 69 47 72 L 44 72 C 42 67 38 64 35 58 C 33 55 33 51 35 48 C 36 46 38 46 38 48 Z" fill="var(--hands-color)" />
+  <path d="M62 48 C 63 52 60 57 56 62 C 54 65 53 69 53 72 L 56 72 C 58 67 62 64 65 58 C 67 55 67 51 65 48 C 64 46 62 46 62 48 Z" fill="var(--hands-color)" />
+
+  <path d="M50 34 C 55 41 53 49 50 56 C 47 49 45 41 50 34 Z" fill="var(--sprout-center)" />
+  <path d="M50 47 C 43 42 39 46 40 51 C 45 52 48 50 50 47 Z" fill="var(--sprout-leaves)" />
+  <path d="M50 47 C 57 42 61 46 60 51 C 55 52 52 50 50 47 Z" fill="var(--sprout-leaves)" />
+  <path d="M49 47 L 51 47 L 50.5 63 L 49.5 63 Z" fill="var(--sprout-stem)" />
+</svg>

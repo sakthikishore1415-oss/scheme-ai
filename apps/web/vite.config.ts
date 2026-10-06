@@ -118,25 +118,35 @@ function geminiLiveServerPlugin(): Plugin {
               'You are PACS Sahayak, a warm, friendly voice assistant. Have a natural voice conversation with the citizen in 1-3 spoken sentences. Be helpful, polite, and conversational.';
             
             let contents: any[] = [];
+            const userParts: any[] = [];
+            if (parsed.prompt) userParts.push({ text: parsed.prompt });
+            if (parsed.audio) {
+              userParts.push({
+                inlineData: {
+                  mimeType: parsed.mimeType || 'audio/webm',
+                  data: parsed.audio,
+                },
+              });
+            }
+            if (userParts.length === 0) userParts.push({ text: 'Hello' });
+
             if (Array.isArray(parsed.history) && parsed.history.length > 0) {
               contents = parsed.history.map((h: any) => ({
                 role: h.role === 'assistant' ? 'model' : 'user',
                 parts: [{ text: h.text || h.content || '' }],
               }));
-              if (parsed.prompt) {
-                contents.push({
-                  role: 'user',
-                  parts: [{ text: parsed.prompt }],
-                });
-              }
+              contents.push({
+                role: 'user',
+                parts: userParts,
+              });
             } else {
               contents = [
                 {
-                    role: 'user',
-                    parts: [{ text: parsed.prompt || 'Hello' }],
-                  },
-                ];
-              }
+                  role: 'user',
+                  parts: userParts,
+                },
+              ];
+            }
 
               const candidateModels = ['gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-3.1-flash-lite'];
               let generatedText = '';

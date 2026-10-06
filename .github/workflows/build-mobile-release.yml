@@ -77,36 +77,60 @@ jobs:
       - name: Print Xcode Version
         run: xcodebuild -version
 
-      - name: Build iOS Application (Device SDK / iphoneos)
+      - name: Archive iOS Application (Device SDK / xcarchive)
         working-directory: apps/ios
         run: |
+          mkdir -p build
           xcodebuild \
             -project ArivomThittam.xcodeproj \
             -scheme ArivomThittam \
             -configuration Release \
-            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$PWD/build/PACSSahayak.xcarchive" \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_ENTITLEMENTS="" \
             CODE_SIGNING_ALLOWED=NO \
-            build
+            archive
 
-      - name: Package Installable IPA
+      - name: Package & Verify Installable IPA
         working-directory: apps/ios
         run: |
-          mkdir -p ../../build-output/Payload
-          BUILD_DIR=$(xcodebuild -project ArivomThittam.xcodeproj -scheme ArivomThittam -sdk iphoneos -configuration Release -showBuildSettings | grep -m 1 " BUILT_PRODUCTS_DIR =" | awk '{print $3}')
-          echo "Built products directory (iphoneos): $BUILD_DIR"
-          if [ -d "$BUILD_DIR/ArivomThittam.app" ]; then
-            cp -r "$BUILD_DIR/ArivomThittam.app" ../../build-output/Payload/
-            cd ../../build-output
-            zip -qr pacs-sahayak.ipa Payload
-            rm -rf Payload
-          else
-            echo "ArivomThittam.app not found in $BUILD_DIR"
+          ARCHIVE_APP="$PWD/build/PACSSahayak.xcarchive/Products/Applications/ArivomThittam.app"
+          if [ ! -d "$ARCHIVE_APP" ]; then
+            echo "❌ ERROR: Built ArivomThittam.app not found in xcarchive at $ARCHIVE_APP"
             exit 1
           fi
-          ls -la "$GITHUB_WORKSPACE/build-output/"
+
+          echo "✓ Verifying compiled Mach-O binary executable..."
+          if [ ! -f "$ARCHIVE_APP/ArivomThittam" ]; then
+            echo "❌ ERROR: Executable binary 'ArivomThittam' missing from .app bundle!"
+            ls -la "$ARCHIVE_APP"
+            exit 1
+          fi
+
+          BINARY_SIZE=$(stat -f%z "$ARCHIVE_APP/ArivomThittam" 2>/dev/null || stat -c%s "$ARCHIVE_APP/ArivomThittam")
+          echo "✓ Executable Mach-O binary size: $BINARY_SIZE bytes"
+          if [ "$BINARY_SIZE" -lt 100000 ]; then
+            echo "❌ ERROR: Binary size ($BINARY_SIZE bytes) is suspiciously small. Real compiled binary must be > 100KB."
+            exit 1
+          fi
+
+          echo "🔐 Applying standard ad-hoc code signature for sideloading/MDM..."
+          codesign --force --deep --sign - "$ARCHIVE_APP"
+
+          mkdir -p ../../build-output/Payload
+          cp -r "$ARCHIVE_APP" ../../build-output/Payload/
+          cd ../../build-output
+          zip -qr9 pacs-sahayak.ipa Payload
+          rm -rf Payload
+
+          IPA_SIZE=$(stat -f%z pacs-sahayak.ipa 2>/dev/null || stat -c%s pacs-sahayak.ipa)
+          echo "🎉 Packaged pacs-sahayak.ipa size: $IPA_SIZE bytes"
+          if [ "$IPA_SIZE" -lt 500000 ]; then
+            echo "❌ ERROR: Generated IPA ($IPA_SIZE bytes) is too small (<500KB). A genuine iOS app is several megabytes."
+            exit 1
+          fi
+          ls -lh pacs-sahayak.ipa
 
       - name: Upload iOS Installable IPA Artifact
         uses: actions/upload-artifact@v6

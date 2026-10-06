@@ -38,15 +38,24 @@ public struct SchemeCardView: View {
                 }
             }
 
-            // Scheme Name & Native Name
+            // Scheme Name & Native Name (Prioritizes Regional Native Title)
+            let isRegional = TranslationManager.shared.currentLanguage != .english
+            let cleanNative: String = {
+                guard let raw = scheme.nativeName, !raw.isEmpty else { return "" }
+                let parts = raw.components(separatedBy: "/").map { $0.trimmingCharacters(in: .whitespaces) }
+                return parts.first ?? raw
+            }()
+            let primaryTitle = (isRegional && !cleanNative.isEmpty) ? cleanNative : scheme.name
+            let secondaryTitle = (isRegional && !cleanNative.isEmpty) ? scheme.name : cleanNative
+
             VStack(alignment: .leading, spacing: 4) {
-                Text(scheme.name)
+                Text(primaryTitle)
                     .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.primary)
                     .lineLimit(2)
 
-                if let native = scheme.nativeName, !native.isEmpty {
-                    Text(native)
+                if !secondaryTitle.isEmpty {
+                    Text(secondaryTitle)
                         .font(.system(size: 13, weight: .medium))
                         .foregroundColor(.secondary)
                         .lineLimit(1)

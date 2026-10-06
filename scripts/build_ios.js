@@ -47,37 +47,53 @@ if (isDarwin) {
 
 // 3. Compile if on macOS with Xcode
 if (isDarwin && xcodeAvailable) {
-  console.log('⚙️ Compiling iOS app using xcodebuild (Device SDK / iphoneos)...');
+  console.log('⚙️ Compiling iOS app using xcodebuild archive (Device SDK)...');
   try {
     const destDir = path.join(rootDir, 'dist', 'ios');
+    const archivePath = path.join(iosDir, 'build', 'PACSSahayak.xcarchive');
     fs.mkdirSync(destDir, { recursive: true });
+    fs.mkdirSync(path.join(iosDir, 'build'), { recursive: true });
 
-    console.log('📱 Building iOS Device SDK (for .ipa package)...');
+    console.log('📱 Archiving iOS Release (for genuine .ipa package)...');
     execSync(
-      'xcodebuild -project ArivomThittam.xcodeproj -scheme ArivomThittam -configuration Release -sdk iphoneos CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGN_ENTITLEMENTS="" CODE_SIGNING_ALLOWED=NO build',
+      `xcodebuild -project ArivomThittam.xcodeproj -scheme ArivomThittam -configuration Release -destination "generic/platform=iOS" -archivePath "${archivePath}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO archive`,
       { cwd: iosDir, stdio: 'inherit', env: process.env }
     );
 
-    const deviceSettings = execSync(
-      'xcodebuild -project ArivomThittam.xcodeproj -scheme ArivomThittam -sdk iphoneos -configuration Release -showBuildSettings',
-      { cwd: iosDir, encoding: 'utf-8' }
-    );
-    const deviceMatch = deviceSettings.match(/\sBUILT_PRODUCTS_DIR\s=\s(.*)/);
-    if (deviceMatch && deviceMatch[1]) {
-      const deviceBuildDir = deviceMatch[1].trim();
-      const appPath = path.join(deviceBuildDir, 'ArivomThittam.app');
-      if (fs.existsSync(appPath)) {
-        const payloadDir = path.join(destDir, 'Payload');
-        fs.rmSync(payloadDir, { recursive: true, force: true });
-        fs.mkdirSync(payloadDir, { recursive: true });
-        fs.cpSync(appPath, path.join(payloadDir, 'ArivomThittam.app'), { recursive: true });
-        execSync(`zip -qr "${path.join(destDir, 'pacs-sahayak.ipa')}" Payload`, {
-          cwd: destDir,
-          stdio: 'inherit'
-        });
-        fs.rmSync(payloadDir, { recursive: true, force: true });
-        console.log(`\n🎉 iOS Installable IPA built: dist/ios/pacs-sahayak.ipa\n`);
-      }
+    const appPath = path.join(archivePath, 'Products', 'Applications', 'ArivomThittam.app');
+    if (!fs.existsSync(appPath)) {
+      throw new Error(`ArivomThittam.app not found in xcarchive at ${appPath}`);
+    }
+
+    // Verify binary exists
+    const binPath = path.join(appPath, 'ArivomThittam');
+    if (!fs.existsSync(binPath)) {
+      throw new Error(`Executable Mach-O binary missing from .app at ${binPath}`);
+    }
+    const binSize = fs.statSync(binPath).size;
+    console.log(`✓ Compiled Mach-O binary verified (${(binSize / (1024 * 1024)).toFixed(2)} MB)`);
+
+    // Ad-hoc sign for sideloaders
+    try {
+      execSync(`codesign --force --deep --sign - "${appPath}"`, { stdio: 'inherit' });
+    } catch (_) {}
+
+    // Package IPA
+    const payloadDir = path.join(destDir, 'Payload');
+    fs.rmSync(payloadDir, { recursive: true, force: true });
+    fs.mkdirSync(payloadDir, { recursive: true });
+    fs.cpSync(appPath, path.join(payloadDir, 'ArivomThittam.app'), { recursive: true });
+    const ipaPath = path.join(destDir, 'pacs-sahayak.ipa');
+    execSync(`zip -qr9 "${ipaPath}" Payload`, {
+      cwd: destDir,
+      stdio: 'inherit'
+    });
+    fs.rmSync(payloadDir, { recursive: true, force: true });
+
+    const ipaSize = fs.statSync(ipaPath).size;
+    console.log(`🎉 iOS Installable IPA built: dist/ios/pacs-sahayak.ipa (${(ipaSize / (1024 * 1024)).toFixed(2)} MB)`);
+    if (ipaSize < 500000) {
+      throw new Error(`IPA size (${ipaSize} bytes) is suspiciously small!`);
     }
   } catch (err) {
     console.error('❌ iOS build failed:', err.message);

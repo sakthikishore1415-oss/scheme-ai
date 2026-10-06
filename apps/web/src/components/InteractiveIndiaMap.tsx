@@ -4,27 +4,27 @@ import { STATES_LIST, STATES_CONFIG } from '../data/states';
 import { MapPin, CheckCircle2, ChevronRight, Volume2 } from 'lucide-react';
 
 export const InteractiveIndiaMap: React.FC = () => {
-  const { selectedStateId, setSelectedStateId, currentStateConfig } = useApp();
+  const { selectedStateId, setSelectedStateId, currentStateConfig, t } = useApp();
 
   return (
     <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <span className="text-xs font-bold text-emerald-700 tracking-wider uppercase">
-            GEOGRAPHIC INTELLIGENCE
+            {t('map.geoIntelligence')}
           </span>
           <h3 className="text-lg font-black text-slate-900">
-            Select State / Union Territory
+            {t('map.selectState')}
           </h3>
         </div>
         <div className="flex items-center gap-1 bg-emerald-50 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full border border-emerald-200">
           <MapPin className="w-3.5 h-3.5" />
-          <span>Active: {currentStateConfig.name}</span>
+          <span>{t('map.activeState')} {currentStateConfig.name}</span>
         </div>
       </div>
 
       <p className="text-xs text-slate-600 leading-relaxed">
-        Government welfare schemes vary significantly across state boundaries. Selecting your state filters relevant state-specific gazettes, local departments, and configures the regional voice engine.
+        {t('map.description')}
       </p>
 
       {/* Interactive State Cards Grid */}
@@ -62,8 +62,8 @@ export const InteractiveIndiaMap: React.FC = () => {
               <div className={`mt-2 pt-2 border-t text-[10px] flex items-center justify-between ${
                 isSelected ? 'border-emerald-500 text-emerald-100' : 'border-slate-200 text-slate-500'
               }`}>
-                <span>{config?.districts.length || 38} Districts</span>
-                <span className="font-semibold">{config?.defaultVoiceLanguage.toUpperCase()} Voice</span>
+                <span>{config?.districts.length || 38} {t('map.districts')}</span>
+                <span className="font-semibold">{config?.defaultVoiceLanguage.toUpperCase()} {t('map.voice')}</span>
               </div>
             </button>
           );

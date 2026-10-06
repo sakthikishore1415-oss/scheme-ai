@@ -52,22 +52,32 @@ module.exports = async function handler(req, res) {
     }
 
     let contents = [];
+    const userParts = [];
+    if (body.prompt) userParts.push({ text: body.prompt });
+    if (body.audio) {
+      userParts.push({
+        inlineData: {
+          mimeType: body.mimeType || 'audio/webm',
+          data: body.audio,
+        },
+      });
+    }
+    if (userParts.length === 0) userParts.push({ text: 'Hello' });
+
     if (Array.isArray(body.history) && body.history.length > 0) {
       contents = body.history.map((h) => ({
         role: h.role === 'assistant' ? 'model' : 'user',
         parts: [{ text: h.text || h.content || '' }],
       }));
-      if (body.prompt) {
-        contents.push({
-          role: 'user',
-          parts: [{ text: body.prompt }],
-        });
-      }
+      contents.push({
+        role: 'user',
+        parts: userParts,
+      });
     } else {
       contents = [
         {
           role: 'user',
-          parts: [{ text: body.prompt || 'Hello' }],
+          parts: userParts,
         },
       ];
     }

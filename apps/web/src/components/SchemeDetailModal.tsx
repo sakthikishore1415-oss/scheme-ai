@@ -117,16 +117,31 @@ export const SchemeDetailModal: React.FC = () => {
   }
 
   // 2. Student Requirement
+  const langKey = (selectedVoiceLanguageId || 'ta').toLowerCase().split('-')[0].split('_')[0];
+  const isTa = langKey === 'ta';
+  const isHi = langKey === 'hi';
+  const isTe = langKey === 'te';
+
   if (
     scheme.eligibility.requiresStudent &&
     (!userProfile || !userProfile.isStudent)
   ) {
+    const qText = isTa
+      ? 'நீங்கள் தற்போது பள்ளி, கல்லூரி அல்லது பாலிடெக்னிக் மாணவராக பயில்கிறீர்களா?'
+      : isHi
+      ? 'क्या आप वर्तमान में स्कूल, कॉलेज या पॉलिटेक्निक में नामांकित छात्र हैं?'
+      : isTe
+      ? 'మీరు ప్రస్తుతం పాఠశాల, కళాశాల లేదా పాలిటెక్నిక్‌లో విద్యార్థినా?'
+      : 'Are you currently enrolled as a student in school, college, or polytechnic?';
+    const yesText = isTa ? 'ஆம், நான் மாணவர்' : isHi ? 'हाँ, मैं छात्र हूँ' : isTe ? 'అవును, నేను విద్యార్థిని' : 'Yes, I am a Student';
+    const noText = isTa ? 'இல்லை, மாணவர் அல்ல' : isHi ? 'नहीं, छात्र नहीं हूँ' : isTe ? 'కాదు' : 'No, Not a Student';
+
     questionsToAsk.push({
       key: 'student',
-      question: 'Are you currently enrolled as a student in school, college, or polytechnic?',
+      question: qText,
       options: [
         {
-          label: 'Yes, I am a Student',
+          label: yesText,
           action: () => {
             updateUserProfile({ isStudent: true, occupation: 'student' });
             setAnsweredFields((prev) => ({ ...prev, student: true }));
@@ -134,7 +149,7 @@ export const SchemeDetailModal: React.FC = () => {
           },
         },
         {
-          label: 'No, Not a Student',
+          label: noText,
           action: () => {
             updateUserProfile({ isStudent: false });
             setAnsweredFields((prev) => ({ ...prev, student: true }));
@@ -149,12 +164,28 @@ export const SchemeDetailModal: React.FC = () => {
     (scheme.eligibility.requiresLandHoldingMaxAcres || (scheme.eligibility as any).requiresLandOwnership) &&
     (!userProfile || (userProfile.landHoldingAcres || 0) === 0)
   ) {
+    const qText = isTa
+      ? 'உங்களுக்கோ அல்லது உங்கள் குடும்பத்திற்கோ சொந்தமாக விவசாய நிலம் உள்ளதா?'
+      : isHi
+      ? 'क्या आपके या आपके परिवार के पास कृषि भूमि है?'
+      : isTe
+      ? 'మీకు లేదా మీ కుటుంబానికి వ్యవసాయ భూమి ఉందా?'
+      : 'Do you or your family own cultivable agricultural land?';
+    const yesText = isTa
+      ? 'ஆம், 5 ஏக்கர் வரை (சிறு/குறு விவசாயி)'
+      : isHi
+      ? 'हाँ, 5 एकड़ तक (छोटे/सीमांत किसान)'
+      : isTe
+      ? 'అవును, 5 ఎకరాల వరకు (చిన్న/సన్నకారు రైతు)'
+      : 'Yes, up to 5 Acres (Small/Marginal Farmer)';
+    const noText = isTa ? 'விவசாய நிலம் இல்லை' : isHi ? 'कृषि भूमि नहीं है' : isTe ? 'వ్యవసాయ భూమి లేదు' : 'No Agricultural Land';
+
     questionsToAsk.push({
       key: 'land',
-      question: 'Do you or your family own cultivable agricultural land?',
+      question: qText,
       options: [
         {
-          label: 'Yes, up to 5 Acres (Small/Marginal Farmer)',
+          label: yesText,
           action: () => {
             updateUserProfile({ landHoldingAcres: 2.5, occupation: 'farmer' });
             setAnsweredFields((prev) => ({ ...prev, land: true }));
@@ -162,7 +193,7 @@ export const SchemeDetailModal: React.FC = () => {
           },
         },
         {
-          label: 'No Agricultural Land',
+          label: noText,
           action: () => {
             updateUserProfile({ landHoldingAcres: 0 });
             setAnsweredFields((prev) => ({ ...prev, land: true }));
@@ -177,12 +208,22 @@ export const SchemeDetailModal: React.FC = () => {
     scheme.eligibility.requiresDisability &&
     (!userProfile || !userProfile.hasDisability)
   ) {
+    const qText = isTa
+      ? 'உங்களுக்கோ அல்லது குடும்பத்தினருக்கோ மாற்றுத்திறனாளி சான்றிதழ் உள்ளதா?'
+      : isHi
+      ? 'क्या आपके पास 40% या अधिक का दिव्यांगता प्रमाणपत्र है?'
+      : isTe
+      ? 'మీకు లేదా కుటుంబ సభ్యులకు దివ్యాంగుల ధృవీకరణ పత్రం ఉందా?'
+      : 'Do you or a family member have a certified disability or require caregiver assistance?';
+    const yesText = isTa ? 'ஆம், 40%+ மாற்றுத்திறனாளி சான்றிதழ்' : isHi ? 'हाँ, 40%+ दिव्यांगता प्रमाणपत्र' : isTe ? 'అవును, 40%+ ధృవీకరణ పత్రం' : 'Yes, 40%+ Certified Disability';
+    const noText = isTa ? 'இல்லை' : isHi ? 'नहीं' : isTe ? 'లేదు' : 'No Disability';
+
     questionsToAsk.push({
       key: 'disability',
-      question: 'Do you or a family member have a certified disability or require caregiver assistance?',
+      question: qText,
       options: [
         {
-          label: 'Yes, 40%+ Certified Disability',
+          label: yesText,
           action: () => {
             updateUserProfile({ hasDisability: true });
             setAnsweredFields((prev) => ({ ...prev, disability: true }));
@@ -190,7 +231,7 @@ export const SchemeDetailModal: React.FC = () => {
           },
         },
         {
-          label: 'No Disability',
+          label: noText,
           action: () => {
             updateUserProfile({ hasDisability: false });
             setAnsweredFields((prev) => ({ ...prev, disability: true }));
@@ -206,12 +247,35 @@ export const SchemeDetailModal: React.FC = () => {
     (!userProfile || (userProfile.annualIncome || 0) > scheme.eligibility.maxAnnualIncome || (userProfile.annualIncome || 0) === 0)
   ) {
     const limit = scheme.eligibility.maxAnnualIncome;
+    const formatted = limit.toLocaleString('en-IN');
+    const qText = isTa
+      ? `உங்கள் குடும்பத்தின் ஆண்டு வருமானம் ₹${formatted}க்கு குறைவாக உள்ளதா?`
+      : isHi
+      ? `क्या आपकी वार्षिक पारिवारिक आय ₹${formatted} से कम है?`
+      : isTe
+      ? `మీ వార్షిక కుటుంబ ఆదాయం ₹${formatted} కంటే తక్కువగా ఉందా?`
+      : `Is your annual family income below ₹${formatted}?`;
+    const yesText = isTa
+      ? `ஆம், ஆண்டு வருமானம் ₹${formatted}க்கு குறைவு`
+      : isHi
+      ? `हाँ, वार्षिक आय ₹${formatted} से कम है`
+      : isTe
+      ? `అవును, ఆదాయం ₹${formatted} కంటే తక్కువ`
+      : `Yes, Annual Income below ₹${formatted}`;
+    const noText = isTa
+      ? `இல்லை, ₹${formatted}க்கு மேல்`
+      : isHi
+      ? `नहीं, ₹${formatted} से अधिक`
+      : isTe
+      ? `కాదు, ₹${formatted} కంటే ఎక్కువ`
+      : `No, Higher than ₹${formatted}`;
+
     questionsToAsk.push({
       key: 'income',
-      question: `Is your annual family income below ₹${limit.toLocaleString('en-IN')}?`,
+      question: qText,
       options: [
         {
-          label: `Yes, Annual Income below ₹${limit.toLocaleString('en-IN')}`,
+          label: yesText,
           action: () => {
             updateUserProfile({ annualIncome: Math.min(120000, limit - 10000) });
             setAnsweredFields((prev) => ({ ...prev, income: true }));
@@ -219,7 +283,7 @@ export const SchemeDetailModal: React.FC = () => {
           },
         },
         {
-          label: `No, Higher than ₹${limit.toLocaleString('en-IN')}`,
+          label: noText,
           action: () => {
             updateUserProfile({ annualIncome: limit + 50000 });
             setAnsweredFields((prev) => ({ ...prev, income: true }));
@@ -243,22 +307,22 @@ export const SchemeDetailModal: React.FC = () => {
                     : 'bg-[#71806b]/20 text-[#e8e1dc] border border-[#71806b]/40'
                 }`}
               >
-                {scheme.schemeType === 'central' ? 'Central Scheme' : `${scheme.stateId || scheme.state || 'State'} Scheme`}
+                {scheme.schemeType === 'central' ? t('scheme.centralScheme') : t('scheme.stateScheme')}
               </span>
               <span className="text-xs text-[#c08494] font-mono">ID: {scheme.id}</span>
-              <span className="text-[11px] text-[#c8a96b] font-medium">✓ Official Gazette Rule</span>
+              <span className="text-[11px] text-[#c8a96b] font-medium">✓ {t('scheme.ruleGazette')}</span>
             </div>
 
             <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">
-              {scheme.name}
+              {selectedVoiceLanguageId !== 'en' && scheme.nativeName
+                ? (scheme.nativeName.includes('/') ? scheme.nativeName.split('/')[selectedVoiceLanguageId === 'ml' ? 1 : 0].trim() : scheme.nativeName)
+                : scheme.name}
             </h2>
-            {scheme.nativeName && (
-              <p className="text-xs sm:text-sm text-[#ffd9e1] font-medium">
-                {scheme.nativeName}
-              </p>
-            )}
+            <p className="text-xs sm:text-sm text-[#ffd9e1] font-medium">
+              {selectedVoiceLanguageId !== 'en' && scheme.nativeName ? scheme.name : (scheme.nativeName || '')}
+            </p>
             <p className="text-xs text-[#c08494]">
-              Authority: <span className="text-white font-semibold">{scheme.department || scheme.authority || 'Government Authority'}</span>
+              {t('scheme.authority')}: <span className="text-white font-semibold">{scheme.department || scheme.authority || 'Government Authority'}</span>
             </p>
           </div>
 
@@ -274,8 +338,8 @@ export const SchemeDetailModal: React.FC = () => {
               title="Discuss this scheme in Voice Assistant"
             >
               <Volume2 className="w-4 h-4 text-[#310a18]" />
-              <span className="hidden sm:inline">{uiStrings.hearInVoice || 'HEAR IN VOICE'}</span>
-              <span className="sm:hidden">{uiStrings.hear || 'HEAR'}</span>
+              <span className="hidden sm:inline">{t('scheme.hearInVoice')}</span>
+              <span className="sm:hidden">{t('scheme.hear')}</span>
             </button>
 
             <button
@@ -286,7 +350,7 @@ export const SchemeDetailModal: React.FC = () => {
                   ? 'bg-[#ba1a1a] text-white border-[#ba1a1a]'
                   : 'bg-[#6b3548] text-[#ffd9e1] border-[#e8e1dc]/30 hover:bg-[#874d60]'
               }`}
-              title={isSaved ? 'Remove from Saved' : 'Save Scheme'}
+              title={isSaved ? 'Remove from Saved' : t('scheme.save')}
             >
               <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-white' : ''}`} />
             </button>
@@ -313,7 +377,7 @@ export const SchemeDetailModal: React.FC = () => {
                 : 'text-[#756a6f] hover:bg-[#eedfe4]'
             }`}
           >
-            {uiStrings.overview || 'OVERVIEW & ELIGIBILITY'}
+            {t('scheme.overviewTab')}
           </button>
           <button
             id="detail-subtab-docs"
@@ -324,7 +388,7 @@ export const SchemeDetailModal: React.FC = () => {
                 : 'text-[#756a6f] hover:bg-[#eedfe4]'
             }`}
           >
-            <span>{uiStrings.documents || 'DOCUMENTS CHECKLIST'}</span>
+            <span>{t('scheme.docsTab')}</span>
             <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
               activeSubTab === 'DOCUMENTS' ? 'bg-[#6b3548] text-white' : 'bg-[#e8e1dc] text-[#241c20]'
             }`}>
@@ -340,7 +404,7 @@ export const SchemeDetailModal: React.FC = () => {
                 : 'text-[#756a6f] hover:bg-[#eedfe4]'
             }`}
           >
-            {uiStrings.howToApply || 'HOW TO APPLY'}
+            {t('scheme.applyTab')}
           </button>
           <button
             id="detail-subtab-simplified"
@@ -352,7 +416,7 @@ export const SchemeDetailModal: React.FC = () => {
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>{uiStrings.simplifiedSummary || 'EXPLAIN SIMPLY'}</span>
+            <span>{t('scheme.explainSimplyTab')}</span>
           </button>
         </div>
 
@@ -366,7 +430,15 @@ export const SchemeDetailModal: React.FC = () => {
                 <div className="bg-[#faf8f3] border border-[#c8a96b] rounded-2xl p-4 sm:p-5 space-y-3 shadow-xs">
                   <div className="flex items-center gap-2 text-[#4a1f2d] font-bold text-xs">
                     <HelpCircle className="w-4 h-4 text-[#c8a96b] shrink-0" />
-                    <span>Quick Eligibility Check: Answer to verify if you qualify</span>
+                    <span>
+                      {isTa
+                        ? 'விரைவு தகுதிச் சரிபார்ப்பு: நீங்கள் தகுதியானவரா என சரிபார்க்கவும்'
+                        : isHi
+                        ? 'त्वरित पात्रता जांच: उत्तर देकर जांचें कि क्या आप पात्र हैं'
+                        : isTe
+                        ? 'త్వరిత అర్హత తనిఖీ: మీరు అర్హులా కాదా అని తనిఖీ చేయండి'
+                        : 'Quick Eligibility Check: Answer to verify if you qualify'}
+                    </span>
                   </div>
 
                   <div className="space-y-3">
@@ -401,11 +473,16 @@ export const SchemeDetailModal: React.FC = () => {
                     <div className="flex items-center gap-1.5 font-bold">
                       <CheckCircle2 className="w-4 h-4 text-[#71806b]" />
                       <span>
-                        Profile Eligibility Match: <strong>{matchResult.score}%</strong> ({matchResult.matchLevel})
+                        {isTa ? 'சுயவிவர தகுதிப் பொருத்தம்:' : isHi ? 'प्रोफ़ाइल पात्रता मिलान:' : isTe ? 'ప్రొఫైల్ అర్హత సరిపోలిక:' : 'Profile Eligibility Match:'}{' '}
+                        <strong>{matchResult.score}%</strong> ({matchResult.matchLevel})
                       </span>
                     </div>
                     <p className="text-[#756a6f]">
-                      Evaluated using your profile (Age: {userProfile?.age || 35}, Occupation: {userProfile?.occupation || 'General'}, State: {userProfile?.state || 'Current'})
+                      {isTa
+                        ? `உங்கள் சுயவிவரத்தின் அடிப்படையில் கணக்கிடப்பட்டது (வயது: ${userProfile?.age || 35}, தொழில்: ${userProfile?.occupation || 'பொதுவான'}, மாநிலம்: ${userProfile?.state || 'தற்போதைய'})`
+                        : isHi
+                        ? `आपकी प्रोफ़ाइल के आधार पर मूल्यांकित (आयु: ${userProfile?.age || 35})`
+                        : `Evaluated using your profile (Age: ${userProfile?.age || 35}, Occupation: ${userProfile?.occupation || 'General'}, State: ${userProfile?.state || 'Current'})`}
                     </p>
                   </div>
                   <button
@@ -424,7 +501,13 @@ export const SchemeDetailModal: React.FC = () => {
                   <Volume2 className="w-5 h-5 text-[#4a1f2d] shrink-0" />
                   <div>
                     <p className="text-xs font-bold text-[#4a1f2d]">
-                      Hear Scheme Explanation in {currentLanguageConfig.name}
+                      {isTa
+                        ? `திட்டத்தின் நேரடி குரல் விளக்கம் (${currentLanguageConfig.name})`
+                        : isHi
+                        ? `योजना का ऑडियो विवरण (${currentLanguageConfig.name})`
+                        : isTe
+                        ? `వాయిస్ వివరణ వినండి (${currentLanguageConfig.name})`
+                        : `Hear Scheme Explanation in ${currentLanguageConfig.name}`}
                     </p>
                     <p className="text-[11px] text-[#514346]">
                       {regionalContent?.summary || scheme.summarySimple}
@@ -451,7 +534,7 @@ export const SchemeDetailModal: React.FC = () => {
               {/* What is it? */}
               <div>
                 <h3 className="text-xs font-bold text-[#4a1f2d] uppercase tracking-wider mb-2">
-                  What is this Scheme?
+                  {t('scheme.whatIsThis')}
                 </h3>
                 <p className="text-xs sm:text-sm text-[#241c20] leading-relaxed bg-[#faf8f3] p-4 rounded-2xl border border-[#e8e1dc]">
                   {scheme.benefits?.detailedBenefit || scheme.summarySimple || scheme.name}
@@ -461,14 +544,14 @@ export const SchemeDetailModal: React.FC = () => {
               {/* Benefits Highlight */}
               <div className="bg-[#71806b]/12 border border-[#71806b] rounded-2xl p-4 sm:p-5">
                 <span className="text-[11px] font-bold text-[#241c20] uppercase tracking-wider block mb-1">
-                  Sanctioned Benefits
+                  {t('scheme.sanctionedBenefits')}
                 </span>
                 <p className="text-lg font-bold text-[#241c20]">
                   {scheme.benefits?.amount || scheme.benefits?.shortSummary || 'Welfare Benefit'}
                 </p>
                 <div className="mt-3 space-y-1 text-xs text-[#514346]">
-                  <p>• <strong>Benefit Type:</strong> {scheme.benefits?.type ? scheme.benefits.type.replace('_', ' ').toUpperCase() : 'WELFARE'}</p>
-                  <p>• <strong>Frequency:</strong> {scheme.benefits?.frequency || 'Direct Benefit Transfer / Periodic'}</p>
+                  <p>• <strong>{t('scheme.benefitType')}:</strong> {scheme.benefits?.type ? scheme.benefits.type.replace('_', ' ').toUpperCase() : 'WELFARE'}</p>
+                  <p>• <strong>{t('scheme.frequency')}:</strong> {scheme.benefits?.frequency || 'Direct Benefit Transfer / Periodic'}</p>
                   {scheme.benefits?.shortSummary && <p>• <strong>Summary:</strong> {scheme.benefits.shortSummary}</p>}
                 </div>
               </div>
@@ -476,31 +559,31 @@ export const SchemeDetailModal: React.FC = () => {
               {/* Who Qualifies? (Eligibility Rules) */}
               <div>
                 <h3 className="text-xs font-bold text-[#4a1f2d] uppercase tracking-wider mb-2">
-                  Who Qualifies?
+                  {t('scheme.whoQualifies')}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div className="bg-[#faf8f3] p-3 rounded-xl border border-[#e8e1dc]">
-                    <span className="text-[10px] font-bold text-[#756a6f] uppercase block">Age Limit</span>
+                    <span className="text-[10px] font-bold text-[#756a6f] uppercase block">{t('scheme.ageLimit')}</span>
                     <strong className="text-[#241c20]">
-                      {scheme.eligibility?.minAge ? `${scheme.eligibility.minAge} years` : 'No minimum'} - {scheme.eligibility?.maxAge ? `${scheme.eligibility.maxAge} years` : 'No maximum'}
+                      {scheme.eligibility?.minAge ? `${scheme.eligibility.minAge} ${isTa ? 'வயது' : isHi ? 'वर्ष' : 'years'}` : (isTa ? 'குறைந்தபட்ச வரம்பு இல்லை' : isHi ? 'न्यूनतम सीमा नहीं' : 'No minimum')} - {scheme.eligibility?.maxAge ? `${scheme.eligibility.maxAge} ${isTa ? 'வயது' : isHi ? 'वर्ष' : 'years'}` : (isTa ? 'அதிகபட்ச வரம்பு இல்லை' : isHi ? 'अधिकतम सीमा नहीं' : 'No maximum')}
                     </strong>
                   </div>
                   <div className="bg-[#faf8f3] p-3 rounded-xl border border-[#e8e1dc]">
-                    <span className="text-[10px] font-bold text-[#756a6f] uppercase block">Income Ceiling</span>
+                    <span className="text-[10px] font-bold text-[#756a6f] uppercase block">{t('scheme.incomeCeiling')}</span>
                     <strong className="text-[#241c20]">
-                      {scheme.eligibility?.maxAnnualIncome ? `₹${scheme.eligibility.maxAnnualIncome.toLocaleString('en-IN')} / year` : 'No restrictive income limit'}
+                      {scheme.eligibility?.maxAnnualIncome ? `₹${scheme.eligibility.maxAnnualIncome.toLocaleString('en-IN')} / ${isTa ? 'ஆண்டு' : isHi ? 'वर्ष' : 'year'}` : (isTa ? 'வருமான வரம்பு இல்லை' : isHi ? 'कोई आय सीमा नहीं' : 'No restrictive income limit')}
                     </strong>
                   </div>
                   <div className="bg-[#faf8f3] p-3 rounded-xl border border-[#e8e1dc]">
-                    <span className="text-[10px] font-bold text-[#756a6f] uppercase block">Target Occupations</span>
+                    <span className="text-[10px] font-bold text-[#756a6f] uppercase block">{t('scheme.targetOccupations')}</span>
                     <strong className="text-[#241c20]">
-                      {scheme.eligibility?.allowedOccupations ? scheme.eligibility.allowedOccupations.join(', ') : 'All Occupations'}
+                      {scheme.eligibility?.allowedOccupations ? scheme.eligibility.allowedOccupations.join(', ') : (isTa ? 'அனைத்து தொழில்களும்' : isHi ? 'सभी व्यवसाय' : 'All Occupations')}
                     </strong>
                   </div>
                   <div className="bg-[#faf8f3] p-3 rounded-xl border border-[#e8e1dc]">
-                    <span className="text-[10px] font-bold text-[#756a6f] uppercase block">Applicable Location</span>
+                    <span className="text-[10px] font-bold text-[#756a6f] uppercase block">{t('scheme.applicableLocation')}</span>
                     <strong className="text-[#241c20]">
-                      {scheme.stateId === 'ALL' || scheme.state === 'ALL' ? 'All States across India' : `${scheme.stateId || scheme.state} State`}
+                      {scheme.stateId === 'ALL' || scheme.state === 'ALL' ? (isTa ? 'இந்தியா முழுவதும் உள்ள அனைத்து மாநிலங்கள்' : isHi ? 'भारत के सभी राज्य' : 'All States across India') : `${scheme.stateId || scheme.state} State`}
                     </strong>
                   </div>
                 </div>
@@ -513,10 +596,10 @@ export const SchemeDetailModal: React.FC = () => {
             <div className="space-y-4 animate-fade-in">
               <div className="bg-[#faf8f3] p-4 rounded-2xl border border-[#e8e1dc]">
                 <h3 className="text-xs font-bold text-[#4a1f2d] uppercase tracking-wider mb-1">
-                  Required Citizen Documents
+                  {t('scheme.requiredDocs')}
                 </h3>
                 <p className="text-xs text-[#514346]">
-                  Tick the documents you have ready. These are required for physical or online verification.
+                  {t('scheme.docsInstruction')}
                 </p>
               </div>
 
@@ -550,7 +633,7 @@ export const SchemeDetailModal: React.FC = () => {
                           </span>
                           {doc.isMandatory && (
                             <span className="text-[10px] bg-[#ffdad6] text-[#93000a] font-bold px-2 py-0.2 rounded-full">
-                              Mandatory
+                              {isTa ? 'கட்டாய ஆவணம்' : isHi ? 'अनिवार्य' : isTe ? 'తప్పనిసరి' : 'Mandatory'}
                             </span>
                           )}
                         </div>
@@ -570,10 +653,10 @@ export const SchemeDetailModal: React.FC = () => {
             <div className="space-y-5 animate-fade-in">
               <div className="bg-[#faf8f3] p-4 rounded-2xl border border-[#e8e1dc]">
                 <h3 className="text-xs font-bold text-[#4a1f2d] uppercase tracking-wider mb-1">
-                  Step-by-Step Application Process
+                  {t('scheme.stepByStep')}
                 </h3>
                 <p className="text-xs text-[#514346]">
-                  Follow these instructions to submit your official application.
+                  {t('scheme.howToApply')}
                 </p>
               </div>
 
@@ -599,14 +682,14 @@ export const SchemeDetailModal: React.FC = () => {
                     rel="noopener noreferrer"
                     className="w-full py-3 px-4 rounded-xl bg-[#4a1f2d] hover:bg-[#6b3548] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
                   >
-                    <span>Visit Official Application Portal</span>
+                    <span>{t('scheme.onlinePortal')}</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 )}
                 {scheme.offlineApplicationCenter && (
                   <div className="text-xs text-[#514346] flex items-center gap-2">
                     <Building className="w-4 h-4 text-[#4a1f2d] shrink-0" />
-                    <span><strong>Offline Center:</strong> {scheme.offlineApplicationCenter}</span>
+                    <span><strong>{t('scheme.whereToApply')}:</strong> {scheme.offlineApplicationCenter}</span>
                   </div>
                 )}
               </div>
@@ -619,7 +702,15 @@ export const SchemeDetailModal: React.FC = () => {
               <div className="p-5 rounded-3xl bg-[#faf8f3] border border-[#c8a96b] space-y-3">
                 <div className="flex items-center gap-2 text-[#4a1f2d] font-bold text-xs uppercase tracking-wider">
                   <Sparkles className="w-4 h-4 text-[#c8a96b]" />
-                  <span>Simple Explanation (No Jargon)</span>
+                  <span>
+                    {isTa
+                      ? 'எளிய விளக்கம் (தொழில்நுட்ப சொற்கள் இன்றி)'
+                      : isHi
+                      ? 'सरल भाषा में विवरण (सरल शब्द)'
+                      : isTe
+                      ? 'సరళమైన వివరణ'
+                      : 'Simple Explanation (No Jargon)'}
+                  </span>
                 </div>
 
                 <p className="text-sm font-semibold text-[#241c20] leading-relaxed">
@@ -628,7 +719,13 @@ export const SchemeDetailModal: React.FC = () => {
 
                 <div className="bg-white p-4 rounded-2xl border border-[#e8e1dc] space-y-2">
                   <span className="text-xs font-bold text-[#4a1f2d] block">
-                    What this means for your family:
+                    {isTa
+                      ? 'உங்கள் குடும்பத்திற்கு இதன் நேரடி பலன்:'
+                      : isHi
+                      ? 'आपके परिवार के लिए इसका क्या अर्थ है:'
+                      : isTe
+                      ? 'మీ కుటుంబానికి దీని ప్రయోజనం:'
+                      : 'What this means for your family:'}
                   </span>
                   <p className="text-xs text-[#514346] leading-relaxed">
                     {scheme.benefits?.detailedBenefit || scheme.benefits?.shortSummary}
@@ -646,7 +743,11 @@ export const SchemeDetailModal: React.FC = () => {
             className="px-4 py-2 rounded-xl bg-white border border-[#e8e1dc] text-xs font-bold text-[#241c20] hover:bg-[#eedfe4] transition-colors cursor-pointer flex items-center gap-1.5"
           >
             <Copy className="w-3.5 h-3.5 text-[#756a6f]" />
-            <span>{copiedLink ? 'Copied!' : 'Copy Summary'}</span>
+            <span>
+              {copiedLink
+                ? (isTa ? 'நகலெடுக்கப்பட்டது!' : 'Copied!')
+                : (isTa ? 'விவரங்களை நகலெடு' : 'Copy Summary')}
+            </span>
           </button>
 
           <button

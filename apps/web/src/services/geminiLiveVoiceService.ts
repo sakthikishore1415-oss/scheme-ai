@@ -63,6 +63,10 @@ export class GeminiLiveVoiceService {
   private lastProcessedText: string = '';
   private speechQueue: string[] = [];
   private isProcessingSpeechQueue: boolean = false;
+  // MediaRecorder Fallback for Browsers without Web Speech API or on Network Disconnect
+  private mediaRecorder: MediaRecorder | null = null;
+  private audioChunks: Blob[] = [];
+  private isUsingMediaRecorderFallback: boolean = false;
   private currentAbortController: AbortController | null = null;
 
   // Assistant Voice State
@@ -121,21 +125,22 @@ export class GeminiLiveVoiceService {
     const SpeechRec = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRec) {
-      const noSpeechRecNotices: Record<string, string> = {
-        ta: 'வணக்கம்! கீழே தட்டச்சு செய்து கேள்வி கேட்கலாம். நேரடி குரல் பதிவுக்கு கூகுள் குரோம் பயன்படுத்தலாம்.',
-        hi: 'नमस्ते! आप नीचे टाइप करके प्रश्न पूछ सकते हैं। सीधे वॉइस माइक के लिए गूगल क्रोम का उपयोग करें।',
-        te: 'నమస్కారం! మీరు క్రింద టైప్ చేయడం ద్వారా ప్రశ్నలను అడగవచ్చు. డైరెక్ట్ వాయిస్ మైక్ కోసం గూగుల్ క్రోమ్ ఉపయోగించండి.',
-        kn: 'ನಮಸ್ಕಾರ! ನೀವು ಕೆಳಗೆ ಟೈಪ್ ಮಾಡುವ ಮೂಲಕ ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಬಹುದು. ನೇರ ವಾಯ್ಸ್ ಮೈಕ್‌ಗಾಗಿ ಗೂಗಲ್ ಕ್ರೋಮ್ ಬಳಸಿ.',
-        ml: 'നമസ്കാരം! താഴെ ടൈപ്പ് ചെയ്ത ചോദ്യങ്ങൾ ചോദിക്കാം. നേരിട്ടുള്ള ശബ്ദത്തിന് ഗൂഗിൾ ക്രോം ഉപയോഗിക്കുക.',
-        mr: 'नमस्कार! आपण खाली टाईप करून प्रश्न विचारू शकता. थेट व्हॉइस मायक्रोफोनसाठी गूगल क्रोम वापरा.',
-        bn: 'নমস্কার! নিচে টাইপ করে প্রশ্ন জিজ্ঞাসা করতে পারেন। সরাসরি ভয়েস মাইকের জন্য গুগল ক্রোম ব্যবহার করুন।',
-        gu: 'નમસ્તે! તમે નીચે ટાઈપ કરીને પ્રશ્નો પૂછી શકો છો. સીધા વોઈસ માઈક માટે ગૂગલ ક્રોમનો ઉપયોગ કરો.',
-        or: 'ନମସ୍କାର! ଆପଣ ତଳେ ଟାଇପ୍ କରି ପ୍ରଶ୍ନ ପଚାରିପାରିବେ। ସିଧାସଳଖ ଭଏସ୍ ମାଇକ୍ ପାଇଁ ଗୁଗଲ୍ କ୍ରୋମ୍ ବ୍ୟବହାର କରନ୍ତୁ।',
-        pa: 'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਤੁਸੀਂ ਹੇਠਾਂ ਟਾਈਪ ਕਰਕੇ ਸਵਾਲ ਪੁੱਛ ਸਕਦੇ ਹੋ। ਸਿੱਧੇ ਵਾਇਸ ਮਾਈਕ ਲਈ ਗੂਗਲ ਕਰੋਮ ਦੀ ਵਰਤੋਂ ਕਰੋ।',
-        as: 'নমস্কাৰ! আপুনি তলত টাইপ কৰি প্ৰশ্ন সুধিব পাৰে। প্ৰত্যক্ষ ভয়েছ মাইকৰ বাবে গুগল ক্ৰোম ব্যৱহাৰ কৰক।',
-        en: 'Hello! Speech recognition is available via typing below. You can also use Google Chrome for direct voice mic.',
+      this.isUsingMediaRecorderFallback = true;
+      const greetings: Record<string, string> = {
+        ta: 'வணக்கம்! நான் PACS Sahayak. உங்களுடன் பேச தயாராக இருக்கிறேன். மைக் பட்டனை அழுத்தி உங்கள் கேள்வியைக் கூறுங்கள்!',
+        hi: 'नमस्ते! मैं PACS Sahayak हूं। सुनने के लिए तैयार हूं, माइक दबाकर बोलें!',
+        te: 'నమస్కారం! నేను PACS Sahayak. మాట్లాడటానికి సిద్ధంగా ఉన్నాను, మైక్ నొక్కి చెప్పండి!',
+        kn: 'ನಮಸ್ಕಾರ! ನಾನು PACS Sahayak. ಮಾತನಾಡಲು ಸಿದ್ಧನಾಗಿದ್ದೇನೆ, ಮೈಕ್ ಒತ್ತಿ ತಿಳಿಸಿ!',
+        ml: 'നമസ്കാരം! ഞാൻ PACS Sahayak ആണ്. സംസാരിക്കാൻ തയ്യാറാണ്, മൈക്ക് അമർത്തി പറയൂ!',
+        mr: 'नमस्कार! मी PACS Sahayak आहे. बोलण्यासाठी तयार आहे, माईक दाबून सांगा!',
+        bn: 'নমস্কার! আমি PACS Sahayak। কথা বলতে প্রস্তুত, মাইক চেপে বলুন!',
+        gu: 'નમસ્તે! હું PACS Sahayak છું. બોલવા માટે તૈયાર છું, માઈક દબાવો!',
+        or: 'ନମସ୍କାର! ମୁଁ PACS Sahayak। କହିବା ପାଇଁ ପ୍ରସ୍ତୁତ, ମାଇକ୍ ଚିପନ୍ତୁ!',
+        pa: 'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ PACS Sahayak ਹਾਂ। ਸੁਣਨ ਲਈ ਤਿਆਰ ਹਾਂ, ਮਾਈਕ ਦਬਾਓ!',
+        as: 'নমস্কাৰ! মই PACS Sahayak। ক’বলৈ সাজু, মাইক টিপক!',
+        en: "Hello! I'm PACS Sahayak. I'm ready to listen. Tap the microphone and speak your query!",
       };
-      const notif = noSpeechRecNotices[this.currentLanguageId] || noSpeechRecNotices.en;
+      const notif = greetings[this.currentLanguageId] || greetings.en;
       this.setState('IDLE');
       this.isListeningActive = false;
       callbacks.onMessage?.({
@@ -251,6 +256,16 @@ export class GeminiLiveVoiceService {
         if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
           console.warn('Microphone permission blocked:', e);
           this.callbacks?.onError?.('Microphone access was blocked. Please allow microphone permissions in your browser to speak.');
+        } else if (e.error === 'network' || e.error === 'audio-capture') {
+          console.warn('Speech recognition device or network error, switching to direct MediaRecorder fallback:', e.error);
+          this.isUsingMediaRecorderFallback = true;
+          if (this.localStream) {
+            this.localStream.getTracks().forEach((t) => t.stop());
+            this.localStream = null;
+          }
+          if (this.isListeningActive) {
+            this.startListening();
+          }
         } else if (e.error !== 'no-speech' && e.error !== 'aborted') {
           console.warn('Speech recognition notice:', e);
         }
@@ -1119,19 +1134,58 @@ CRITICAL VOICE RULES:
     this.isListeningActive = true;
     this.isMuted = false;
 
-    // Ensure audio unlocking and active microphone stream with real visualizer feedback
+    // Ensure audio unlocking
     speechService.unlockAudio();
-    await this.ensureMicrophoneStream();
+
+    if (this.isUsingMediaRecorderFallback) {
+      const hasStream = await this.ensureMicrophoneStream();
+      if (hasStream && this.localStream) {
+        try {
+          this.audioChunks = [];
+          const mimeType = (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported('audio/webm;codecs=opus'))
+            ? 'audio/webm;codecs=opus'
+            : (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported('audio/mp4'))
+            ? 'audio/mp4'
+            : 'audio/webm';
+
+          this.mediaRecorder = new MediaRecorder(this.localStream, { mimeType });
+          this.mediaRecorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) {
+              this.audioChunks.push(e.data);
+            }
+          };
+          this.mediaRecorder.onstop = async () => {
+            if (this.audioChunks.length === 0) return;
+            const blob = new Blob(this.audioChunks, { type: mimeType });
+            this.audioChunks = [];
+            await this.processAudioBlobTurn(blob, mimeType);
+          };
+          this.mediaRecorder.start(250);
+          this.setState('USER_SPEAKING');
+          return true;
+        } catch (recErr) {
+          console.warn('MediaRecorder fallback start error:', recErr);
+        }
+      }
+    }
 
     this.setState('LISTENING');
 
     if (this.recognition) {
       try {
         this.recognition.start();
+        // Lazily attach visualizer stream only after recognition engine has opened mic
+        setTimeout(() => {
+          if (this.isListeningActive && !this.isUsingMediaRecorderFallback) {
+            this.ensureMicrophoneStream().catch(() => {});
+          }
+        }, 350);
         return true;
       } catch (e: any) {
         if (e.name !== 'InvalidStateError') {
-          console.warn('Speech recognition start notice:', e);
+          console.warn('Speech recognition start notice, falling back:', e);
+          this.isUsingMediaRecorderFallback = true;
+          return this.startListening();
         }
         return true;
       }
@@ -1149,6 +1203,11 @@ CRITICAL VOICE RULES:
       this.pauseSilenceTimer = null;
     }
     this.isListeningActive = false;
+    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      try {
+        this.mediaRecorder.stop();
+      } catch (_) {}
+    }
     if (this.recognition) {
       try {
         this.recognition.stop();
@@ -1158,6 +1217,70 @@ CRITICAL VOICE RULES:
     if (this.state === 'LISTENING' || this.state === 'USER_SPEAKING') {
       this.setState('IDLE');
     }
+  }
+
+  private async processAudioBlobTurn(blob: Blob, mimeType: string) {
+    if (blob.size < 500) {
+      this.setState('IDLE');
+      return;
+    }
+    this.setState('THINKING');
+    this.callbacks?.onInterimTranscript?.('Analyzing voice audio...');
+
+    try {
+      const base64Audio = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const res = (reader.result as string) || '';
+          const commaIdx = res.indexOf(',');
+          resolve(commaIdx >= 0 ? res.slice(commaIdx + 1) : res);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+
+      const res = await fetch('/api/gemini-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          audio: base64Audio,
+          mimeType,
+          language: this.currentLanguageId,
+          languageId: this.currentLanguageId,
+          stateName: this.currentStateName,
+          history: this.conversationHistory,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const reply = data.text || data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (reply) {
+          const cleanReply = reply.replace(/[*_#`[\]()]/g, '').trim();
+          this.callbacks?.onInterimTranscript?.('');
+          this.callbacks?.onMessage({
+            id: `user-${Date.now() - 500}`,
+            role: 'user',
+            text: '🎤 [Voice Query]',
+            timestamp: Date.now() - 500,
+          });
+          this.callbacks?.onMessage({
+            id: `asst-${Date.now()}`,
+            role: 'assistant',
+            text: cleanReply,
+            timestamp: Date.now(),
+          });
+          this.conversationHistory.push({ role: 'user', text: '[Voice Query]' });
+          this.conversationHistory.push({ role: 'assistant', text: cleanReply });
+          this.enqueueSpeech(cleanReply);
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('Audio fallback processing error:', err);
+    }
+    this.callbacks?.onInterimTranscript?.('');
+    this.setState('IDLE');
   }
 
   public getLanguage(): string {
@@ -1232,6 +1355,13 @@ CRITICAL VOICE RULES:
         this.recognition.stop();
       } catch (_) {}
       this.recognition = null;
+    }
+
+    if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+      try {
+        this.mediaRecorder.stop();
+      } catch (_) {}
+      this.mediaRecorder = null;
     }
 
     if (this.localStream) {
