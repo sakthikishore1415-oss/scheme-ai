@@ -45,7 +45,7 @@ export function detectLanguageFromText(text: string): string | null {
  * Automatically detects the user's preferred language from browser settings.
  */
 export function detectBrowserLanguage(): string {
-  if (typeof navigator === 'undefined') return 'ta';
+  if (typeof navigator === 'undefined') return 'en';
 
   const browserLangs = navigator.languages || [navigator.language];
 
@@ -58,7 +58,7 @@ export function detectBrowserLanguage(): string {
     }
   }
 
-  return 'ta'; // Default to Tamil as primary regional locale for PACS Sahayak
+  return 'en'; // Default to English if no supported regional language is detected
 }
 
 /**

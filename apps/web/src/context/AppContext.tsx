@@ -173,8 +173,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Compute config objects
   const currentStateConfig = STATES_CONFIG[selectedStateId] || STATES_CONFIG['TN'];
-  const normalizedVoiceLang = (selectedVoiceLanguageId || 'ta').toLowerCase().split('-')[0].split('_')[0];
-  const currentLanguageConfig = SUPPORTED_LANGUAGES[selectedVoiceLanguageId] || SUPPORTED_LANGUAGES[normalizedVoiceLang] || SUPPORTED_LANGUAGES['ta'];
+  const normalizedVoiceLang = (selectedVoiceLanguageId || 'en').toLowerCase().split('-')[0].split('_')[0];
+  const currentLanguageConfig = SUPPORTED_LANGUAGES[selectedVoiceLanguageId] || SUPPORTED_LANGUAGES[normalizedVoiceLang] || SUPPORTED_LANGUAGES['en'];
 
   // Handle State Changes
   const setSelectedStateId = (stateId: string) => {

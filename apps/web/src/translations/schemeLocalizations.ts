@@ -590,7 +590,7 @@ function cleanNativeForLanguage(rawNativeName: string, langId: string): string {
  * Returns a fully localized Scheme object based on the active language.
  */
 export function getLocalizedScheme(scheme: Scheme, languageId: string): Scheme {
-  const normLang = (languageId || 'ta').toLowerCase().split('-')[0].split('_')[0];
+  const normLang = (languageId || 'en').toLowerCase().split('-')[0].split('_')[0];
   if (normLang === 'en') {
     return scheme;
   }
