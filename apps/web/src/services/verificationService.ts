@@ -61,7 +61,7 @@ class VerificationService {
   }
 
   /**
-   * Compares Arivom local repository rules against current official portal rules
+   * Compares PACS Sahayak local repository rules against current official portal rules
    */
   public async compareRepositoryWithOfficialSource(scheme: Scheme): Promise<ComparisonReport> {
     const verification = await this.verifySchemeOnline(scheme);

@@ -5,11 +5,11 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Arivom Thittam</string>
+	<string>PACS Sahayak</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.arivomthittam.ios</string>
+	<string>com.pacssahayak.ios</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -23,7 +23,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Arivom Thittam requires microphone access to let you ask questions about welfare schemes in Tamil and English using voice.</string>
+	<string>PACS Sahayak requires microphone access to let you ask questions about welfare schemes in Tamil and English using voice.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Speech recognition enables hands-free voice assistance for discovering government schemes.</string>
 	<key>UIApplicationSceneManifest</key>

@@ -10,7 +10,7 @@ on:
       release_name:
         description: 'Release Title'
         required: true
-        default: 'Arivom Thittam Mobile v1.0.0'
+        default: 'PACS Sahayak Mobile v1.0.0'
       prerelease:
         description: 'Mark as Pre-release'
         type: boolean
@@ -53,14 +53,14 @@ jobs:
       - name: Prepare APK Artifact
         run: |
           mkdir -p build-output
-          find apps/android/app/build/outputs/apk/ -name "*.apk" -exec cp {} build-output/arivom-thittam.apk \;
+          find apps/android/app/build/outputs/apk/ -name "*.apk" -exec cp {} build-output/pacs-sahayak.apk \;
           ls -la build-output/
 
       - name: Upload Android APK
         uses: actions/upload-artifact@v6
         with:
-          name: arivom-thittam-android-apk
-          path: build-output/arivom-thittam.apk
+          name: pacs-sahayak-android-apk
+          path: build-output/pacs-sahayak.apk
           if-no-files-found: error
 
   build-ios:
@@ -100,7 +100,7 @@ jobs:
           if [ -d "$BUILD_DIR/ArivomThittam.app" ]; then
             cp -r "$BUILD_DIR/ArivomThittam.app" ../../build-output/Payload/
             cd ../../build-output
-            zip -qr arivom-thittam.ipa Payload
+            zip -qr pacs-sahayak.ipa Payload
             rm -rf Payload
           else
             echo "ArivomThittam.app not found in $BUILD_DIR"
@@ -111,8 +111,8 @@ jobs:
       - name: Upload iOS Installable IPA Artifact
         uses: actions/upload-artifact@v6
         with:
-          name: arivom-thittam-ios-ipa
-          path: build-output/arivom-thittam.ipa
+          name: pacs-sahayak-ios-ipa
+          path: build-output/pacs-sahayak.ipa
           if-no-files-found: error
 
   publish-release:
@@ -125,13 +125,13 @@ jobs:
       - name: Download Android Artifact
         uses: actions/download-artifact@v7
         with:
-          name: arivom-thittam-android-apk
+          name: pacs-sahayak-android-apk
           path: release-assets
 
       - name: Download iOS Artifact
         uses: actions/download-artifact@v7
         with:
-          name: arivom-thittam-ios-ipa
+          name: pacs-sahayak-ios-ipa
           path: release-assets
 
       - name: Display Release Files
@@ -145,16 +145,16 @@ jobs:
           draft: false
           prerelease: ${{ github.event.inputs.prerelease || false }}
           files: |
-            release-assets/arivom-thittam.apk
-            release-assets/arivom-thittam.ipa
+            release-assets/pacs-sahayak.apk
+            release-assets/pacs-sahayak.ipa
           generate_release_notes: true
           body: |
-            ## 📱 Arivom Thittam Multi-Platform Mobile Release
+            ## 📱 PACS Sahayak Multi-Platform Mobile Release
 
             ### 🤖 Android
-            - **`arivom-thittam.apk`**: Genuine Native Android APK (Kotlin + Jetpack Compose) for Android 7.0+ (API 24+) devices.
+            - **`pacs-sahayak.apk`**: Genuine Native Android APK (Kotlin + Jetpack Compose) for Android 7.0+ (API 24+) devices.
 
             ### 🍎 iOS
-            - **`arivom-thittam.ipa`**: Genuine Native iOS Installable Application Package (Swift + SwiftUI) for iOS 17.0+ devices (installable via AltStore, Sideloadly, TrollStore, or enterprise MDM).
+            - **`pacs-sahayak.ipa`**: Genuine Native iOS Installable Application Package (Swift + SwiftUI) for iOS 17.0+ devices (installable via AltStore, Sideloadly, TrollStore, or enterprise MDM).
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

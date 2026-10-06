@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.arivomthittam.domain.language.AndroidTranslations
 import com.arivomthittam.ui.components.ArivomTopAppBar
 import com.arivomthittam.ui.theme.OnSurface
 import com.arivomthittam.ui.theme.OnSurfaceVariant
@@ -57,6 +58,7 @@ val STANDARD_DOCUMENTS = listOf(
 
 @Composable
 fun DocumentsScreen(
+    language: String = "ta",
     checkedDocuments: Set<String>,
     onToggleDocument: (String) -> Unit,
     onNavigateBack: () -> Unit
@@ -68,8 +70,10 @@ fun DocumentsScreen(
     Scaffold(
         topBar = {
             ArivomTopAppBar(
-                title = "Arivom Thittam",
-                tamilTitle = "ஆவண சரிபார்ப்பு",
+                title = "PACS Sahayak",
+                tamilTitle = AndroidTranslations.getString(language, "scheme.documents"),
+                currentLanguageName = AndroidTranslations.getLanguageDisplayName(language),
+                logoLetter = AndroidTranslations.getLogoLetter(language),
                 canNavigateBack = true,
                 onNavigateBack = onNavigateBack
             )

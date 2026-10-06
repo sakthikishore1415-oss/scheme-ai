@@ -122,7 +122,7 @@ export const MyMatchesView: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="bg-[#6b3548] text-[#ffd9e1] text-xs px-2.5 py-0.5 rounded-full font-bold border border-[#e8e1dc]/30 flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5 text-[#c8a96b]" />
-              {userProfile ? t('matches.title') : 'Government Welfare Schemes'}
+              {userProfile ? t('matches.title') : t('home.browseCatalog')}
             </span>
             <span className="text-xs text-[#c8a96b] font-mono font-bold">
               📍 {currentStateConfig.name}
@@ -130,7 +130,7 @@ export const MyMatchesView: React.FC = () => {
           </div>
 
           <h1 className={`font-black text-white tracking-tight mt-2 ${easyMode ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
-            {userProfile ? t('matches.title') : 'Official Schemes & Entitlements'}
+            {userProfile ? t('matches.title') : t('home.heroTitle')}
           </h1>
 
           <p className="text-xs sm:text-sm text-[#ffd9e1] mt-1">
@@ -139,7 +139,7 @@ export const MyMatchesView: React.FC = () => {
                 {t('matches.subtitle')} (<strong>{userProfile.occupation || 'Citizen'}</strong>, {userProfile.district || currentStateConfig.name})
               </>
             ) : (
-              `Explore official Central & ${currentStateConfig.name} state welfare entitlements.`
+              t('home.heroSubtitle')
             )}
           </p>
         </div>
@@ -170,10 +170,10 @@ export const MyMatchesView: React.FC = () => {
             </div>
             <div>
               <h3 className="font-bold text-sm sm:text-base text-[#21191d]">
-                Want to check your exact scheme eligibility?
+                {t('home.checkEligibility')}
               </h3>
               <p className="text-xs text-[#756a6f] mt-0.5 max-w-xl leading-relaxed">
-                Complete your citizen profile in 60 seconds (or tap the Mic) to discover all schemes you qualify for. In the meantime, you can explore the complete catalog below.
+                {t('home.createProfileNotice')}
               </p>
             </div>
           </div>
@@ -183,14 +183,14 @@ export const MyMatchesView: React.FC = () => {
               onClick={() => setActiveTab('profile')}
               className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-[#4a1f2d] hover:bg-[#310a18] text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-all"
             >
-              <span>Create Profile</span>
+              <span>{t('header.createProfile')}</span>
               <ArrowRight className="w-4 h-4 text-[#c8a96b]" />
             </button>
             <button
               onClick={() => setShowVoiceModal(true)}
               className="px-4 py-2.5 rounded-xl bg-white hover:bg-[#faf8f3] text-[#4a1f2d] border border-[#e8e1dc] font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-colors"
             >
-              <span>Ask Voice</span>
+              <span>{t('home.startVoiceBtn')?.split(' ')[0] || 'Voice'}</span>
             </button>
           </div>
         </div>
@@ -246,7 +246,7 @@ export const MyMatchesView: React.FC = () => {
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>All Schemes ({sourceMatches.length})</span>
+            <span>{t('matches.filterAll')} ({sourceMatches.length})</span>
           </button>
 
           <button

@@ -1,0 +1,126 @@
+import { TranslationDictionary } from './types';
+
+export const gu: TranslationDictionary = {
+  // Navigation
+  'nav.home': 'હોમ',
+  'nav.matches': 'પાત્ર યોજનાઓ',
+  'nav.saved': 'સાચવેલ',
+  'nav.profile': 'પ્રોફાઇલ',
+  'nav.voice': 'વોઇસ સહાય',
+  'nav.support': 'સહાય કેન્દ્ર',
+
+  // Header & Brand
+  'header.title': 'પેક્સ સહાયક',
+  'header.tagline': 'સરકારી યોજનાઓ જાણો, તમારા હક મેળવો',
+  'header.createProfile': 'પ્રોફાઇલ બનાવો',
+  'header.selectLanguage': 'ભાષા પસંદ કરો',
+  'header.changeState': 'રાજ્ય બદલો',
+
+  // Home Screen
+  'home.heroTitle': 'સરકારી યોજનાઓ શોધો',
+  'home.heroSubtitle': 'તમારા વ્યવસાય, કુટુંબ અને આવક અનુસાર સરકારી કલ્યાણકારી યોજનાઓ તાત્કાલિક શોધો.',
+  'home.startVoiceBtn': 'અવાજથી વાત કરો',
+  'home.talkToAssistant': 'એઆઈ સહાયક સાથે વાત કરો',
+  'home.browseCatalog': 'બધી યોજનાઓ જુઓ',
+  'home.checkEligibility': 'પાત્રતા તપાસો',
+  'home.quickNeedsHeading': 'ઝડપી જરૂરિયાતો',
+  'home.quickNeedsSubtitle': 'ચોક્કસ કેટેગરી મુજબ સરકારી યોજનાઓ શોધો',
+  'home.matchesNotice': 'યોજનાઓ તમારી પ્રોફાઇલ સાથે મેળ ખાય છે.',
+  'home.viewMatches': 'યોજનાઓ જુઓ',
+  'home.createProfileNotice': 'પાત્ર યોજનાઓ જાણવા પ્રોફાઇલ પૂર્ણ કરો.',
+
+  // Categories
+  'category.agriculture': 'ખેતી અને ખેડૂત કલ્યાણ',
+  'category.education': 'શિક્ષણ અને શિષ્યવૃત્તિ',
+  'category.housing': 'આવાસ અને જમીન',
+  'category.employment': 'રોજગાર અને શ્રમિકો',
+  'category.women': 'મહિલા કલ્યાણ અને સ્વસહાય જૂથો',
+  'category.senior': 'વરિષ્ઠ નાગરિકો અને પેન્શન',
+  'category.health': 'આરોગ્ય અને તબીબી વીમો',
+  'category.financial': 'નાણાકીય સહાય અને લોન',
+  'category.disability': 'દિવ્યાંગ કલ્યાણ',
+  'category.general': 'સામાન્ય કલ્યાણ',
+
+  // Professions
+  'profession.farmer': 'ખેડૂત / કૃષિ',
+  'profession.student': 'વિદ્યાર્થી',
+  'profession.worker': 'મજૂર / શ્રમિક',
+  'profession.business': 'વેપારી',
+  'profession.homemaker': 'ગૃહિણી',
+  'profession.senior': 'વરિષ્ઠ નાગરિક',
+  'profession.pwd': 'દિવ્યાંગ વ્યક્તિ',
+
+  // Profile Form & Questions
+  'profile.title': 'નાગરિક પ્રોફાઇલ',
+  'profile.subtitle': 'યોગ્ય યોજનાઓ શોધવા તમારી વિગતો દાખલ કરો.',
+  'profile.step1': 'પ્રાથમિક વિગતો',
+  'profile.step2': 'વ્યવસાય વિગતો',
+  'profile.step3': 'જરૂરિયાતો અને પ્રાથમિકતાઓ',
+  'profile.fullName': 'પૂરું નામ',
+  'profile.age': 'ઉંમર (વર્ષ)',
+  'profile.gender': 'જાતિ',
+  'profile.state': 'રાજ્ય',
+  'profile.district': 'જિલ્લો',
+  'profile.occupation': 'મુખ્ય વ્યવસાય',
+  'profile.annualIncome': 'વાર્ષિક કૌટુંબિક આવક (₹)',
+  'profile.primaryNeed': 'મુખ્ય જરૂરિયાત',
+  'profile.genderMale': 'પુરુષ',
+  'profile.genderFemale': 'સ્ત્રી',
+  'profile.genderOther': 'અન્ય',
+  'profile.saveProfile': 'પ્રોફાઇલ સાચવો અને યોજનાઓ જુઓ',
+
+  // Matches Screen
+  'matches.title': 'પાત્ર સરકારી યોજનાઓ',
+  'matches.subtitle': 'સત્તાવાર સરકારી ગેઝેટ મુજબ મૂલ્યાંકન કરેલ.',
+  'matches.filterAll': 'બધી યોજનાઓ',
+  'matches.filterStrong': 'સંપૂર્ણ પાત્ર',
+  'matches.filterPotential': 'સંભવિત પાત્ર',
+  'matches.filterMoreInfo': 'વધુ માહિતી જરૂરી',
+  'matches.searchPlaceholder': 'યોજનાનું નામ, વિભાગ અથવા લાભ શોધો...',
+  'matches.emptyTitle': 'કોઈ યોજના મેળ ખાતી નથી',
+  'matches.emptySubtitle': 'નવા વિકલ્પો માટે પ્રોફાઇલ વિગતો અપડેટ કરો.',
+  'matches.updateProfileBtn': 'પ્રોફાઇલ અપડેટ કરો',
+  'matches.whyMatches': 'આ યોજના કેમ મેળ ખાય છે?',
+  'matches.viewDetails': 'વિગતો જુઓ',
+
+  // Saved Schemes & Checklist
+  'saved.title': 'સાચવેલ યોજનાઓ અને ચેકલિસ્ટ',
+  'saved.subtitle': 'જન સેવા કેન્દ્ર / ઇ-ગ્રામ કેન્દ્રમાં અરજી માટે તૈયાર.',
+  'saved.emptyTitle': 'હજી સુધી કોઈ યોજના સાચવી નથી',
+  'saved.emptySubtitle': 'અરજી ચેકલિસ્ટ બનાવવા યોજનાઓ બુકમાર્ક કરો.',
+  'saved.readinessTitle': 'દસ્તાવેજ તૈયારીની સ્થિતિ',
+  'saved.readinessSubtitle': 'જરૂરી દસ્તાવેજો ચકાસાયેલ',
+  'saved.printBtn': 'ચેકલિસ્ટ પ્રિન્ટ કરો',
+  'saved.discoverBtn': 'યોજનાઓ શોધો',
+
+  // Scheme Details & Common Actions
+  'scheme.benefits': 'યોજનાના લાભો',
+  'scheme.documents': 'જરૂરી દસ્તાવેજો',
+  'scheme.howToApply': 'કેવી રીતે અરજી કરવી',
+  'scheme.whereToApply': 'ક્યાં અરજી કરવી',
+  'scheme.officialSource': 'સત્તાવાર પોર્ટલ',
+  'scheme.verifiedBadge': 'સરકારી ગેઝેટ ચકાસાયેલ',
+  'scheme.save': 'સાચવો',
+  'scheme.saved': 'સાચવેલ છે',
+  'scheme.share': 'શેર કરો',
+
+  // Voice Assistant
+  'voice.readyTitle': 'સાંભળવા માટે તૈયાર — બોલવા માટે ટેપ કરો',
+  'voice.listeningTitle': 'તમારો અવાજ સાંભળી રહ્યા છીએ...',
+  'voice.thinkingTitle': 'નિયમોની ચકાસણી ચાલુ છે...',
+  'voice.speakingTitle': 'પેક્સ સહાયક બોલી રહ્યા છે...',
+  'voice.tapToSpeak': 'બોલવા માટે ટેપ કરો',
+  'voice.stopListening': 'બંધ કરો',
+  'voice.typePlaceholder': 'તમારો પ્રશ્ન અહીં લખો...',
+  'voice.privacyNote': 'નાગરિક ગોપનીયતા: તમારો અવાજ માત્ર પાત્રતા ચકાસવા માટે વપરાય છે.',
+  'voice.viewMatchesBtn': 'પાત્ર યોજનાઓ જુઓ',
+
+  // Common Buttons & Messages
+  'common.continue': 'આગળ વધો',
+  'common.back': 'પાછળ',
+  'common.submit': 'સબમિટ કરો',
+  'common.close': 'બંધ કરો',
+  'common.loading': 'માહિતી લોડ થઈ રહી છે...',
+  'common.error': 'ભૂલ આવી. કૃપા કરીને ફરી પ્રયાસ કરો.',
+  'common.retry': 'ફરી પ્રયાસ કરો',
+};

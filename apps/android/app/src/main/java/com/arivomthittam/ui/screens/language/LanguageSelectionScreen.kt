@@ -68,7 +68,8 @@ val LANGUAGES = listOf(
     LanguageOption("mr", "Marathi", "मराठी", "MH", "पुढे सुरू ठेवा  →  (CONTINUE)"),
     LanguageOption("gu", "Gujarati", "ગુજરાતી", "GJ", "આગળ વધો  →  (CONTINUE)"),
     LanguageOption("or", "Odia", "ଓଡ଼ିଆ", "OR", "ଆଗକୁ ବଢ଼ନ୍ତୁ  →  (CONTINUE)"),
-    LanguageOption("pa", "Punjabi", "ਪੰਜਾਬੀ", "PB", "ਜਾਰੀ ਰੱਖੋ  →  (CONTINUE)")
+    LanguageOption("pa", "Punjabi", "ਪੰਜਾਬੀ", "PB", "ਜਾਰੀ ਰੱਖੋ  →  (CONTINUE)"),
+    LanguageOption("as", "Assamese", "অসমীয়া", "AS", "আগবাঢ়ক  →  (CONTINUE)")
 )
 
 @Composable
@@ -85,7 +86,7 @@ fun LanguageSelectionScreen(
     Scaffold(
         topBar = {
             ArivomTopAppBar(
-                title = "Arivom Thittam",
+                title = "PACS Sahayak",
                 logoLetter = com.arivomthittam.domain.language.AndroidTranslations.getLogoLetter(selectedLang)
             )
         },

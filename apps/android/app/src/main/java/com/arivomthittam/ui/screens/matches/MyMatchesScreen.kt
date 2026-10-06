@@ -49,13 +49,15 @@ fun MyMatchesScreen(
     Scaffold(
         topBar = {
             ArivomTopAppBar(
-                title = "Arivom Thittam",
-                tamilTitle = "பொருந்தும் திட்டங்கள்"
+                title = "PACS Sahayak",
+                logoLetter = com.arivomthittam.domain.language.AndroidTranslations.getLogoLetter(uiState.selectedLanguage),
+                currentLanguageName = com.arivomthittam.domain.language.AndroidTranslations.getLanguageDisplayName(uiState.selectedLanguage)
             )
         },
         bottomBar = {
             ArivomBottomBar(
                 currentRoute = Screen.Matches.route,
+                selectedLanguage = uiState.selectedLanguage,
                 onNavigate = onNavigate
             )
         }
@@ -71,7 +73,7 @@ fun MyMatchesScreen(
             item {
                 Column {
                     Text(
-                        text = "YOUR MATCHES / பொருந்தும் திட்டங்கள்",
+                        text = com.arivomthittam.domain.language.AndroidTranslations.getString("matches.title", uiState.selectedLanguage),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = OnSurfaceVariant,
@@ -85,7 +87,7 @@ fun MyMatchesScreen(
                         modifier = Modifier.padding(top = 2.dp)
                     )
                     Text(
-                        text = "Evaluated against official published gazette guidelines.",
+                        text = com.arivomthittam.domain.language.AndroidTranslations.getString("matches.subtitle", uiState.selectedLanguage),
                         fontSize = 12.sp,
                         color = OnSurfaceVariant
                     )
@@ -107,13 +109,13 @@ fun MyMatchesScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "No Scheme Matches Available",
+                                text = com.arivomthittam.domain.language.AndroidTranslations.getString("matches.noMatchesTitle", uiState.selectedLanguage),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp,
                                 color = OnSurface
                             )
                             Text(
-                                text = "No government schemes currently loaded from connected repository.",
+                                text = com.arivomthittam.domain.language.AndroidTranslations.getString("matches.noMatchesDesc", uiState.selectedLanguage),
                                 fontSize = 12.sp,
                                 color = OnSurfaceVariant,
                                 modifier = Modifier.padding(top = 4.dp)
@@ -136,13 +138,13 @@ fun MyMatchesScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "No Profile Created Yet",
+                                text = com.arivomthittam.domain.language.AndroidTranslations.getString("matches.noProfileTitle", uiState.selectedLanguage),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp,
                                 color = OnSurface
                             )
                             Text(
-                                text = "Complete your demographic details to discover matching schemes.",
+                                text = com.arivomthittam.domain.language.AndroidTranslations.getString("matches.noProfileDesc", uiState.selectedLanguage),
                                 fontSize = 12.sp,
                                 color = OnSurfaceVariant,
                                 modifier = Modifier.padding(top = 4.dp, bottom = 14.dp)
@@ -162,6 +164,7 @@ fun MyMatchesScreen(
                     SchemeCardItem(
                         result = match,
                         isSaved = uiState.savedSchemeIds.contains(match.scheme.id),
+                        language = uiState.selectedLanguage,
                         onSaveToggle = onSaveToggle,
                         onDetailsClick = onSchemeClick,
                         onWhyMeClick = onWhyMeClick

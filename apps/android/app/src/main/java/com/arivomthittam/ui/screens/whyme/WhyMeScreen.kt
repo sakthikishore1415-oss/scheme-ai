@@ -61,13 +61,16 @@ import com.arivomthittam.ui.theme.TertiaryFixed
 @Composable
 fun WhyMeScreen(
     matchResult: EligibilityResult?,
+    language: String = "en",
     onNavigateBack: () -> Unit
 ) {
     if (matchResult == null) {
         Scaffold(
             topBar = {
                 ArivomTopAppBar(
-                    title = "Why Me?",
+                    title = com.arivomthittam.domain.language.AndroidTranslations.getString("scheme.whyMe", language),
+                    logoLetter = com.arivomthittam.domain.language.AndroidTranslations.getLogoLetter(language),
+                    currentLanguageName = com.arivomthittam.domain.language.AndroidTranslations.getLanguageDisplayName(language),
                     canNavigateBack = true,
                     onNavigateBack = onNavigateBack
                 )
@@ -88,8 +91,9 @@ fun WhyMeScreen(
     Scaffold(
         topBar = {
             ArivomTopAppBar(
-                title = "Why Did I Qualify?",
-                tamilTitle = "எனக்கு ஏன் இந்த திட்டம்?",
+                title = com.arivomthittam.domain.language.AndroidTranslations.getString("scheme.whyMe", language),
+                logoLetter = com.arivomthittam.domain.language.AndroidTranslations.getLogoLetter(language),
+                currentLanguageName = com.arivomthittam.domain.language.AndroidTranslations.getLanguageDisplayName(language),
                 canNavigateBack = true,
                 onNavigateBack = onNavigateBack
             )
@@ -146,7 +150,8 @@ fun WhyMeScreen(
                 )
             }
 
-            items(matchResult.whyMeEnglish) { point ->
+            val pointsToShow = if (matchResult.whyMeRegional.isNotEmpty()) matchResult.whyMeRegional else matchResult.whyMeEnglish
+            items(pointsToShow) { point ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
@@ -261,7 +266,7 @@ fun WhyMeScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Arivom Thittam evaluates eligibility using authoritative deterministic rules published in official gazettes. Final application approval is granted by respective district revenue / nodal officers.",
+                            text = "PACS Sahayak evaluates eligibility using authoritative deterministic rules published in official gazettes. Final application approval is granted by respective district revenue / nodal officers.",
                             fontSize = 11.sp,
                             color = OnSurfaceVariant,
                             lineHeight = 16.sp

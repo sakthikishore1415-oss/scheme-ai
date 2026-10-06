@@ -1,5 +1,5 @@
 {
-  "name": "@arivom-thittam/eligibility-spec",
+  "name": "@pacs-sahayak/eligibility-spec",
   "version": "1.0.0",
   "private": true,
   "description": "Authoritative deterministic eligibility rules specification shared between TypeScript Web and Kotlin Android engines."

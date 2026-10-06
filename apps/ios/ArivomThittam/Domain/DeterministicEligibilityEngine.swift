@@ -1,7 +1,7 @@
 import Foundation
 
 /// Pure deterministic eligibility engine for iOS (Swift)
-/// Strictly mirrors the authoritative logic defined in @arivom-thittam/eligibility-spec
+/// Strictly mirrors the authoritative logic defined in @pacs-sahayak/eligibility-spec
 /// Zero LLM hallucination guarantee.
 public struct DeterministicEligibilityEngine {
 

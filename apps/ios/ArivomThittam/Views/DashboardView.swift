@@ -14,24 +14,53 @@ public struct DashboardView: View {
             ScrollView {
                 VStack(spacing: 20) {
                     // Header Brand & Language Switcher
-                    HStack {
+                    HStack(spacing: 12) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(LinearGradient(
+                                    colors: [Color(red: 0.89, green: 0.76, blue: 0.51), Color(red: 0.29, green: 0.12, blue: 0.18)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ))
+                                .frame(width: 44, height: 44)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color(red: 0.78, green: 0.66, blue: 0.42), lineWidth: 1)
+                                )
+
+                            Image(systemName: "shield.checkered")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(.white)
+                        }
+
                         VStack(alignment: .leading, spacing: 2) {
                             Text(translationManager.localized("app_title"))
-                                .font(.system(size: 24, weight: .black))
+                                .font(.system(size: 22, weight: .black))
                                 .foregroundColor(.primary)
                             Text(translationManager.localized("tagline"))
-                                .font(.system(size: 12, weight: .medium))
+                                .font(.system(size: 11, weight: .medium))
                                 .foregroundColor(.secondary)
                         }
 
                         Spacer()
 
-                        Button(action: {
-                            translationManager.toggleLanguage()
-                        }) {
+                        Menu {
+                            ForEach(AppLanguage.allCases) { lang in
+                                Button(action: {
+                                    translationManager.setLanguage(lang)
+                                }) {
+                                    HStack {
+                                        Text(lang.displayName)
+                                        if translationManager.currentLanguage == lang {
+                                            Image(systemName: "checkmark")
+                                        }
+                                    }
+                                }
+                            }
+                        } label: {
                             HStack(spacing: 4) {
                                 Image(systemName: "globe")
-                                Text(translationManager.currentLanguage == .english ? "தமிழ்" : "English")
+                                Text(translationManager.currentLanguage.displayName)
                                     .font(.system(size: 13, weight: .bold))
                             }
                             .padding(.horizontal, 10)

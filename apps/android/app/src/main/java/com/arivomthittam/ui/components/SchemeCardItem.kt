@@ -56,6 +56,7 @@ import com.arivomthittam.ui.theme.TertiaryFixed
 fun SchemeCardItem(
     result: EligibilityResult,
     isSaved: Boolean,
+    language: String = "en",
     onSaveToggle: (String) -> Unit,
     onDetailsClick: (String) -> Unit,
     onWhyMeClick: (String) -> Unit
@@ -88,7 +89,7 @@ fun SchemeCardItem(
                                 .padding(horizontal = 10.dp, vertical = 4.dp)
                         ) {
                             Text(
-                                text = "100% ELIGIBLE (${result.score}%)",
+                                text = "${com.arivomthittam.domain.language.AndroidTranslations.getString("scheme.statusEligible", language)} (${result.score}%)",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = TertiaryContainer
@@ -103,7 +104,7 @@ fun SchemeCardItem(
                                 .padding(horizontal = 10.dp, vertical = 4.dp)
                         ) {
                             Text(
-                                text = "MORE INFO NEEDED (${result.score}%)",
+                                text = "${com.arivomthittam.domain.language.AndroidTranslations.getString("scheme.statusMoreInfo", language)} (${result.score}%)",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = OnSecondaryContainer
@@ -118,7 +119,7 @@ fun SchemeCardItem(
                                 .padding(horizontal = 10.dp, vertical = 4.dp)
                         ) {
                             Text(
-                                text = "EVALUATION PENDING",
+                                text = com.arivomthittam.domain.language.AndroidTranslations.getString("scheme.statusPending", language),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = OnSurfaceVariant
@@ -169,7 +170,15 @@ fun SchemeCardItem(
             )
 
             // Why Me? Match Logic Indicator Box
-            if (result.whyMeEnglish.isNotEmpty()) {
+            val whyMePoint = if (result.whyMeRegional.isNotEmpty()) {
+                result.whyMeRegional.first()
+            } else if (result.whyMeEnglish.isNotEmpty()) {
+                result.whyMeEnglish.first()
+            } else {
+                null
+            }
+
+            if (!whyMePoint.isNullOrBlank()) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -186,7 +195,7 @@ fun SchemeCardItem(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = result.whyMeEnglish.first(),
+                            text = whyMePoint,
                             fontSize = 11.sp,
                             color = OnSurface,
                             fontWeight = FontWeight.Medium
@@ -209,7 +218,7 @@ fun SchemeCardItem(
                     border = BorderStroke(1.dp, PrimaryIndigo)
                 ) {
                     Text(
-                        text = "Why Me?",
+                        text = com.arivomthittam.domain.language.AndroidTranslations.getString("scheme.whyMe", language),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = PrimaryIndigo
@@ -223,7 +232,7 @@ fun SchemeCardItem(
                     colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
                 ) {
                     Text(
-                        text = "View Details",
+                        text = com.arivomthittam.domain.language.AndroidTranslations.getString("scheme.viewDetails", language),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = OnPrimary

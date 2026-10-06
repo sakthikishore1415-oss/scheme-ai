@@ -1,4 +1,4 @@
-const { getApiKey } = require('./_utils');
+const { getApiKey, getXaiApiKey } = require('./_utils');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -10,12 +10,17 @@ module.exports = async function handler(req, res) {
   }
 
   const apiKey = getApiKey();
-  if (!apiKey) {
+  const xaiApiKey = getXaiApiKey();
+  if (!apiKey && !xaiApiKey) {
     return res.status(503).json({
       error: 'NO_API_KEY',
-      message: 'Gemini API key not configured on server',
+      message: 'Neither Gemini nor xAI API key is configured on server',
     });
   }
 
-  return res.status(200).json({ status: 'configured' });
+  return res.status(200).json({
+    status: 'configured',
+    gemini: Boolean(apiKey),
+    xai: Boolean(xaiApiKey),
+  });
 };

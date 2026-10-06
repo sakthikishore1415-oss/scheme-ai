@@ -162,7 +162,7 @@ fun HomeScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo)
                     ) {
                         Text(
-                            text = "Find My Schemes",
+                            text = com.arivomthittam.domain.language.AndroidTranslations.getString("home.findMySchemes", lang),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = OnPrimary
@@ -188,7 +188,7 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "🎙 Speak to Arivom",
+                            text = "🎙 " + com.arivomthittam.domain.language.AndroidTranslations.getString("home.speakToAssistant", lang),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = PrimaryIndigo
@@ -201,7 +201,7 @@ fun HomeScreen(
             item {
                 Column {
                     Text(
-                        text = "Quick needs",
+                        text = com.arivomthittam.domain.language.AndroidTranslations.getString("home.quickNeeds", lang),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = OnSurface,
@@ -247,7 +247,7 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Matched Welfare Schemes",
+                        text = com.arivomthittam.domain.language.AndroidTranslations.getString("home.matchedWelfareSchemes", lang),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = OnSurface
@@ -255,7 +255,7 @@ fun HomeScreen(
 
                     if (uiState.matches.isNotEmpty()) {
                         Text(
-                            text = "View All (${uiState.matches.size})",
+                            text = "${com.arivomthittam.domain.language.AndroidTranslations.getString("home.viewAll", lang)} (${uiState.matches.size})",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = PrimaryIndigo,
@@ -338,6 +338,7 @@ fun HomeScreen(
                     SchemeCardItem(
                         result = match,
                         isSaved = uiState.savedSchemeIds.contains(match.scheme.id),
+                        language = lang,
                         onSaveToggle = onSaveToggle,
                         onDetailsClick = onSchemeClick,
                         onWhyMeClick = onWhyMeClick

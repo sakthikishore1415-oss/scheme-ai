@@ -76,6 +76,7 @@ import com.arivomthittam.ui.theme.TertiaryFixed
 fun SchemeDetailsScreen(
     scheme: Scheme?,
     isSaved: Boolean,
+    language: String = "en",
     onSaveToggle: (String) -> Unit,
     onWhyMeClick: (String) -> Unit,
     onNavigateBack: () -> Unit
@@ -85,6 +86,8 @@ fun SchemeDetailsScreen(
             topBar = {
                 ArivomTopAppBar(
                     title = "Scheme Details",
+                    logoLetter = com.arivomthittam.domain.language.AndroidTranslations.getLogoLetter(language),
+                    currentLanguageName = com.arivomthittam.domain.language.AndroidTranslations.getLanguageDisplayName(language),
                     canNavigateBack = true,
                     onNavigateBack = onNavigateBack
                 )
@@ -109,7 +112,8 @@ fun SchemeDetailsScreen(
         topBar = {
             ArivomTopAppBar(
                 title = scheme.name,
-                tamilTitle = scheme.nativeName,
+                logoLetter = com.arivomthittam.domain.language.AndroidTranslations.getLogoLetter(language),
+                currentLanguageName = com.arivomthittam.domain.language.AndroidTranslations.getLanguageDisplayName(language),
                 canNavigateBack = true,
                 onNavigateBack = onNavigateBack
             )

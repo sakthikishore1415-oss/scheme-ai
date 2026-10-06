@@ -9,7 +9,7 @@ import com.arivomthittam.data.model.Scheme
 
 /**
  * Deterministic Eligibility Engine (Kotlin Native)
- * Implements the authoritative evaluation rules defined in @arivom-thittam/eligibility-spec.
+ * Implements the authoritative evaluation rules defined in @pacs-sahayak/eligibility-spec.
  * Pure deterministic rule checks — No AI decision-making.
  */
 object DeterministicEligibilityEngine {

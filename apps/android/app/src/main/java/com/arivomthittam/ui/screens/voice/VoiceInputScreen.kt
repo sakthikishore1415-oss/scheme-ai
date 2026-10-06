@@ -163,7 +163,7 @@ fun VoiceInputScreen(
         if (!isMuted && ttsEngine != null) {
             isSpeaking = true
             ttsEngine?.setSpeechRate(voiceSpeed)
-            ttsEngine?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "arivom_voice")
+            ttsEngine?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "pacs_voice")
         }
     }
 
@@ -280,7 +280,7 @@ fun VoiceInputScreen(
                 val greeting = GeminiVoiceService.getGreeting(activeLanguage)
                 messages.add(ChatMessage(id = "msg_welcome", sender = "assistant", text = greeting))
                 if (!isMuted) {
-                    tts?.speak(greeting, TextToSpeech.QUEUE_FLUSH, null, "arivom_voice_greeting")
+                    tts?.speak(greeting, TextToSpeech.QUEUE_FLUSH, null, "pacs_voice_greeting")
                 }
             }
         }
@@ -441,7 +441,7 @@ fun VoiceInputScreen(
                             Column {
                                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                     Text(
-                                        text = "Arivom Voice Live",
+                                        text = "PACS Sahayak Voice Live",
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 16.sp,
                                         color = SovereignMaroon
@@ -766,7 +766,7 @@ fun VoiceInputScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = if (isUser) "You (Citizen)" else "Arivom AI",
+                                        text = if (isUser) "You (Citizen)" else "PACS Sahayak AI",
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = if (isUser) Color.White.copy(alpha = 0.8f) else SovereignMaroon

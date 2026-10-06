@@ -58,9 +58,9 @@ class SpeechService {
     const voices = this.getVoices();
     if (!voices || voices.length === 0) return null;
 
-    const langConfig = SUPPORTED_LANGUAGES[langId];
+    const langPrefix = (langId || 'en').toLowerCase().split('-')[0].split('_')[0];
+    const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES[langPrefix];
     const bcp47 = (langConfig?.bcp47Code || langId || 'en-IN').toLowerCase().replace('_', '-');
-    const langPrefix = langId.toLowerCase().split('-')[0].split('_')[0];
     const langName = (langConfig?.name || '').toLowerCase();
     const nativeName = (langConfig?.nativeName || '').toLowerCase();
 
@@ -225,7 +225,8 @@ class SpeechService {
           window.speechSynthesis.cancel();
         } catch (_) {}
 
-        const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['ta'];
+        const langPrefix = (langId || 'ta').toLowerCase().split('-')[0].split('_')[0];
+        const langConfig = SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES[langPrefix] || SUPPORTED_LANGUAGES['ta'];
         const utterance = new SpeechSynthesisUtterance(cleanText);
         const bcp47 = langConfig?.bcp47Code || 'ta-IN';
         utterance.lang = bcp47;
@@ -306,7 +307,8 @@ class SpeechService {
     onEnd?: () => void
   ): Promise<boolean> {
     try {
-      const voiceName = LANGUAGE_VOICE_MAP[langId] || 'Aoede';
+      const normalized = (langId || 'ta').toLowerCase().split('-')[0].split('_')[0];
+      const voiceName = LANGUAGE_VOICE_MAP[normalized] || LANGUAGE_VOICE_MAP[langId] || 'Aoede';
       const res = await fetch('/api/gemini-tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

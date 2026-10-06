@@ -15,7 +15,7 @@ val localProperties = Properties().apply {
 
 val apiBaseUrl: String = localProperties.getProperty("API_BASE_URL")
     ?: System.getenv("API_BASE_URL")
-    ?: "https://api.arivomthittam.gov.in"
+    ?: "https://api.pacssahayak.gov.in"
 
 val geminiApiKey: String = localProperties.getProperty("GEMINI_API_KEY")
     ?: System.getenv("GEMINI_API_KEY")
@@ -30,7 +30,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.arivomthittam"
+        applicationId = "com.pacssahayak"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

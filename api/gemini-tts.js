@@ -39,7 +39,7 @@ module.exports = async function handler(req, res) {
 
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
     const textToSpeak = (body.text || '').trim();
-    const languageId = (body.languageId || 'ta').toLowerCase();
+    const languageId = (body.languageId || 'ta').toLowerCase().split('-')[0].split('_')[0];
 
     const voiceName =
       body.voiceName && body.voiceName !== 'Kore'

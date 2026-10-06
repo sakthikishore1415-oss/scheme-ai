@@ -24,7 +24,7 @@ export const AboutArchitectureView: React.FC = () => {
           TECHNICAL ARCHITECTURE & CIVIC TECH VISION
         </div>
         <h1 className="text-2xl sm:text-3xl font-black text-white">
-          Arivom Thittam (அறிவோம் திட்டம்) System Architecture
+          PACS Sahayak System Architecture
         </h1>
         <p className="text-xs sm:text-sm text-[#ffd9e1] max-w-3xl leading-relaxed">
           Designed from the ground up for 1.4 billion Indian citizens. Solving the twin barriers of complex administrative language and the digital divide through voice-first, state-aware, and button-phone inclusive engineering.

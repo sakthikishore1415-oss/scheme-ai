@@ -1,4 +1,4 @@
-# Arivom Thittam — Native iOS Application (Swift & SwiftUI)
+# PACS Sahayak — Native iOS Application (Swift & SwiftUI)
 
 > **Know Your Schemes. Claim Your Benefits.**  
 > *அரசு திட்டங்களை அறிவோம். உரிமைகளைப் பெறுவோம்.*
@@ -88,4 +88,4 @@ xcodebuild \
 An automated unified workflow is provided at `.github/workflows/build-mobile-release.yml`.
 - Runs on `macos-14` runner.
 - Builds the application using `xcodebuild -sdk iphoneos`.
-- Packages and archives an installable `arivom-thittam.ipa` as a GitHub Release and downloadable artifact.
+- Packages and archives an installable `pacs-sahayak.ipa` as a GitHub Release and downloadable artifact.

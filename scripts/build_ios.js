@@ -8,7 +8,7 @@ const rootDir = path.resolve(__dirname, '..');
 const iosDir = path.join(rootDir, 'apps', 'ios');
 
 console.log('\n========================================');
-console.log('🍎 Building iOS App (@arivom-thittam/ios)');
+console.log('🍎 Building iOS App (@pacs-sahayak/ios)');
 console.log('========================================');
 
 // 1. Verify iOS workspace structure
@@ -71,12 +71,12 @@ if (isDarwin && xcodeAvailable) {
         fs.rmSync(payloadDir, { recursive: true, force: true });
         fs.mkdirSync(payloadDir, { recursive: true });
         fs.cpSync(appPath, path.join(payloadDir, 'ArivomThittam.app'), { recursive: true });
-        execSync(`zip -qr "${path.join(destDir, 'arivom-thittam.ipa')}" Payload`, {
+        execSync(`zip -qr "${path.join(destDir, 'pacs-sahayak.ipa')}" Payload`, {
           cwd: destDir,
           stdio: 'inherit'
         });
         fs.rmSync(payloadDir, { recursive: true, force: true });
-        console.log(`\n🎉 iOS Installable IPA built: dist/ios/arivom-thittam.ipa\n`);
+        console.log(`\n🎉 iOS Installable IPA built: dist/ios/pacs-sahayak.ipa\n`);
       }
     }
   } catch (err) {

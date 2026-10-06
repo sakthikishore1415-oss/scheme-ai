@@ -1,4 +1,4 @@
-const { getApiKey } = require('./_utils');
+const { getApiKey, getXaiApiKey } = require('./_utils');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,17 +15,41 @@ module.exports = async function handler(req, res) {
 
   try {
     const apiKey = getApiKey();
-    if (!apiKey) {
+    const xaiApiKey = getXaiApiKey();
+    if (!apiKey && !xaiApiKey) {
       return res.status(503).json({
         error: 'NO_API_KEY',
-        message: 'Gemini API key not configured on server',
+        message: 'Neither Gemini nor xAI API key is configured on server',
       });
     }
 
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
-    const systemInstructionText =
-      body.systemInstruction ||
-      'You are Arivom (அறிவோம்), a warm, friendly voice assistant. Have a natural voice conversation with the citizen in 1-3 spoken sentences. Be helpful, polite, and conversational.';
+    const rawLang = (body.language || body.languageId || '').toLowerCase().split('-')[0].split('_')[0];
+    const languageNames = {
+      ta: 'Tamil (தமிழ்)',
+      ml: 'Malayalam (മലയാളം)',
+      hi: 'Hindi (हिन्दी)',
+      te: 'Telugu (తెలుగు)',
+      kn: 'Kannada (ಕನ್ನಡ)',
+      bn: 'Bengali (বাংলা)',
+      mr: 'Marathi (मराठी)',
+      gu: 'Gujarati (ગુજરાતી)',
+      or: 'Odia (ଓଡ଼ିଆ)',
+      pa: 'Punjabi (ਪੰਜਾਬੀ)',
+      as: 'Assamese (অসমীয়া)',
+      en: 'English',
+    };
+    const targetLangName = languageNames[rawLang];
+    let systemInstructionText = body.systemInstruction;
+    if (!systemInstructionText) {
+      if (targetLangName && rawLang !== 'en') {
+        systemInstructionText = `You are PACS Sahayak, a warm, friendly civic voice assistant. Respond STRICTLY in ${targetLangName} in 1-2 spoken sentences. Do NOT use English.`;
+      } else {
+        systemInstructionText = 'You are PACS Sahayak, a warm, friendly voice assistant. Have a natural voice conversation with the citizen in 1-3 spoken sentences. Be helpful, polite, and conversational.';
+      }
+    } else if (targetLangName && rawLang !== 'en' && !systemInstructionText.toLowerCase().includes(rawLang)) {
+      systemInstructionText += `\nCRITICAL LANGUAGE MANDATE: You MUST reply STRICTLY in ${targetLangName}. Do NOT use English.`;
+    }
 
     let contents = [];
     if (Array.isArray(body.history) && body.history.length > 0) {
@@ -53,38 +77,72 @@ module.exports = async function handler(req, res) {
     let lastStatus = 500;
     let lastErrText = '';
 
-    for (const model of candidateModels) {
+    if (apiKey) {
+      for (const model of candidateModels) {
+        try {
+          const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+          const apiRes = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              systemInstruction: {
+                parts: [{ text: systemInstructionText }],
+              },
+              contents,
+              generationConfig: {
+                temperature: 0.5,
+                maxOutputTokens: 600,
+              },
+            }),
+          });
+
+          if (apiRes.ok) {
+            const data = await apiRes.json();
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            if (text) {
+              generatedText = text;
+              break;
+            }
+          } else {
+            lastStatus = apiRes.status;
+            lastErrText = await apiRes.text();
+          }
+        } catch (err) {
+          lastErrText = err?.message || 'Network error';
+        }
+      }
+    }
+    if (!generatedText && xaiApiKey) {
       try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        const apiRes = await fetch(endpoint, {
+        const xaiRes = await fetch('https://api.x.ai/v1/chat/completions', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${xaiApiKey}`,
+          },
           body: JSON.stringify({
-            systemInstruction: {
-              parts: [{ text: systemInstructionText }],
-            },
-            contents,
-            generationConfig: {
-              temperature: 0.5,
-              maxOutputTokens: 600,
-            },
+            messages: [
+              { role: 'system', content: systemInstructionText },
+              ...(Array.isArray(body.history)
+                ? body.history.slice(-4).map((h) => ({
+                    role: h.role === 'assistant' ? 'assistant' : 'user',
+                    content: h.text || h.content || '',
+                  }))
+                : []),
+              { role: 'user', content: body.prompt || 'Hello' },
+            ],
+            model: 'grok-beta',
+            temperature: 0.5,
           }),
         });
-
-        if (apiRes.ok) {
-          const data = await apiRes.json();
-          const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          if (text) {
-            generatedText = text;
-            break;
+        if (xaiRes.ok) {
+          const xaiData = await xaiRes.json();
+          const grokText = xaiData.choices?.[0]?.message?.content;
+          if (grokText) {
+            generatedText = grokText;
           }
-        } else {
-          lastStatus = apiRes.status;
-          lastErrText = await apiRes.text();
         }
-      } catch (err) {
-        lastErrText = err?.message || 'Network error';
-      }
+      } catch (_) {}
     }
 
     if (generatedText) {

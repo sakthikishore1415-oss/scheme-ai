@@ -1,7 +1,7 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { getLanguageInitial } from '../data/languages';
+import { PacsAppIcon } from './PacsAppIcon';
 import { speechService } from '../utils/speech';
 import {
   Mic,
@@ -42,7 +42,7 @@ export const Header: React.FC = () => {
         <div className="flex items-center gap-3 shrink-0">
           <div className="flex items-center gap-1.5 font-bold text-[#c8a96b]">
             <span className="inline-block w-2 h-2 rounded-full bg-[#c8a96b] animate-pulse"></span>
-            ARIVOM THITTAM
+            PACS SAHAYAK
           </div>
           <span className="text-[#c08494]/60">|</span>
           <span className="text-[#ffd9e1] font-medium text-[11px]">{uiStrings.appTitle}</span>
@@ -96,9 +96,7 @@ export const Header: React.FC = () => {
             onClick={() => setActiveTab('home')}
             className="flex items-center gap-2.5 text-left group cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-xl bg-[#4a1f2d] text-white flex items-center justify-center font-bold text-xl shadow-md group-hover:bg-[#6b3548] transition-colors">
-              {getLanguageInitial(selectedVoiceLanguageId)}
-            </div>
+            <PacsAppIcon size={42} className="shadow-md transition-transform group-hover:scale-105" />
             <div>
               <div className="font-extrabold text-base text-[#241c20] leading-none tracking-tight group-hover:text-[#4a1f2d] transition-colors">
                 {uiStrings.appTitle}

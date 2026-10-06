@@ -10,7 +10,7 @@ export const en: TranslationDictionary = {
   'nav.support': 'Support',
 
   // Header & Brand
-  'header.title': 'Arivom Thittam',
+  'header.title': 'PACS Sahayak',
   'header.tagline': 'Know your welfare schemes. Claim your entitlements.',
   'header.createProfile': 'Create Profile',
   'header.selectLanguage': 'Select Language',
@@ -108,7 +108,7 @@ export const en: TranslationDictionary = {
   'voice.readyTitle': 'Ready to listen — tap to speak',
   'voice.listeningTitle': 'Listening to your voice...',
   'voice.thinkingTitle': 'Understanding & evaluating criteria...',
-  'voice.speakingTitle': 'Arivom Thittam is speaking...',
+  'voice.speakingTitle': 'PACS Sahayak is speaking...',
   'voice.tapToSpeak': 'Tap to Speak',
   'voice.stopListening': 'Stop Listening',
   'voice.typePlaceholder': 'Type your details or query here...',

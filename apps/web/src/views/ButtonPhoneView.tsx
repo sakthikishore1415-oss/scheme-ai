@@ -18,7 +18,7 @@ export const ButtonPhoneView: React.FC = () => {
             Button Phone (IVR) & 2-Way SMS Gateway
           </h1>
           <p className="text-xs sm:text-sm text-[#ffd9e1] leading-relaxed">
-            350M+ Indian citizens do not own a smartphone. Arivom Thittam’s deterministic engine connects directly to standard telecom telephony switches, enabling voice discovery and SMS receipts on any basic ₹1,200 handset.
+            350M+ Indian citizens do not own a smartphone. PACS Sahayak’s deterministic engine connects directly to standard telecom telephony switches, enabling voice discovery and SMS receipts on any basic ₹1,200 handset.
           </p>
         </div>
 

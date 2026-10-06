@@ -5,23 +5,23 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     },
-    "@arivom-thittam/scheme-data#build": {
+    "@pacs-sahayak/scheme-data#build": {
       "dependsOn": ["^build"],
       "outputs": []
     },
-    "@arivom-thittam/api-contracts#build": {
+    "@pacs-sahayak/api-contracts#build": {
       "dependsOn": ["^build"],
       "outputs": []
     },
-    "@arivom-thittam/eligibility-spec#build": {
+    "@pacs-sahayak/eligibility-spec#build": {
       "dependsOn": ["^build"],
       "outputs": []
     },
-    "@arivom-thittam/android#build": {
+    "@pacs-sahayak/android#build": {
       "dependsOn": ["^build"],
       "outputs": ["build/outputs/apk/**", "dist/**"]
     },
-    "@arivom-thittam/ios#build": {
+    "@pacs-sahayak/ios#build": {
       "dependsOn": ["^build"],
       "outputs": ["build/**", "dist/**"]
     },

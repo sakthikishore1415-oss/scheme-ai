@@ -26,6 +26,28 @@ function getApiKey(): string {
   return '';
 }
 
+function getXaiApiKey(): string {
+  if (process.env.XAI_API_KEY) return process.env.XAI_API_KEY;
+  if (process.env.VITE_XAI_API_KEY) return process.env.VITE_XAI_API_KEY;
+
+  const candidatePaths = [
+    path.resolve(__dirname, '.env'),
+    path.resolve(__dirname, '../../.env'),
+  ];
+  for (const p of candidatePaths) {
+    try {
+      if (fs.existsSync(p)) {
+        const content = fs.readFileSync(p, 'utf-8');
+        const match = content.match(/^(?:VITE_)?XAI_API_KEY=(.+)$/m);
+        if (match && match[1]) {
+          return match[1].trim().replace(/^['"]|['"]$/g, '');
+        }
+      }
+    } catch (_) {}
+  }
+  return '';
+}
+
 function pcmToWav(pcmBuffer: Buffer, sampleRate = 24000, numChannels = 1): Buffer {
   const byteRate = sampleRate * numChannels * 2;
   const blockAlign = numChannels * 2;
@@ -93,7 +115,7 @@ function geminiLiveServerPlugin(): Plugin {
             const parsed = JSON.parse(body || '{}');
             const systemInstructionText =
               parsed.systemInstruction ||
-              'You are Arivom (அறிவோம்), a warm, friendly voice assistant. Have a natural voice conversation with the citizen in 1-3 spoken sentences. Be helpful, polite, and conversational.';
+              'You are PACS Sahayak, a warm, friendly voice assistant. Have a natural voice conversation with the citizen in 1-3 spoken sentences. Be helpful, polite, and conversational.';
             
             let contents: any[] = [];
             if (Array.isArray(parsed.history) && parsed.history.length > 0) {
@@ -198,7 +220,7 @@ function geminiLiveServerPlugin(): Plugin {
             const parsed = JSON.parse(body || '{}');
             const systemInstructionText =
               parsed.systemInstruction ||
-              'You are Arivom (அறிவோம்), a warm, friendly voice assistant. Answer concisely in 1-2 punchy spoken sentences.';
+              'You are PACS Sahayak, a warm, friendly voice assistant. Answer concisely in 1-2 punchy spoken sentences.';
 
             let contents: any[] = [];
             if (Array.isArray(parsed.history) && parsed.history.length > 0) {
@@ -406,6 +428,8 @@ export default defineConfig(() => {
     define: {
       'import.meta.env.VITE_GEMINI_API_KEY': JSON.stringify(getApiKey()),
       '__GEMINI_API_KEY__': JSON.stringify(getApiKey()),
+      'import.meta.env.VITE_XAI_API_KEY': JSON.stringify(getXaiApiKey()),
+      '__XAI_API_KEY__': JSON.stringify(getXaiApiKey()),
     },
     resolve: {
       alias: {

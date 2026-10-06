@@ -36,7 +36,7 @@ DEFAULT_SEEDS = (
     "https://www.india.gov.in/",
 )
 DEFAULT_DOMAINS = ("www.myscheme.gov.in", "www.india.gov.in")
-USER_AGENT = "ArivomThittamSchemeCrawler/1.0 (+https://github.com/arivom-thittam)"
+USER_AGENT = "PacsSahayakSchemeCrawler/1.0 (+https://github.com/pacs-sahayak)"
 SCHEME_TERMS = re.compile(
     r"\b(scheme|schemes|welfare|benefit|benefits|subsidy|scholarship|pension|"
     r"insurance|housing|employment|farmer|agriculture|livelihood|financial assistance|"

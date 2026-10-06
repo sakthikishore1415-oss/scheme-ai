@@ -58,14 +58,15 @@ export function detectBrowserLanguage(): string {
     }
   }
 
-  return 'ta'; // Default to Tamil as primary regional locale for Arivom Thittam
+  return 'ta'; // Default to Tamil as primary regional locale for PACS Sahayak
 }
 
 /**
  * Safe lookup for language configuration
  */
 export function getLanguageConfig(langId: string): LanguageConfig {
-  return SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['en'] || {
+  const normalized = (langId || 'en').toLowerCase().split('-')[0].split('_')[0];
+  return SUPPORTED_LANGUAGES[normalized] || SUPPORTED_LANGUAGES[langId] || SUPPORTED_LANGUAGES['en'] || {
     id: 'en',
     name: 'English',
     nativeName: 'English',

@@ -1,0 +1,126 @@
+import { TranslationDictionary } from './types';
+
+export const mr: TranslationDictionary = {
+  // Navigation
+  'nav.home': 'मुख्यपृष्ठ',
+  'nav.matches': 'पात्र योजना',
+  'nav.saved': 'जतन केलेल्या',
+  'nav.profile': 'प्रोफाइल',
+  'nav.voice': 'व्हॉइस मदत',
+  'nav.support': 'मदत केंद्र',
+
+  // Header & Brand
+  'header.title': 'पॅक्स सहायक',
+  'header.tagline': 'शासकीय योजना जाणून घ्या, आपले हक्क मिळवा',
+  'header.createProfile': 'प्रोफाइल तयार करा',
+  'header.selectLanguage': 'भाषा निवडा',
+  'header.changeState': 'राज्य बदला',
+
+  // Home Screen
+  'home.heroTitle': 'शासकीय योजना शोधा',
+  'home.heroSubtitle': 'आपला व्यवसाय, कुटुंब आणि उत्पन्नानुसार शासकीय कल्याणकारी योजना त्वरित शोधा.',
+  'home.startVoiceBtn': 'आवाजाने बोला',
+  'home.talkToAssistant': 'एआय सहाय्यकाशी बोला',
+  'home.browseCatalog': 'सर्व योजना पहा',
+  'home.checkEligibility': 'पात्रता तपासा',
+  'home.quickNeedsHeading': 'तातडीच्या गरजा',
+  'home.quickNeedsSubtitle': 'विशिष्ट विभागानुसार योजनांची माहिती मिळवा',
+  'home.matchesNotice': 'योजना आपल्या प्रोफाइलशी जुळतात.',
+  'home.viewMatches': 'योजना पहा',
+  'home.createProfileNotice': 'पात्र योजना जाणून घेण्यासाठी प्रोफाइल पूर्ण करा.',
+
+  // Categories
+  'category.agriculture': 'कृषी व शेतकरी कल्याण',
+  'category.education': 'शिक्षण व शिष्यवृत्ती',
+  'category.housing': 'गृहनिर्माण व जमीन',
+  'category.employment': 'कामगार व रोजगार',
+  'category.women': 'महिला कल्याण व बचत गट',
+  'category.senior': 'ज्येष्ठ नागरिक व पेन्शन',
+  'category.health': 'आरोग्य व वैद्यकीय विमा',
+  'category.financial': 'आर्थिक सहाय्य व कर्ज',
+  'category.disability': 'दिव्यांग कल्याण',
+  'category.general': 'सर्वसाधारण कल्याण',
+
+  // Professions
+  'profession.farmer': 'शेतकरी / कृषी',
+  'profession.student': 'विद्यार्थी',
+  'profession.worker': 'कामगार / मजूर',
+  'profession.business': 'व्यापारी',
+  'profession.homemaker': 'गृहिणी',
+  'profession.senior': 'ज्येष्ठ नागरिक',
+  'profession.pwd': 'दिव्यांग व्यक्ती',
+
+  // Profile Form & Questions
+  'profile.title': 'नागरिक प्रोफाइल',
+  'profile.subtitle': 'अचूक योजना शोधण्यासाठी आपली माहिती भरा.',
+  'profile.step1': 'प्राथमिक माहिती',
+  'profile.step2': 'व्यवसाय तपशील',
+  'profile.step3': 'गरजा व प्राधान्ये',
+  'profile.fullName': 'पूर्ण नाव',
+  'profile.age': 'वय (वर्षे)',
+  'profile.gender': 'लिंग',
+  'profile.state': 'राज्य',
+  'profile.district': 'जिल्हा',
+  'profile.occupation': 'मुख्य व्यवसाय',
+  'profile.annualIncome': 'वार्षिक कौटुंबिक उत्पन्न (₹)',
+  'profile.primaryNeed': 'मुख्य गरज',
+  'profile.genderMale': 'पुरुष',
+  'profile.genderFemale': 'स्त्री',
+  'profile.genderOther': 'इतर',
+  'profile.saveProfile': 'प्रोफाइल जतन करा आणि योजना पहा',
+
+  // Matches Screen
+  'matches.title': 'पात्र शासकीय योजना',
+  'matches.subtitle': 'शासकीय राजपत्रांनुसार तपासणी केली आहे.',
+  'matches.filterAll': 'सर्व योजना',
+  'matches.filterStrong': 'पूर्ण पात्र',
+  'matches.filterPotential': 'संभाव्य पात्र',
+  'matches.filterMoreInfo': 'अधिक माहिती आवश्यक',
+  'matches.searchPlaceholder': 'योजनेचे नाव, विभाग किंवा लाभ शोधा...',
+  'matches.emptyTitle': 'कोणतीही योजना जुळली नाही',
+  'matches.emptySubtitle': 'नवीन पर्यायांसाठी प्रोफाइल अद्यतनित करा.',
+  'matches.updateProfileBtn': 'प्रोफाइल अद्यतनित करा',
+  'matches.whyMatches': 'ही योजना का जुळते?',
+  'matches.viewDetails': 'तपशील पहा',
+
+  // Saved Schemes & Checklist
+  'saved.title': 'जतन केलेल्या योजना व यादी',
+  'saved.subtitle': 'आपले सरकार सेवा केंद्रात अर्ज करण्यासाठी तयार.',
+  'saved.emptyTitle': 'अद्याप कोणतीही योजना जतन केलेली नाही',
+  'saved.emptySubtitle': 'अर्ज यादी तयार करण्यासाठी योजना बुकमार्क करा.',
+  'saved.readinessTitle': 'कागदपत्रांची पूर्वतयारी',
+  'saved.readinessSubtitle': 'आवश्यक कागदपत्रे पडताळली',
+  'saved.printBtn': 'अर्ज यादी प्रिंट करा',
+  'saved.discoverBtn': 'योजना शोधा',
+
+  // Scheme Details & Common Actions
+  'scheme.benefits': 'योजनेचे लाभ',
+  'scheme.documents': 'आवश्यक कागदपत्रे',
+  'scheme.howToApply': 'अर्ज कसा करावा',
+  'scheme.whereToApply': 'अर्ज कोठे करावा',
+  'scheme.officialSource': 'अधिकृत पोर्टल',
+  'scheme.verifiedBadge': 'शासकीय राजपत्र पडताळणी',
+  'scheme.save': 'जतन करा',
+  'scheme.saved': 'जतन केले',
+  'scheme.share': 'शेअर करा',
+
+  // Voice Assistant
+  'voice.readyTitle': 'ऐकण्यासाठी सज्ज — बोलण्यासाठी स्पर्श करा',
+  'voice.listeningTitle': 'आपला आवाज ऐकत आहे...',
+  'voice.thinkingTitle': 'नियमांची तपासणी सुरू आहे...',
+  'voice.speakingTitle': 'पॅक्स सहायक बोलत आहे...',
+  'voice.tapToSpeak': 'बोलण्यासाठी स्पर्श करा',
+  'voice.stopListening': 'थांबवा',
+  'voice.typePlaceholder': 'आपला प्रश्न येथे टाइप करा...',
+  'voice.privacyNote': 'नागरिक गोपनीयता: आपला आवाज फक्त पात्रता तपासणीसाठी वापरला जातो.',
+  'voice.viewMatchesBtn': 'पात्र योजना पहा',
+
+  // Common Buttons & Messages
+  'common.continue': 'पुढे जा',
+  'common.back': 'मागे',
+  'common.submit': 'सादर करा',
+  'common.close': 'बंद करा',
+  'common.loading': 'माहिती लोड होत आहे...',
+  'common.error': 'त्रुटी आढळली. कृपया पुन्हा प्रयत्न करा.',
+  'common.retry': 'पुन्हा प्रयत्न करा',
+};

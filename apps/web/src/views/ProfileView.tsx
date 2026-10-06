@@ -31,6 +31,8 @@ export const ProfileView: React.FC = () => {
     selectedStateId,
     selectedVoiceLanguageId,
     setActiveTab: setAppActiveTab,
+    uiStrings,
+    t,
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'DETAILS' | 'FAMILY' | 'DOCUMENTS'>('DETAILS');
@@ -191,17 +193,17 @@ export const ProfileView: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="bg-[#6b3548] text-[#ffd9e1] text-xs px-2.5 py-0.5 rounded-full font-bold border border-[#e8e1dc]/30 flex items-center gap-1">
               <User className="w-3.5 h-3.5 text-[#c8a96b]" />
-              CITIZEN PROFILE
+              {uiStrings.profileHeading || 'CITIZEN PROFILE'}
             </span>
             <span className="text-xs text-[#c8a96b] font-mono font-bold">
-              {userProfile?.name ? `Active Member: ${userProfile.name}` : 'No Profile Loaded'}
+              {userProfile?.name ? `Active Member: ${userProfile.name}` : (uiStrings.noProfile || 'No Profile Loaded')}
             </span>
           </div>
           <h1 className={`font-black text-white mt-2 ${easyMode ? 'text-2xl sm:text-3xl' : 'text-xl sm:text-2xl'}`}>
-            {userProfile ? 'Profile & Entitlement Questionnaire' : 'Create Citizen Profile'}
+            {userProfile ? (uiStrings.profileHeading || 'Citizen Profile') : (uiStrings.createProfile || 'Create Citizen Profile')}
           </h1>
           <p className="text-xs sm:text-sm text-[#ffd9e1] mt-1">
-            Your demographic information deterministically checks official government gazette criteria.
+            {uiStrings.createProfileNotice || 'Your demographic information deterministically checks official government gazette criteria.'}
           </p>
         </div>
 
@@ -235,7 +237,7 @@ export const ProfileView: React.FC = () => {
           }`}
         >
           <User className="w-3.5 h-3.5" />
-          <span>CITIZEN DEMOGRAPHICS</span>
+          <span>{uiStrings.citizenDemographics || 'CITIZEN DEMOGRAPHICS'}</span>
         </button>
 
         <button
@@ -247,7 +249,7 @@ export const ProfileView: React.FC = () => {
           }`}
         >
           <Users className="w-3.5 h-3.5" />
-          <span>FAMILY MEMBERS ({familyMembers.length})</span>
+          <span>{uiStrings.familyMembers || 'FAMILY MEMBERS'} ({familyMembers.length})</span>
         </button>
 
         <button
@@ -259,7 +261,7 @@ export const ProfileView: React.FC = () => {
           }`}
         >
           <FileText className="w-3.5 h-3.5" />
-          <span>DOCUMENTS CHECKLIST</span>
+          <span>{uiStrings.documents || 'DOCUMENTS CHECKLIST'}</span>
         </button>
       </div>
 

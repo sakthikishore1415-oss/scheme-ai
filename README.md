@@ -1,4 +1,4 @@
-# Arivom Thittam (அறிவோம் திட்டம்) — Monorepo
+# PACS Sahayak (பேக்ஸ் சகாயக்) — Monorepo
 
 > **Know Your Schemes. Claim Your Benefits.**  
 > *அரசு திட்டங்களை அறிவோம். உரிமைகளைப் பெறுவோம்.*
@@ -10,7 +10,7 @@ A unified, multi-platform civic access platform designed to make government welf
 ## 🏛️ Monorepo Architecture
 
 ```
-arivom-thittam/
+pacs-sahayak/
 │
 ├── apps/
 │   ├── web/                     # React 19 + TypeScript + Vite + Tailwind CSS
@@ -141,8 +141,8 @@ An automated unified workflow is provided at [`.github/workflows/build-mobile-re
 
 - **Trigger**: Manual trigger via **`workflow_dispatch`** (from the GitHub Actions tab) or on version tags (`v*`).
 - **Parallel Compilation**:
-  1. **Android Job**: Runs on `ubuntu-latest` with JDK 17 & Gradle, producing `arivom-thittam.apk`.
-  2. **iOS Job**: Runs on `macos-14` with Xcode, producing installable `arivom-thittam.ipa`.
+  1. **Android Job**: Runs on `ubuntu-latest` with JDK 17 & Gradle, producing `pacs-sahayak.apk`.
+  2. **iOS Job**: Runs on `macos-14` with Xcode, producing installable `pacs-sahayak.ipa`.
 - **Unified Release**: Automatically bundles and publishes all mobile binaries (APK + IPA) together in a single GitHub Release.
 
 ---

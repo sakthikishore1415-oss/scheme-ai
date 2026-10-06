@@ -2,7 +2,7 @@ package com.arivomthittam.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Arivom Thittam Sovereign Civic Design System (Maroon & Gold)
+// PACS Sahayak Sovereign Civic Design System (Maroon & Gold)
 // Exact match with Web Sovereign Design System
 val SovereignMaroon = Color(0xFF4A1F2D)
 val SovereignMaroonVariant = Color(0xFF6B3548)

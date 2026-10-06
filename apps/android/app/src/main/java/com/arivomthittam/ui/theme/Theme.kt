@@ -63,7 +63,7 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 @Composable
-fun ArivomThittamTheme(
+fun PacsSahayakTheme(
     darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -86,3 +86,9 @@ fun ArivomThittamTheme(
         content = content
     )
 }
+
+@Composable
+fun ArivomThittamTheme(
+    darkTheme: Boolean = false,
+    content: @Composable () -> Unit
+) = PacsSahayakTheme(darkTheme = darkTheme, content = content)

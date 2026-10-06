@@ -168,8 +168,9 @@ fun CitizenProfileScreen(
     Scaffold(
         topBar = {
             ArivomTopAppBar(
-                title = "Arivom Thittam",
-                tamilTitle = "சுயவிவரப் பதிவு"
+                title = "PACS Sahayak",
+                logoLetter = com.arivomthittam.domain.language.AndroidTranslations.getLogoLetter(currentLanguage),
+                currentLanguageName = com.arivomthittam.domain.language.AndroidTranslations.getLanguageDisplayName(currentLanguage)
             )
         },
         bottomBar = {

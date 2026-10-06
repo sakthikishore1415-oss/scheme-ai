@@ -126,7 +126,8 @@ export const SUPPORTED_LANGUAGES: Record<string, LanguageConfig> = {
 export const LANGUAGE_LIST = Object.values(SUPPORTED_LANGUAGES);
 
 export function getLanguageInitial(langId: string): string {
-  switch (langId) {
+  const norm = (langId || 'ta').toLowerCase().split('-')[0].split('_')[0];
+  switch (norm) {
     case 'ta':
       return 'அ';
     case 'ml':

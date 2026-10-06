@@ -49,13 +49,15 @@ fun SavedSchemesScreen(
     Scaffold(
         topBar = {
             ArivomTopAppBar(
-                title = "Arivom Thittam",
-                tamilTitle = "சேமிக்கப்பட்டவை"
+                title = "PACS Sahayak",
+                logoLetter = com.arivomthittam.domain.language.AndroidTranslations.getLogoLetter(uiState.selectedLanguage),
+                currentLanguageName = com.arivomthittam.domain.language.AndroidTranslations.getLanguageDisplayName(uiState.selectedLanguage)
             )
         },
         bottomBar = {
             ArivomBottomBar(
                 currentRoute = Screen.Saved.route,
+                selectedLanguage = uiState.selectedLanguage,
                 onNavigate = onNavigate
             )
         }
@@ -71,7 +73,7 @@ fun SavedSchemesScreen(
             item {
                 Column {
                     Text(
-                        text = "SAVED BOOKMARKS / சேமித்தவை",
+                        text = com.arivomthittam.domain.language.AndroidTranslations.getString("saved.title", uiState.selectedLanguage),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = OnSurfaceVariant,
@@ -107,13 +109,13 @@ fun SavedSchemesScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "You haven't saved any schemes yet.",
+                                text = com.arivomthittam.domain.language.AndroidTranslations.getString("saved.emptyTitle", uiState.selectedLanguage),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp,
                                 color = OnSurface
                             )
                             Text(
-                                text = "Bookmark schemes from matches to view offline anytime.",
+                                text = com.arivomthittam.domain.language.AndroidTranslations.getString("saved.emptyDesc", uiState.selectedLanguage),
                                 fontSize = 12.sp,
                                 color = OnSurfaceVariant,
                                 modifier = Modifier.padding(top = 4.dp)
@@ -126,6 +128,7 @@ fun SavedSchemesScreen(
                     SchemeCardItem(
                         result = match,
                         isSaved = true,
+                        language = uiState.selectedLanguage,
                         onSaveToggle = onSaveToggle,
                         onDetailsClick = onSchemeClick,
                         onWhyMeClick = onWhyMeClick

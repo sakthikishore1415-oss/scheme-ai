@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "name": "Arivom Thittam Eligibility Rules Specification",
+  "name": "PACS Sahayak Eligibility Rules Specification",
   "disqualifiers": [
     {
       "key": "age",

@@ -1,5 +1,5 @@
 {
-  "name": "@arivom-thittam/web",
+  "name": "@pacs-sahayak/web",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -14,7 +14,7 @@
     "node": ">=22.0.0"
   },
   "dependencies": {
-    "@arivom-thittam/api-contracts": "*",
+    "@pacs-sahayak/api-contracts": "*",
     "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.1.14",
     "@types/canvas-confetti": "^1.9.0",

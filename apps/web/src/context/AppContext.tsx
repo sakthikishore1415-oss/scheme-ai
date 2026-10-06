@@ -100,11 +100,11 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [selectedStateId, setSelectedStateIdState] = useState<string>(() => {
-    return localStorage.getItem('arivom_selected_state') || 'TN';
+    return localStorage.getItem('pacs_sahayak_selected_state') || localStorage.getItem('arivom_selected_state') || 'TN';
   });
 
   const [selectedVoiceLanguageId, setSelectedVoiceLanguageIdState] = useState<string>(() => {
-    const saved = localStorage.getItem('arivom_selected_lang');
+    const saved = localStorage.getItem('pacs_sahayak_selected_lang') || localStorage.getItem('arivom_selected_lang');
     if (saved && SUPPORTED_LANGUAGES[saved]) return saved;
     return detectBrowserLanguage();
   });
@@ -172,20 +172,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Compute config objects
   const currentStateConfig = STATES_CONFIG[selectedStateId] || STATES_CONFIG['TN'];
-  const currentLanguageConfig = SUPPORTED_LANGUAGES[selectedVoiceLanguageId] || SUPPORTED_LANGUAGES['ta'];
+  const normalizedVoiceLang = (selectedVoiceLanguageId || 'ta').toLowerCase().split('-')[0].split('_')[0];
+  const currentLanguageConfig = SUPPORTED_LANGUAGES[selectedVoiceLanguageId] || SUPPORTED_LANGUAGES[normalizedVoiceLang] || SUPPORTED_LANGUAGES['ta'];
 
   // Handle State Changes
   const setSelectedStateId = (stateId: string) => {
     setSelectedStateIdState(stateId);
     try {
-      localStorage.setItem('arivom_selected_state', stateId);
+      localStorage.setItem('pacs_sahayak_selected_state', stateId);
     } catch (_) {}
     const newConfig = STATES_CONFIG[stateId];
     if (newConfig) {
       setSelectedVoiceLanguageIdState(newConfig.defaultVoiceLanguage);
       geminiLiveVoiceService.setLanguage(newConfig.defaultVoiceLanguage);
       try {
-        localStorage.setItem('arivom_selected_lang', newConfig.defaultVoiceLanguage);
+        localStorage.setItem('pacs_sahayak_selected_lang', newConfig.defaultVoiceLanguage);
       } catch (_) {}
       if (userProfile) {
         setUserProfile((prev) =>
@@ -206,7 +207,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSelectedVoiceLanguageIdState(langId);
     geminiLiveVoiceService.setLanguage(langId);
     try {
-      localStorage.setItem('arivom_selected_lang', langId);
+      localStorage.setItem('pacs_sahayak_selected_lang', langId);
     } catch (_) {}
     if (userProfile) {
       setUserProfile((prev) => (prev ? { ...prev, voiceLanguage: langId } : null));

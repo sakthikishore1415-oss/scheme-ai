@@ -21,17 +21,17 @@ if (fs.existsSync(webDist)) {
 }
 
 // 2. Android
-const androidApk = path.join(distDir, 'android', 'arivom-thittam.apk');
+const androidApk = path.join(distDir, 'android', 'pacs-sahayak.apk');
 let androidStatus = 'Verified (Ready for CI / JDK build)';
 if (fs.existsSync(androidApk)) {
-  androidStatus = '✓ Built (dist/android/arivom-thittam.apk)';
+  androidStatus = '✓ Built (dist/android/pacs-sahayak.apk)';
 }
 
 // 3. iOS
-const iosIpa = path.join(distDir, 'ios', 'arivom-thittam.ipa');
+const iosIpa = path.join(distDir, 'ios', 'pacs-sahayak.ipa');
 let iosStatus = 'Verified (Ready for macOS / CI build)';
 if (fs.existsSync(iosIpa)) {
-  iosStatus = '✓ Built (dist/ios/arivom-thittam.ipa)';
+  iosStatus = '✓ Built (dist/ios/pacs-sahayak.ipa)';
 }
 
 console.log('Target Summary:');

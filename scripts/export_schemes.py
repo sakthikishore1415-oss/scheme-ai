@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Arivom Thittam - Unified Scheme & Requirements JSON Exporter Pipeline
+PACS Sahayak - Unified Scheme & Requirements JSON Exporter Pipeline
 =====================================================================
 Compiles, validates, and exports all Central and State government schemes
 with their detailed eligibility criteria, benefits, and required documents
@@ -85,7 +85,7 @@ def validate_and_normalize_scheme(s: dict, index: int) -> dict:
     return normalized
 
 def main():
-    print("🏛️  Arivom Thittam — Schemes & Requirements JSON Export Pipeline")
+    print("🏛️  PACS Sahayak — Schemes & Requirements JSON Export Pipeline")
     print("=" * 65)
     
     schemes_raw = load_schemes(SOURCE_JSON)

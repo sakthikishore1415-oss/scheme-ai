@@ -1,4 +1,4 @@
-import { REALTIME_TOOLS, getArivomSystemPrompt } from './realtimeSessionManager';
+import { REALTIME_TOOLS, getPacsSahayakSystemPrompt } from './realtimeSessionManager';
 import { speechService } from '../utils/speech';
 import { extractProfileFromSpokenText } from '../utils/nlpExtractor';
 import { getVoicePack } from '../data/locales';
@@ -171,7 +171,7 @@ export class RealtimeVoiceService {
         type: 'session.update',
         session: {
           modalities: ['audio', 'text'],
-          instructions: getArivomSystemPrompt(this.currentLanguageId, this.currentStateName),
+          instructions: getPacsSahayakSystemPrompt(this.currentLanguageId, this.currentStateName),
           voice: 'verse',
           input_audio_transcription: {
             model: 'whisper-1',

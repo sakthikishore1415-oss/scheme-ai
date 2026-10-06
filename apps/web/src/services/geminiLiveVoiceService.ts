@@ -143,7 +143,7 @@ export class GeminiLiveVoiceService {
         role: 'assistant',
         text: notif,
         timestamp: Date.now(),
-        audioVoice: 'Arivom Scheme Advisor',
+        audioVoice: 'PACS Sahayak Scheme Advisor',
       });
       return;
     }
@@ -274,18 +274,18 @@ export class GeminiLiveVoiceService {
 
       // Welcome voice greeting displayed in transcript
       const greetings: Record<string, string> = {
-        ta: 'வணக்கம்! நான் அறிவோம். உங்களுடன் பேச தயாராக இருக்கிறேன். உங்கள் கேள்வியைக் கூறுங்கள்!',
-        hi: 'नमस्ते! मैं अरिवोम हूं। मैं आपकी कैसे मदद कर सकता हूं? बताइए!',
-        te: 'నమస్కారం! నేను అరివోమ్. మాట్లాడటానికి సిద్ధంగా ఉన్నాను, చెప్పండి!',
-        kn: 'ನಮಸ್ಕಾರ! ನಾನು ಅರಿವೋಮ್. ಮಾತನಾಡಲು ಸಿದ್ಧನಾಗಿದ್ದೇನೆ, ತಿಳಿಸಿ!',
-        ml: 'നമസ്കാരം! ഞാൻ അറിവോം ആണ്. സംസാരിക്കാൻ തയ്യാറാണ്, പറയൂ!',
-        mr: 'नमस्कार! मी अरिवोम आहे. मी तुम्हाला कशी मदत करू शकतो?',
-        bn: 'নমস্কার! আমি অরিভোম। আপনার সাথে কথা বলতে প্রস্তুত, বলুন!',
-        gu: 'નમસ્તે! હું અરિવોમ છું. હું તમારી શું મદદ કરી શકું?',
-        or: 'ନମସ୍କାର! ମୁଁ ଅରିଭୋମ୍। ଆପଣଙ୍କୁ କିପରି ସାହାଯ୍ୟ କରିପାରିବି?',
-        pa: 'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਅਰਿਵੋਮ ਹਾਂ। ਮੈਂ ਤੁਹਾਡੀ ਕਿਵੇਂ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?',
-        as: 'নমস্কাৰ! মই অৰিবোম। মই আপোনাক কিদৰে সহায় কৰিব পাৰোঁ?',
-        en: "Hello! I'm Arivom. I'm listening. Ask me any government scheme question!",
+        ta: 'வணக்கம்! நான் PACS Sahayak. உங்களுடன் பேச தயாராக இருக்கிறேன். உங்கள் கேள்வியைக் கூறுங்கள்!',
+        hi: 'नमस्ते! मैं PACS Sahayak हूं। मैं आपकी कैसे मदद कर सकता हूं? बताइए!',
+        te: 'నమస్కారం! నేను PACS Sahayak. మాట్లాడటానికి సిద్ధంగా ఉన్నాను, చెప్పండి!',
+        kn: 'ನಮಸ್ಕಾರ! ನಾನು PACS Sahayak. ಮಾತನಾಡಲು ಸಿದ್ಧನಾಗಿದ್ದೇನೆ, ತಿಳಿಸಿ!',
+        ml: 'നമസ്കാരം! ഞാൻ PACS Sahayak ആണ്. സംസാരിക്കാൻ തയ്യാറാണ്, പറയൂ!',
+        mr: 'नमस्कार! मी PACS Sahayak आहे. मी तुम्हाला कशी मदत करू शकतो?',
+        bn: 'নমস্কার! আমি PACS Sahayak। আপনার সাথে কথা বলতে প্রস্তুত, বলুন!',
+        gu: 'નમસ્તે! હું PACS Sahayak છું. હું તમારી શું મદદ કરી શકું?',
+        or: 'ନମସ୍କାର! ମୁଁ PACS Sahayak। ଆପଣଙ୍କୁ କିପରି ସାହାଯ୍ୟ କରିପାରିବି?',
+        pa: 'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ PACS Sahayak ਹਾਂ। ਮੈਂ ਤੁਹਾਡੀ ਕਿਵੇਂ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?',
+        as: 'নমস্কাৰ! মই PACS Sahayak। মই আপোনাক কিদৰে সহায় কৰিব পাৰোঁ?',
+        en: "Hello! I'm PACS Sahayak. I'm listening. Ask me any government scheme question!",
       };
       const welcome = greetings[this.currentLanguageId] || greetings.en;
       this.callbacks?.onMessage?.({
@@ -293,7 +293,7 @@ export class GeminiLiveVoiceService {
         role: 'assistant',
         text: welcome,
         timestamp: Date.now(),
-        audioVoice: 'Arivom Scheme Advisor',
+        audioVoice: 'PACS Sahayak Scheme Advisor',
       });
 
       // Start listening directly for citizen's voice
@@ -482,7 +482,7 @@ export class GeminiLiveVoiceService {
       text: '...',
       isStreaming: true,
       timestamp: Date.now(),
-      audioVoice: 'Arivom Scheme Advisor',
+      audioVoice: 'PACS Sahayak Scheme Advisor',
     });
 
     const reply = await this.generateGeminiReply(spokenText);
@@ -495,7 +495,7 @@ export class GeminiLiveVoiceService {
         text: reply,
         isStreaming: false,
         timestamp: Date.now(),
-        audioVoice: 'Arivom Scheme Advisor',
+        audioVoice: 'PACS Sahayak Scheme Advisor',
       });
       this.conversationHistory.push({ role: 'assistant', text: reply });
       this.enqueueSpeech(reply);
@@ -507,7 +507,7 @@ export class GeminiLiveVoiceService {
         text: contextualReply,
         isStreaming: false,
         timestamp: Date.now(),
-        audioVoice: 'Arivom Scheme Advisor',
+        audioVoice: 'PACS Sahayak Scheme Advisor',
       });
       this.conversationHistory.push({ role: 'assistant', text: contextualReply });
       this.enqueueSpeech(contextualReply);
@@ -548,7 +548,7 @@ export class GeminiLiveVoiceService {
       const languageName = langConfig.name;
       const nativeName = langConfig.nativeName;
       
-      const systemInstruction = `You are Arivom (அறிவோம்), a warm, empathetic, proactive civic AI voice counsellor for citizens in ${this.currentStateName}, India.
+      const systemInstruction = `You are PACS Sahayak, a warm, empathetic, proactive civic AI voice counsellor for citizens in ${this.currentStateName}, India.
 
 CRITICAL SINGLE SOURCE OF TRUTH LANGUAGE MANDATE:
 The user has explicitly chosen to converse in: ${languageName.toUpperCase()} (${nativeName}).
@@ -828,6 +828,7 @@ CRITICAL VOICE RULES:
   }
 
   public getGeminiVoiceForLanguage(langId: string): string {
+    const normalized = (langId || 'en').toLowerCase().split('-')[0].split('_')[0];
     const map: Record<string, string> = {
       ta: 'Aoede',
       hi: 'Kore',
@@ -842,7 +843,7 @@ CRITICAL VOICE RULES:
       as: 'Aoede',
       en: 'Kore',
     };
-    return map[langId] || 'Kore';
+    return map[normalized] || map[langId] || 'Kore';
   }
 
   public async speak(text: string): Promise<void> {
@@ -1164,11 +1165,12 @@ CRITICAL VOICE RULES:
   }
 
   public setLanguage(languageId: string): void {
-    if (this.currentLanguageId !== languageId) {
+    const normalized = (languageId || 'ta').toLowerCase().split('-')[0].split('_')[0];
+    if (this.currentLanguageId !== normalized) {
       this.conversationHistory = [];
     }
-    this.currentLanguageId = languageId;
-    this.selectedVoice = this.getGeminiVoiceForLanguage(languageId);
+    this.currentLanguageId = normalized;
+    this.selectedVoice = this.getGeminiVoiceForLanguage(normalized);
     const bcp47Map: Record<string, string> = {
       ta: 'ta-IN',
       en: 'en-IN',
@@ -1185,7 +1187,7 @@ CRITICAL VOICE RULES:
     };
     if (this.recognition) {
       try {
-        this.recognition.lang = bcp47Map[languageId] || (languageId === 'en' ? 'en-IN' : 'ta-IN');
+        this.recognition.lang = bcp47Map[normalized] || (normalized === 'en' ? 'en-IN' : 'ta-IN');
         // If actively listening, restart recognition to ensure the browser speech engine applies the new language locale immediately
         if (this.isListeningActive) {
           try {

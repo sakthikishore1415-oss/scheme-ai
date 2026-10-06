@@ -121,6 +121,7 @@ fun ArivomThittamNavGraph(
             SchemeDetailsScreen(
                 scheme = scheme,
                 isSaved = viewModel.isSchemeSaved(schemeId),
+                language = uiState.selectedLanguage,
                 onSaveToggle = { viewModel.toggleSaveScheme(schemeId) },
                 onWhyMeClick = {
                     navController.navigate(Screen.WhyMe.createRoute(schemeId))
@@ -137,12 +138,14 @@ fun ArivomThittamNavGraph(
             val match = viewModel.getMatchForScheme(schemeId)
             WhyMeScreen(
                 matchResult = match,
+                language = uiState.selectedLanguage,
                 onNavigateBack = { navController.popBackStack() }
             )
         }
 
         composable(Screen.Documents.route) {
             DocumentsScreen(
+                language = uiState.selectedLanguage,
                 checkedDocuments = uiState.checkedDocuments,
                 onToggleDocument = { docId -> viewModel.toggleDocumentCheck(docId) },
                 onNavigateBack = { navController.popBackStack() }
@@ -167,6 +170,7 @@ fun ArivomThittamNavGraph(
 
         composable(Screen.Settings.route) {
             SettingsScreen(
+                language = uiState.selectedLanguage,
                 onNavigate = { route -> navController.navigate(route) }
             )
         }

@@ -1,5 +1,5 @@
 {
-  "name": "@arivom-thittam/api-contracts",
+  "name": "@pacs-sahayak/api-contracts",
   "version": "1.0.0",
   "private": true,
   "main": "./src/index.ts",

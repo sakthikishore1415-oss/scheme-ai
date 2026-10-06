@@ -7,6 +7,7 @@ import {
   GeminiLiveMessage,
 } from '../services/geminiLiveVoiceService';
 import { getLanguageInitial, SUPPORTED_LANGUAGES, LANGUAGE_LIST } from '../data/languages';
+import { PacsAppIcon } from './PacsAppIcon';
 import { VoiceOrbVisualizer } from './voice/VoiceOrbVisualizer';
 import {
   Mic,
@@ -208,7 +209,7 @@ export const VoiceAssistantModal: React.FC = () => {
       case 'THINKING':
         return { label: 'Thinking...', color: 'bg-[#faf5ff] text-[#7e22ce] border-[#e9d5ff]' };
       case 'SPEAKING':
-        return { label: 'Arivom Speaking...', color: 'bg-[#fdf2f8] text-[#9d174d] border-[#fbcfe8]' };
+        return { label: 'PACS Sahayak Speaking...', color: 'bg-[#fdf2f8] text-[#9d174d] border-[#fbcfe8]' };
       case 'IDLE':
         return { label: 'Paused / Idle', color: 'bg-[#f3f4f6] text-[#4b5563] border-[#e5e7eb]' };
       default:
@@ -295,13 +296,11 @@ export const VoiceAssistantModal: React.FC = () => {
         {/* ========================================================= */}
         <div className="px-4 py-3 sm:px-6 sm:py-3.5 flex items-center justify-between border-b border-[#e8e1dc] bg-[#faf8f3] shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-[#4a1f2d] text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
-              {getLanguageInitial(selectedVoiceLanguageId)}
-            </div>
+            <PacsAppIcon size={34} variant="circle" className="shrink-0 shadow-xs" />
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold text-[#4a1f2d] truncate">
-                  Arivom Voice
+                  PACS Sahayak Voice
                 </span>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${status.color}`}>
                   {status.label}
@@ -391,7 +390,7 @@ export const VoiceAssistantModal: React.FC = () => {
               <div className="mt-3 space-y-1">
                 <p className="text-xs font-bold text-[#4a1f2d]">
                   {voiceState === 'SPEAKING'
-                    ? 'Arivom Speaking'
+                    ? 'PACS Sahayak Speaking'
                     : voiceState === 'USER_SPEAKING'
                     ? 'Hearing you...'
                     : voiceState === 'THINKING'
@@ -517,7 +516,7 @@ export const VoiceAssistantModal: React.FC = () => {
                     <Mic className="w-6 h-6 animate-pulse" />
                   </div>
                   <div className="space-y-1 max-w-sm">
-                    <p className="text-sm font-bold text-[#21191d]">Speak directly to Arivom</p>
+                    <p className="text-sm font-bold text-[#21191d]">Speak directly to PACS Sahayak</p>
                     <p className="text-xs text-[#514346] leading-relaxed">
                       Ask any government scheme question in <strong>{currentLang.nativeName}</strong>.
                     </p>
@@ -551,9 +550,7 @@ export const VoiceAssistantModal: React.FC = () => {
                         }`}
                       >
                         {!isUser && (
-                          <div className="w-7 h-7 rounded-full bg-[#4a1f2d] text-white flex items-center justify-center font-bold text-xs shrink-0 mt-0.5 shadow-2xs">
-                            {getLanguageInitial(selectedVoiceLanguageId)}
-                          </div>
+                          <PacsAppIcon size={26} variant="circle" className="shrink-0 mt-0.5 shadow-2xs" />
                         )}
 
                         <div
@@ -569,7 +566,7 @@ export const VoiceAssistantModal: React.FC = () => {
                                 isUser ? 'text-white/90' : 'text-[#4a1f2d]'
                               }`}
                             >
-                              {isUser ? 'Citizen' : 'Arivom AI'}
+                              {isUser ? 'Citizen' : 'PACS Sahayak AI'}
                             </span>
                             <div className="flex items-center gap-1.5">
                               {!isUser && (

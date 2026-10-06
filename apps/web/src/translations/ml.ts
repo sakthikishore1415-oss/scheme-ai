@@ -10,7 +10,7 @@ export const ml: TranslationDictionary = {
   'nav.support': 'സഹായ കേന്ദ്രം',
 
   // Header & Brand
-  'header.title': 'അറിവോം തിട്ടം',
+  'header.title': 'പാക്സ് സഹായക്',
   'header.tagline': 'സർക്കാർ ക്ഷേമപദ്ധതികൾ അറിയൂ, അവകാശങ്ങൾ നേടൂ',
   'header.createProfile': 'പ്രൊഫൈൽ നിർമ്മിക്കുക',
   'header.selectLanguage': 'ഭാഷ തിരഞ്ഞെടുക്കൂ',
@@ -108,7 +108,7 @@ export const ml: TranslationDictionary = {
   'voice.readyTitle': 'സംസാരിക്കാൻ തയ്യാറാണ് — ബട്ടൺ അമർത്തുക',
   'voice.listeningTitle': 'കേൾക്കുന്നു... ദയവായി സംസാരിക്കൂ',
   'voice.thinkingTitle': 'വിവരങ്ങൾ പരിശോധിച്ച് പദ്ധതികൾ കണ്ടെത്തുന്നു...',
-  'voice.speakingTitle': 'അറിവോം തിട്ടം സംസാരിക്കുന്നു...',
+  'voice.speakingTitle': 'പാക്സ് സഹായക് സംസാരിക്കുന്നു...',
   'voice.tapToSpeak': 'സംസാരിക്കാൻ അമർത്തുക',
   'voice.stopListening': 'നിർത്തുക',
   'voice.typePlaceholder': 'വിവരങ്ങൾ ഇവിടെ ടൈപ്പ് ചെയ്യുക...',

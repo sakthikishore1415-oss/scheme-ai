@@ -27,7 +27,7 @@ export const ButtonPhoneSimulator: React.FC = () => {
 
   const [callState, setCallState] = useState<'IDLE' | 'DIALING' | 'CONNECTED' | 'ENDED'>('IDLE');
   const [ivrStep, setIvrStep] = useState<number>(0);
-  const [screenText, setScreenText] = useState<string>('ARIVOM THITTAM\n1800-425-7000\nPress CALL to start');
+  const [screenText, setScreenText] = useState<string>('PACS SAHAYAK\n1800-425-7000\nPress CALL to start');
   const [audioPrompt, setAudioPrompt] = useState<string>('');
   const [smsNotification, setSmsNotification] = useState<string | null>(null);
   const [currentSelectedLang, setCurrentSelectedLang] = useState<string>(selectedVoiceLanguageId);
@@ -41,7 +41,7 @@ export const ButtonPhoneSimulator: React.FC = () => {
     setIvrStep(1);
 
     const prompt =
-      'வணக்கம்! அறிவோம் திட்டம் சேவைக்கு வரவேற்கிறோம். தமிழுக்கு 1 அழுத்தவும். For English press 2. For Malayalam press 3. For Kannada press 4. For Telugu press 5. For Hindi press 6.';
+      'வணக்கம்! பேக்ஸ் சகாயக் சேவைக்கு வரவேற்கிறோம். தமிழுக்கு 1 அழுத்தவும். For English press 2. For Malayalam press 3. For Kannada press 4. For Telugu press 5. For Hindi press 6.';
     setAudioPrompt(prompt);
     setScreenText('IVR CONNECTED\n1: Tamil | 2: English\n3: Malayalam | 4: Kannada\n5: Telugu | 6: Hindi');
     speechService.speak(prompt, 'ta');
@@ -200,7 +200,7 @@ export const ButtonPhoneSimulator: React.FC = () => {
         const confirmVoice =
           currentSelectedLang === 'ta'
             ? 'திட்ட விபரங்கள் உங்கள் மொபைலுக்கு எஸ்.எம்.எஸ் ஆக அனுப்பப்பட்டது. நன்றி!'
-            : 'Scheme details dispatched as simulated SMS summary. Thank you for using Arivom Thittam!';
+            : 'Scheme details dispatched as simulated SMS summary. Thank you for using PACS Sahayak!';
         setAudioPrompt(confirmVoice);
         setScreenText('SIMULATED SMS DISPATCHED\nPress # to End Call');
         speechService.speak(confirmVoice, currentSelectedLang);
@@ -211,7 +211,7 @@ export const ButtonPhoneSimulator: React.FC = () => {
           .join('\n');
 
         setSmsNotification(
-          `[Simulation only — no real SMS was sent]\nARIVOM THITTAM:\n${summaryText}\nApply at nearest e-Seva center.`
+          `[Simulation only — no real SMS was sent]\nPACS SAHAYAK:\n${summaryText}\nApply at nearest e-Seva center.`
         );
 
         logCitizenCallStep({
@@ -277,7 +277,7 @@ export const ButtonPhoneSimulator: React.FC = () => {
               </div>
 
               <div className="text-[9px] text-center border-t border-slate-700/30 pt-0.5 text-slate-800">
-                {callState === 'CONNECTED' ? '● CALL IN PROGRESS' : 'ARIVOM THITTAM'}
+                {callState === 'CONNECTED' ? '● CALL IN PROGRESS' : 'PACS SAHAYAK'}
               </div>
             </div>
 
@@ -358,7 +358,7 @@ export const ButtonPhoneSimulator: React.FC = () => {
           <div className="bg-slate-800/40 p-4 rounded-2xl border border-slate-800 text-xs text-slate-400 space-y-1">
             <strong className="text-slate-300 block font-semibold">Toll-Free Voice Architecture:</strong>
             <p className="text-[11px] leading-relaxed">
-              In production, inbound telephony calls to 1800-425-7000 terminate on an Asterisk/FreeSWITCH SIP trunk. DTMF tones and audio streams route directly into the Arivom Thittam deterministic engine.
+              In production, inbound telephony calls to 1800-425-7000 terminate on an Asterisk/FreeSWITCH SIP trunk. DTMF tones and audio streams route directly into the PACS Sahayak deterministic engine.
             </p>
           </div>
         </div>

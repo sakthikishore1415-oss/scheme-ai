@@ -17,6 +17,7 @@ export const WhyMeExplanationModal: React.FC = () => {
     selectedVoiceLanguageId,
     currentLanguageConfig,
     userProfile,
+    uiStrings,
   } = useApp();
 
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
@@ -67,7 +68,7 @@ export const WhyMeExplanationModal: React.FC = () => {
               <span className="text-xs text-[#90a6dd]">Match Score: {score}%</span>
             </div>
             <h2 className="text-lg sm:text-xl font-bold text-white">
-              Why Did We Show This Scheme?
+              {uiStrings.whyMe || 'Why Did We Show This Scheme?'}
             </h2>
             <p className="text-xs text-[#d9e2ff] mt-0.5">
               Transparent breakdown for <strong>{scheme.name}</strong>
@@ -106,7 +107,7 @@ export const WhyMeExplanationModal: React.FC = () => {
                       : 'bg-[#092554] hover:bg-[#243b6b] text-white'
                   }`}
                 >
-                  <span>{isPlayingAudio ? 'STOP' : 'HEAR AUDIO'}</span>
+                  <span>{isPlayingAudio ? 'STOP' : (uiStrings.hear || 'HEAR AUDIO')}</span>
                 </button>
               </div>
               <div className="space-y-1 text-xs text-[#092554] font-medium leading-relaxed bg-white/80 rounded-xl p-3 border border-[#b0c6ff]/40">
@@ -159,7 +160,7 @@ export const WhyMeExplanationModal: React.FC = () => {
           <div className="p-3.5 rounded-xl bg-[#f2f4f6] border border-[#c5c6d0]/60 text-[11px] text-[#44464f] flex items-start gap-2">
             <Info className="w-4 h-4 text-[#092554] shrink-0 mt-0.5" />
             <p className="leading-relaxed">
-              <strong>Important Disclaimer:</strong> Arivom Thittam uses deterministic rule matching based on published government gazette guidelines. Final eligibility is verified and sanctioned exclusively by the respective government department or Grama Niladhari / Revenue Officer.
+              <strong>Important Disclaimer:</strong> PACS Sahayak uses deterministic rule matching based on published government gazette guidelines. Final eligibility is verified and sanctioned exclusively by the respective government department or Grama Niladhari / Revenue Officer.
             </p>
           </div>
         </div>
@@ -174,7 +175,7 @@ export const WhyMeExplanationModal: React.FC = () => {
             }}
             className="px-5 py-2 text-xs font-bold text-white bg-[#092554] hover:bg-[#243b6b] rounded-xl cursor-pointer transition-colors"
           >
-            GOT IT
+            {uiStrings.close || 'GOT IT'}
           </button>
         </div>
       </div>

@@ -36,7 +36,7 @@ import com.arivomthittam.ui.theme.SurfaceContainerLow
 @Composable
 fun ArivomTopAppBar(
     title: String,
-    logoLetter: String = "A",
+    logoLetter: String = "P",
     tamilTitle: String? = null,
     canNavigateBack: Boolean = false,
     onNavigateBack: () -> Unit = {},
@@ -71,21 +71,11 @@ fun ArivomTopAppBar(
                     Spacer(modifier = Modifier.width(8.dp))
                 }
 
-                // Dynamic Logo emblem
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(PrimaryIndigo),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = logoLetter,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                }
+                // Official PACS Sahayak Emblem Icon
+                PacsAppIcon(
+                    size = 34.dp,
+                    isCircle = false
+                )
 
                 Spacer(modifier = Modifier.width(10.dp))
 

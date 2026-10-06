@@ -1,0 +1,126 @@
+import { TranslationDictionary } from './types';
+
+export const pa: TranslationDictionary = {
+  // Navigation
+  'nav.home': 'ਮੁੱਖ ਸਫ਼ਾ',
+  'nav.matches': 'ਯੋਗ ਸਕੀਮਾਂ',
+  'nav.saved': 'ਸੰਭਾਲੀਆਂ ਗਈਆਂ',
+  'nav.profile': 'ਪ੍ਰੋਫ਼ਾਈਲ',
+  'nav.voice': 'ਵੌਇਸ ਸਹਾਇਤਾ',
+  'nav.support': 'ਸਹਾਇਤਾ ਕੇਂਦਰ',
+
+  // Header & Brand
+  'header.title': 'ਪੈਕਸ ਸਹਾਇਕ',
+  'header.tagline': 'ਸਰਕਾਰੀ ਸਕੀਮਾਂ ਜਾਣੋ, ਆਪਣੇ ਹੱਕ ਪ੍ਰਾਪਤ ਕਰੋ',
+  'header.createProfile': 'ਪ੍ਰੋਫ਼ਾਈਲ ਬਣਾਓ',
+  'header.selectLanguage': 'ਭਾਸ਼ਾ ਚੁਣੋ',
+  'header.changeState': 'ਰਾਜ ਬਦਲੋ',
+
+  // Home Screen
+  'home.heroTitle': 'ਸਰਕਾਰੀ ਸਕੀਮਾਂ ਲੱਭੋ',
+  'home.heroSubtitle': 'ਆਪਣੇ ਕੰਮ, ਪਰਿਵਾਰ ਅਤੇ ਆਮਦਨ ਅਨੁਸਾਰ ਸਰਕਾਰੀ ਭਲਾਈ ਸਕੀਮਾਂ ਤੁਰੰਤ ਲੱਭੋ।',
+  'home.startVoiceBtn': 'ਬੋਲ ਕੇ ਗੱਲ ਕਰੋ',
+  'home.talkToAssistant': 'ਏਆਈ ਸਹਾਇਕ ਨਾਲ ਗੱਲ ਕਰੋ',
+  'home.browseCatalog': 'ਸਾਰੀਆਂ ਸਕੀਮਾਂ ਵੇਖੋ',
+  'home.checkEligibility': 'ਯੋਗਤਾ ਦੀ ਜਾਂਚ ਕਰੋ',
+  'home.quickNeedsHeading': 'ਤੁਰੰਤ ਲੋੜਾਂ',
+  'home.quickNeedsSubtitle': 'ਸ਼੍ਰੇਣੀ ਅਨੁਸਾਰ ਸਰਕਾਰੀ ਭਲਾਈ ਸਕੀਮਾਂ ਵੇਖੋ',
+  'home.matchesNotice': 'ਸਕੀਮਾਂ ਤੁਹਾਡੀ ਪ੍ਰੋਫ਼ਾਈਲ ਨਾਲ ਮੇਲ ਖਾਂਦੀਆਂ ਹਨ।',
+  'home.viewMatches': 'ਸਕੀਮਾਂ ਵੇਖੋ',
+  'home.createProfileNotice': 'ਯੋਗ ਸਕੀਮਾਂ ਜਾਣਨ ਲਈ ਪ੍ਰੋਫ਼ਾਈਲ ਪੂਰੀ ਕਰੋ।',
+
+  // Categories
+  'category.agriculture': 'ਖੇਤੀਬਾੜੀ ਅਤੇ ਕਿਸਾਨ ਭਲਾਈ',
+  'category.education': 'ਸਿੱਖਿਆ ਅਤੇ ਵਜ਼ੀਫ਼ੇ',
+  'category.housing': 'ਰਿਹਾਇਸ਼ ਅਤੇ ਜ਼ਮੀਨ',
+  'category.employment': 'ਮਜ਼ਦੂਰ ਅਤੇ ਰੁਜ਼ਗਾਰ',
+  'category.women': 'ਮਹਿਲਾ ਭਲਾਈ ਅਤੇ ਸਵੈ-ਸਹਾਇਤਾ ਸਮੂਹ',
+  'category.senior': 'ਬਜ਼ੁਰਗ ਨਾਗਰਿਕ ਅਤੇ ਪੈਨਸ਼ਨ',
+  'category.health': 'ਸਿਹਤ ਅਤੇ ਮੈਡੀਕਲ ਬੀਮਾ',
+  'category.financial': 'ਵਿੱਤੀ ਸਹਾਇਤਾ ਅਤੇ ਕਰਜ਼ੇ',
+  'category.disability': 'ਦਿਵਿਆਂਗਜਨ ਭਲਾਈ',
+  'category.general': 'ਆਮ ਭਲਾਈ',
+
+  // Professions
+  'profession.farmer': 'ਕਿਸਾਨ / ਜ਼ਿਮੀਂਦਾਰ',
+  'profession.student': 'ਵਿਦਿਆਰਥੀ',
+  'profession.worker': 'ਮਜ਼ਦੂਰ / ਕਾਮਾ',
+  'profession.business': 'ਵਪਾਰੀ',
+  'profession.homemaker': 'ਘਰੇਲੂ ਔਰਤ',
+  'profession.senior': 'ਬਜ਼ੁਰਗ ਨਾਗਰਿਕ',
+  'profession.pwd': 'ਦਿਵਿਆਂਗ ਵਿਅਕਤੀ',
+
+  // Profile Form & Questions
+  'profile.title': 'ਨਾਗਰਿਕ ਪ੍ਰੋਫ਼ਾਈਲ',
+  'profile.subtitle': 'ਸਹੀ ਸਕੀਮਾਂ ਲੱਭਣ ਲਈ ਆਪਣੀ ਮੁੱਢਲੀ ਜਾਣਕਾਰੀ ਦਰਜ ਕਰੋ।',
+  'profile.step1': 'ਮੁੱਢਲੀ ਜਾਣਕਾਰੀ',
+  'profile.step2': 'ਕੰਮਕਾਜ ਦੇ ਵੇਰਵੇ',
+  'profile.step3': 'ਲੋੜਾਂ ਅਤੇ ਤਰਜੀਹਾਂ',
+  'profile.fullName': 'ਪੂਰਾ ਨਾਮ',
+  'profile.age': 'ਉਮਰ (ਸਾਲ)',
+  'profile.gender': 'ਲਿੰਗ',
+  'profile.state': 'ਰਾਜ',
+  'profile.district': 'ਜ਼ਿਲ੍ਹਾ',
+  'profile.occupation': 'ਮੁੱਖ ਕਿੱਤਾ',
+  'profile.annualIncome': 'ਸਾਲਾਨਾ ਪਰਿਵਾਰਕ ਆਮਦਨ (₹)',
+  'profile.primaryNeed': 'ਮੁੱਖ ਲੋੜ',
+  'profile.genderMale': 'ਪੁਰਸ਼',
+  'profile.genderFemale': 'ਔਰਤ',
+  'profile.genderOther': 'ਹੋਰ',
+  'profile.saveProfile': 'ਪ੍ਰੋਫ਼ਾਈਲ ਸੰਭਾਲੋ ਅਤੇ ਸਕੀਮਾਂ ਵੇਖੋ',
+
+  // Matches Screen
+  'matches.title': 'ਯੋਗ ਸਰਕਾਰੀ ਸਕੀਮਾਂ',
+  'matches.subtitle': 'ਸਰਕਾਰੀ ਗਜ਼ਟਾਂ ਅਨੁਸਾਰ ਤਸਦੀਕ ਕੀਤੀਆਂ ਗਈਆਂ ਹਨ।',
+  'matches.filterAll': 'ਸਾਰੀਆਂ ਸਕੀਮਾਂ',
+  'matches.filterStrong': 'ਪੂਰੀ ਤਰ੍ਹਾਂ ਯੋਗ',
+  'matches.filterPotential': 'ਸੰਭਾਵੀ ਯੋਗ',
+  'matches.filterMoreInfo': 'ਹੋਰ ਜਾਣਕਾਰੀ ਦੀ ਲੋੜ ਹੈ',
+  'matches.searchPlaceholder': 'ਸਕੀਮ ਦਾ ਨਾਮ, ਵਿਭਾਗ ਜਾਂ ਲਾਭ ਲੱਭੋ...',
+  'matches.emptyTitle': 'ਕੋਈ ਸਕੀਮ ਮੇਲ ਨਹੀਂ ਖਾਂਦੀ',
+  'matches.emptySubtitle': 'ਨਵੇਂ ਵਿਕਲਪਾਂ ਲਈ ਪ੍ਰੋਫ਼ਾਈਲ ਜਾਣਕਾਰੀ ਅੱਪਡੇਟ ਕਰੋ।',
+  'matches.updateProfileBtn': 'ਪ੍ਰੋਫ਼ਾਈਲ ਅੱਪਡੇਟ ਕਰੋ',
+  'matches.whyMatches': 'ਇਹ ਕਿਉਂ ਮੇਲ ਖਾਂਦੀ ਹੈ?',
+  'matches.viewDetails': 'ਵੇਰਵੇ ਵੇਖੋ',
+
+  // Saved Schemes & Checklist
+  'saved.title': 'ਸੰਭਾਲੀਆਂ ਗਈਆਂ ਸਕੀਮਾਂ ਅਤੇ ਸੂਚੀ',
+  'saved.subtitle': 'ਸੇਵਾ ਕੇਂਦਰ ਵਿੱਚ ਅਰਜ਼ੀ ਦੇਣ ਲਈ ਤਿਆਰ।',
+  'saved.emptyTitle': 'ਅਜੇ ਕੋਈ ਸਕੀਮ ਸੰਭਾਲੀ ਨਹੀਂ ਗਈ',
+  'saved.emptySubtitle': 'ਅਰਜ਼ੀ ਸੂਚੀ ਬਣਾਉਣ ਲਈ ਸਕੀਮਾਂ ਬੁੱਕਮਾਰਕ ਕਰੋ।',
+  'saved.readinessTitle': 'ਦਸਤਾਵੇਜ਼ ਤਿਆਰੀ ਦੀ ਸਥਿਤੀ',
+  'saved.readinessSubtitle': 'ਜ਼ਰੂਰੀ ਦਸਤਾਵੇਜ਼ ਪ੍ਰਮਾਣਿਤ ਹਨ',
+  'saved.printBtn': 'ਸੂਚੀ ਪ੍ਰਿੰਟ ਕਰੋ',
+  'saved.discoverBtn': 'ਸਕੀਮਾਂ ਲੱਭੋ',
+
+  // Scheme Details & Common Actions
+  'scheme.benefits': 'ਸਕੀਮ ਦੇ ਲਾਭ',
+  'scheme.documents': 'ਜ਼ਰੂਰੀ ਦਸਤਾਵੇਜ਼',
+  'scheme.howToApply': 'ਅਰਜ਼ੀ ਕਿਵੇਂ ਦੇਣੀ ਹੈ',
+  'scheme.whereToApply': 'ਅਰਜ਼ੀ ਕਿੱਥੇ ਦੇਣੀ ਹੈ',
+  'scheme.officialSource': 'ਸਰਕਾਰੀ ਪੋਰਟਲ',
+  'scheme.verifiedBadge': 'ਸਰਕਾਰੀ ਗਜ਼ਟ ਪ੍ਰਮਾਣਿਤ',
+  'scheme.save': 'ਸੰਭਾਲੋ',
+  'scheme.saved': 'ਸੰਭਾਲਿਆ ਗਿਆ',
+  'scheme.share': 'ਸਾਂਝਾ ਕਰੋ',
+
+  // Voice Assistant
+  'voice.readyTitle': 'ਸੁਣਨ ਲਈ ਤਿਆਰ — ਬੋਲਣ ਲਈ ਟੈਪ ਕਰੋ',
+  'voice.listeningTitle': 'ਤੁਹਾਡੀ ਆਵਾਜ਼ ਸੁਣ ਰਹੇ ਹਾਂ...',
+  'voice.thinkingTitle': 'ਨਿਯਮਾਂ ਦੀ ਜਾਂਚ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ...',
+  'voice.speakingTitle': 'ਪੈਕਸ ਸਹਾਇਕ ਬੋਲ ਰਿਹਾ ਹੈ...',
+  'voice.tapToSpeak': 'ਬੋਲਣ ਲਈ ਟੈਪ ਕਰੋ',
+  'voice.stopListening': 'ਬੰਦ ਕਰੋ',
+  'voice.typePlaceholder': 'ਆਪਣਾ ਸਵਾਲ ਇੱਥੇ ਲਿਖੋ...',
+  'voice.privacyNote': 'ਨਾਗਰਿਕ ਨਿੱਜਤਾ: ਤੁਹਾਡੀ ਆਵਾਜ਼ ਸਿਰਫ਼ ਯੋਗਤਾ ਜਾਂਚ ਲਈ ਵਰਤੀ ਜਾਂਦੀ ਹੈ।',
+  'voice.viewMatchesBtn': 'ਯੋਗ ਸਕੀਮਾਂ ਵੇਖੋ',
+
+  // Common Buttons & Messages
+  'common.continue': 'ਅੱਗੇ ਵਧੋ',
+  'common.back': 'ਪਿੱਛੇ',
+  'common.submit': 'ਜਮ੍ਹਾਂ ਕਰੋ',
+  'common.close': 'ਬੰਦ ਕਰੋ',
+  'common.loading': 'ਜਾਣਕਾਰੀ ਲੋਡ ਹੋ ਰਹੀ ਹੈ...',
+  'common.error': 'ਗਲਤੀ ਹੋ ਗਈ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
+  'common.retry': 'ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ',
+};

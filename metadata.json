@@ -1,5 +1,5 @@
 {
-  "name": "Arivom Thittam",
+  "name": "PACS Sahayak",
   "description": "State-aware, voice-first civic-tech platform for discovering government schemes across smartphones and button phones.",
   "requestFramePermissions": ["microphone"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

@@ -1,12 +1,12 @@
 {
-  "name": "arivom-thittam",
+  "name": "pacs-sahayak",
   "private": true,
   "scripts": {
-    "dev": "npm run dev --workspace=@arivom-thittam/web",
+    "dev": "npm run dev --workspace=@pacs-sahayak/web",
     "build": "turbo run build && node scripts/collect_build_artifacts.js",
-    "build:web": "turbo run build --filter=@arivom-thittam/web",
-    "build:android": "turbo run build --filter=@arivom-thittam/android",
-    "build:ios": "turbo run build --filter=@arivom-thittam/ios",
+    "build:web": "turbo run build --filter=@pacs-sahayak/web",
+    "build:android": "turbo run build --filter=@pacs-sahayak/android",
+    "build:ios": "turbo run build --filter=@pacs-sahayak/ios",
     "build:all": "turbo run build && node scripts/collect_build_artifacts.js",
     "lint": "turbo run lint",
     "clean": "turbo run clean",

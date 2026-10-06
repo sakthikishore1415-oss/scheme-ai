@@ -1,5 +1,5 @@
 /**
- * Arivom Thittam — Shared API Contracts & Models
+ * PACS Sahayak — Shared API Contracts & Models
  * Authoritative data structures for both Web (TypeScript) and Android (Kotlin).
  */
 

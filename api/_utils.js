@@ -31,6 +31,35 @@ function getApiKey() {
   return '';
 }
 
+function getXaiApiKey() {
+  if (process.env.XAI_API_KEY) {
+    return process.env.XAI_API_KEY.trim();
+  }
+  if (process.env.VITE_XAI_API_KEY) {
+    return process.env.VITE_XAI_API_KEY.trim();
+  }
+
+  const candidatePaths = [
+    path.resolve(process.cwd(), '.env'),
+    path.resolve(process.cwd(), 'apps', 'web', '.env'),
+    path.resolve(__dirname, '..', '.env'),
+  ];
+
+  for (const p of candidatePaths) {
+    try {
+      if (fs.existsSync(p)) {
+        const content = fs.readFileSync(p, 'utf-8');
+        const match = content.match(/^(?:VITE_)?XAI_API_KEY=(.+)$/m);
+        if (match && match[1]) {
+          return match[1].trim().replace(/^['"]|['"]$/g, '');
+        }
+      }
+    } catch (_) {}
+  }
+
+  return '';
+}
+
 function pcmToWav(pcmBuffer, sampleRate = 24000, numChannels = 1) {
   const byteRate = sampleRate * numChannels * 2;
   const blockAlign = numChannels * 2;
@@ -56,5 +85,6 @@ function pcmToWav(pcmBuffer, sampleRate = 24000, numChannels = 1) {
 
 module.exports = {
   getApiKey,
+  getXaiApiKey,
   pcmToWav,
 };

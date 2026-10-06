@@ -8,7 +8,7 @@ const rootDir = path.resolve(__dirname, '..');
 const androidDir = path.join(rootDir, 'apps', 'android');
 
 console.log('\n========================================');
-console.log('🤖 Building Android App (@arivom-thittam/android)');
+console.log('🤖 Building Android App (@pacs-sahayak/android)');
 console.log('========================================');
 
 // 1. Verify Android workspace files
@@ -76,9 +76,9 @@ if (javaAvailable && sdkAvailable) {
         const destDir = path.join(rootDir, 'dist', 'android');
         fs.mkdirSync(destDir, { recursive: true });
         const sourceApk = path.join(apkDir, apks[0]);
-        const targetApk = path.join(destDir, 'arivom-thittam.apk');
+        const targetApk = path.join(destDir, 'pacs-sahayak.apk');
         fs.copyFileSync(sourceApk, targetApk);
-        console.log(`\n🎉 Android APK built successfully: dist/android/arivom-thittam.apk\n`);
+        console.log(`\n🎉 Android APK built successfully: dist/android/pacs-sahayak.apk\n`);
       }
     }
   } catch (err) {

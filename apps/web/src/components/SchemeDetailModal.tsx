@@ -36,6 +36,7 @@ export const SchemeDetailModal: React.FC = () => {
     triggerMatchCelebration,
     userDocuments,
     toggleUserDocument,
+    uiStrings,
     t,
   } = useApp();
 
@@ -273,8 +274,8 @@ export const SchemeDetailModal: React.FC = () => {
               title="Discuss this scheme in Voice Assistant"
             >
               <Volume2 className="w-4 h-4 text-[#310a18]" />
-              <span className="hidden sm:inline">HEAR IN VOICE</span>
-              <span className="sm:hidden">HEAR</span>
+              <span className="hidden sm:inline">{uiStrings.hearInVoice || 'HEAR IN VOICE'}</span>
+              <span className="sm:hidden">{uiStrings.hear || 'HEAR'}</span>
             </button>
 
             <button
@@ -312,7 +313,7 @@ export const SchemeDetailModal: React.FC = () => {
                 : 'text-[#756a6f] hover:bg-[#eedfe4]'
             }`}
           >
-            OVERVIEW & ELIGIBILITY
+            {uiStrings.overview || 'OVERVIEW & ELIGIBILITY'}
           </button>
           <button
             id="detail-subtab-docs"
@@ -323,7 +324,7 @@ export const SchemeDetailModal: React.FC = () => {
                 : 'text-[#756a6f] hover:bg-[#eedfe4]'
             }`}
           >
-            <span>DOCUMENTS CHECKLIST</span>
+            <span>{uiStrings.documents || 'DOCUMENTS CHECKLIST'}</span>
             <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
               activeSubTab === 'DOCUMENTS' ? 'bg-[#6b3548] text-white' : 'bg-[#e8e1dc] text-[#241c20]'
             }`}>
@@ -339,7 +340,7 @@ export const SchemeDetailModal: React.FC = () => {
                 : 'text-[#756a6f] hover:bg-[#eedfe4]'
             }`}
           >
-            HOW TO APPLY
+            {uiStrings.howToApply || 'HOW TO APPLY'}
           </button>
           <button
             id="detail-subtab-simplified"
@@ -351,7 +352,7 @@ export const SchemeDetailModal: React.FC = () => {
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>EXPLAIN SIMPLY</span>
+            <span>{uiStrings.simplifiedSummary || 'EXPLAIN SIMPLY'}</span>
           </button>
         </div>
 
@@ -412,7 +413,7 @@ export const SchemeDetailModal: React.FC = () => {
                     onClick={() => setSelectedWhyMeScheme(matchResult)}
                     className="px-3.5 py-1.5 rounded-xl bg-[#4a1f2d] text-white font-bold text-xs hover:bg-[#6b3548] shrink-0 cursor-pointer"
                   >
-                    VIEW WHY ME
+                    {uiStrings.whyMe || 'VIEW WHY ME'}
                   </button>
                 </div>
               )}
@@ -443,7 +444,7 @@ export const SchemeDetailModal: React.FC = () => {
                       : 'bg-[#4a1f2d] text-white hover:bg-[#6b3548]'
                   }`}
                 >
-                  {isPlayingAudio ? 'STOP' : 'HEAR AUDIO'}
+                  {isPlayingAudio ? 'STOP' : (uiStrings.hear || 'HEAR AUDIO')}
                 </button>
               </div>
 

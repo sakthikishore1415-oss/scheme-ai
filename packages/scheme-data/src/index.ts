@@ -1,4 +1,4 @@
-import { Scheme, SchemeFilters } from '@arivom-thittam/api-contracts';
+import { Scheme, SchemeFilters } from '@pacs-sahayak/api-contracts';
 
 export interface SchemeRepositoryResponse {
   schemes: Scheme[];

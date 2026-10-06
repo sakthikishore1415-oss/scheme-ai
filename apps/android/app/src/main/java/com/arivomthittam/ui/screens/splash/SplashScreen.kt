@@ -69,31 +69,21 @@ fun SplashScreen(
         ) {
             Box(
                 modifier = Modifier
-                    .size(96.dp)
+                    .size(104.dp)
                     .clip(CircleShape)
                     .background(Color.White.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(72.dp)
-                        .clip(CircleShape)
-                        .background(Color.White),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "அ",
-                        color = PrimaryIndigo,
-                        fontSize = 38.sp,
-                        fontWeight = FontWeight.Black
-                    )
-                }
+                com.arivomthittam.ui.components.PacsAppIcon(
+                    size = 84.dp,
+                    isCircle = false
+                )
             }
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = "Arivom Thittam",
+                text = "PACS Sahayak",
                 color = Color.White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
@@ -101,7 +91,7 @@ fun SplashScreen(
             )
 
             Text(
-                text = "அறிவோம் திட்டம்",
+                text = "பேக்ஸ் சகாயக்",
                 color = PrimaryFixed,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,

@@ -1,7 +1,8 @@
 <resources>
-    <style name="Theme.ArivomThittam" parent="android:Theme.Material.Light.NoActionBar">
+    <style name="Theme.PacsSahayak" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">#047857</item>
         <item name="android:navigationBarColor">#0F172A</item>
     </style>
+    <style name="Theme.ArivomThittam" parent="Theme.PacsSahayak" />
 </resources>
 

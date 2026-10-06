@@ -1,4 +1,4 @@
-# Arivom Thittam — Authoritative Deterministic Eligibility Specification
+# PACS Sahayak — Authoritative Deterministic Eligibility Specification
 
 ## Principles
 1. **Zero Hallucination / No Generative Decision-Making**: AI/LLMs must NEVER decide eligibility.

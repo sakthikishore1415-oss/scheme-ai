@@ -74,6 +74,21 @@ export interface AppTranslationStrings {
   privacyNotice: string;
   verifiedOfficialBadge: string;
   offlineCenterNote: string;
+
+  // Convenience & Detail Modals
+  hearInVoice?: string;
+  hear?: string;
+  overview?: string;
+  documents?: string;
+  howToApply?: string;
+  simplifiedSummary?: string;
+  whyMe?: string;
+  close?: string;
+  noProfile?: string;
+  createProfile?: string;
+  createProfileNotice?: string;
+  citizenDemographics?: string;
+  familyMembers?: string;
 }
 
 export const UI_TRANSLATIONS: Record<string, AppTranslationStrings> = {
@@ -84,7 +99,7 @@ export const UI_TRANSLATIONS: Record<string, AppTranslationStrings> = {
     navProfile: 'சுயவிவரம்',
     navSupport: 'உதவி மையம்',
 
-    appTitle: 'அறிவோம் திட்டம்',
+    appTitle: 'பேக்ஸ் சகாயக்',
     appTagline: 'அரசு நலத்திட்டங்களை அறிந்து உரிமையோடு பெறுங்கள்',
     selectLanguage: 'மொழியை தேர்வு செய்க',
     changeState: 'மாநிலத்தை மாற்றுக',
@@ -149,7 +164,7 @@ export const UI_TRANSLATIONS: Record<string, AppTranslationStrings> = {
     navProfile: 'प्रोफ़ाइल',
     navSupport: 'सहायता केंद्र',
 
-    appTitle: 'अरिवोम थित्तम',
+    appTitle: 'पैक्स सहायक',
     appTagline: 'सरकारी योजनाओं को जानें, अपने अधिकार पाएं',
     selectLanguage: 'भाषा चुनें',
     changeState: 'राज्य बदलें',
@@ -214,7 +229,7 @@ export const UI_TRANSLATIONS: Record<string, AppTranslationStrings> = {
     navProfile: 'പ്രൊഫൈൽ',
     navSupport: 'സഹായം',
 
-    appTitle: 'അറിവോം തിട്ടം',
+    appTitle: 'പാക്സ് സഹായക്',
     appTagline: 'സർക്കാർ ക്ഷേമപദ്ധതികൾ അറിയൂ, അവകാശങ്ങൾ നേടൂ',
     selectLanguage: 'ഭാഷ തിരഞ്ഞെടുക്കൂ',
     changeState: 'സംസ്ഥാനം മാറ്റുക',
@@ -279,7 +294,7 @@ export const UI_TRANSLATIONS: Record<string, AppTranslationStrings> = {
     navProfile: 'ప్రొఫైల్',
     navSupport: 'సహాయ కేంద్రం',
 
-    appTitle: 'అరివోమ్ తిట్టం',
+    appTitle: 'ప్యాక్స్ సహాయక్',
     appTagline: 'ప్రభుత్వ సంక్షేమ పథకాలను తెలుసుకోండి, ప్రయోజనాలు పొందండి',
     selectLanguage: 'భాషను ఎంచుకోండి',
     changeState: 'రాష్ట్రాన్ని మార్చండి',
@@ -344,7 +359,7 @@ export const UI_TRANSLATIONS: Record<string, AppTranslationStrings> = {
     navProfile: 'ಪ್ರೊಫೈಲ್',
     navSupport: 'ಸಹಾಯ ಕೇಂದ್ರ',
 
-    appTitle: 'ಅರಿವೋಮ್ ತಿಟ್ಟಂ',
+    appTitle: 'ಪ್ಯಾಕ್ಸ್ ಸಹಾಯಕ',
     appTagline: 'ಸರ್ಕಾರಿ ಯೋಜನೆಗಳನ್ನು ತಿಳಿಯಿರಿ, ಸೌಲಭ್ಯಗಳನ್ನು ಪಡೆಯಿರಿ',
     selectLanguage: 'ಭಾಷೆ ಆಯ್ಕೆಮಾಡಿ',
     changeState: 'ರಾಜ್ಯ ಬದಲಾಯಿಸಿ',
@@ -409,7 +424,7 @@ export const UI_TRANSLATIONS: Record<string, AppTranslationStrings> = {
     navProfile: 'প্রোফাইল',
     navSupport: 'সহায়তা কেন্দ্র',
 
-    appTitle: 'অরিভোম থিত্তম',
+    appTitle: 'প্যাক্স সহায়ক',
     appTagline: 'সরকারি প্রকল্প জানুন, অধিকার বুঝে নিন',
     selectLanguage: 'ভাষা নির্বাচন করুন',
     changeState: 'রাজ্য পরিবর্তন করুন',
@@ -474,7 +489,7 @@ export const UI_TRANSLATIONS: Record<string, AppTranslationStrings> = {
     navProfile: 'माहिती',
     navSupport: 'मदत केंद्र',
 
-    appTitle: 'अरिवोम थित्तम',
+    appTitle: 'पॅक्स सहायक',
     appTagline: 'सरकारी योजना जाणून घ्या, हक्क मिळवा',
     selectLanguage: 'भाषा निवडा',
     changeState: 'राज्य बदला',
@@ -539,7 +554,7 @@ export const UI_TRANSLATIONS: Record<string, AppTranslationStrings> = {
     navProfile: 'પ્રોફાઇલ',
     navSupport: 'સહાય કેન્દ્ર',
 
-    appTitle: 'અરિવોમ થિત્તમ',
+    appTitle: 'પેક્સ સહાયક',
     appTagline: 'સરકારી યોજનાઓ જાણો, અધિકારો મેળવો',
     selectLanguage: 'ભાષા પસંદ કરો',
     changeState: 'રાજ્ય બદલો',
@@ -604,7 +619,7 @@ export const UI_TRANSLATIONS: Record<string, AppTranslationStrings> = {
     navProfile: 'ପ୍ରୋଫାଇଲ୍',
     navSupport: 'ସହାୟତା କେନ୍ଦ୍ର',
 
-    appTitle: 'ଅରିଭୋମ୍ ଥିତ୍ତମ',
+    appTitle: 'ପ୍ୟାକ୍ସ ସହାୟକ',
     appTagline: 'ସରକାରୀ ଯୋଜନା ଜାଣନ୍ତୁ, ଅଧିକାର ପାଆନ୍ତୁ',
     selectLanguage: 'ଭାଷା ବାଛନ୍ତୁ',
     changeState: 'ରାଜ୍ୟ ବଦଳାନ୍ତୁ',
@@ -669,7 +684,7 @@ export const UI_TRANSLATIONS: Record<string, AppTranslationStrings> = {
     navProfile: 'ਪ੍ਰੋਫਾਈਲ',
     navSupport: 'ਸਹਾਇਤਾ ਕੇਂਦਰ',
 
-    appTitle: 'ਅਰੀਵੋਮ ਥਿੱਤਮ',
+    appTitle: 'ਪੈਕਸ ਸਹਾਇਕ',
     appTagline: 'ਸਰਕਾਰੀ ਸਕੀਮਾਂ ਜਾਣੋ, ਲਾਭ ਪ੍ਰਾਪਤ ਕਰੋ',
     selectLanguage: 'ਭਾਸ਼ਾ ਚੁਣੋ',
     changeState: 'ਰਾਜ ਬਦਲੋ',
@@ -734,7 +749,7 @@ export const UI_TRANSLATIONS: Record<string, AppTranslationStrings> = {
     navProfile: 'প্ৰফাইল',
     navSupport: 'সহায়তা কেন্দ্ৰ',
 
-    appTitle: 'অৰিভোম থিত্তম',
+    appTitle: 'পেক্স সহায়ক',
     appTagline: 'চৰকাৰী আঁচনি জানক, সুবিধা লাভ কৰক',
     selectLanguage: 'ভাষা বাছক',
     changeState: 'ৰাজ্য সলনি কৰক',
@@ -799,7 +814,7 @@ export const UI_TRANSLATIONS: Record<string, AppTranslationStrings> = {
     navProfile: 'Profile',
     navSupport: 'Support',
 
-    appTitle: 'Arivom Thittam',
+    appTitle: 'PACS Sahayak',
     appTagline: 'Know your welfare schemes. Claim your entitlements.',
     selectLanguage: 'Select Language',
     changeState: 'Change State',
@@ -859,11 +874,20 @@ export const UI_TRANSLATIONS: Record<string, AppTranslationStrings> = {
 };
 
 export function getUITranslations(langId: string): AppTranslationStrings {
-  return UI_TRANSLATIONS[langId] || UI_TRANSLATIONS['en'];
+  const normalized = (langId || 'en').toLowerCase().split('-')[0].split('_')[0];
+  const strings = UI_TRANSLATIONS[normalized] || UI_TRANSLATIONS[langId] || UI_TRANSLATIONS['en'];
+  return {
+    ...strings,
+    whyMe: strings.whyThisMatchesBtn,
+    simplifiedSummary: strings.explainSimplyBtn,
+    createProfile: strings.profileHeading,
+    createProfileNotice: strings.privacyNotice,
+  };
 }
 
 export function getDualText(key: keyof AppTranslationStrings, langId: string): DualText {
-  const native = UI_TRANSLATIONS[langId]?.[key] || UI_TRANSLATIONS['en'][key];
+  const normalized = (langId || 'en').toLowerCase().split('-')[0].split('_')[0];
+  const native = UI_TRANSLATIONS[normalized]?.[key] || UI_TRANSLATIONS[langId]?.[key] || UI_TRANSLATIONS['en'][key];
   const en = UI_TRANSLATIONS['en'][key];
   return { native, en };
 }

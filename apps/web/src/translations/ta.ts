@@ -10,7 +10,7 @@ export const ta: TranslationDictionary = {
   'nav.support': 'உதவி மையம்',
 
   // Header & Brand
-  'header.title': 'அறிவோம் திட்டம்',
+  'header.title': 'பேக்ஸ் சகாயக்',
   'header.tagline': 'அரசு நலத்திட்டங்களை அறிந்து உரிமையோடு பெறுங்கள்',
   'header.createProfile': 'சுயவிவரம் உருவாக்குக',
   'header.selectLanguage': 'மொழியை தேர்வு செய்க',
@@ -108,7 +108,7 @@ export const ta: TranslationDictionary = {
   'voice.readyTitle': 'பேச தயாராக உள்ளது — தட்டவும்',
   'voice.listeningTitle': 'உங்கள் குரலை கவனிக்கிறோம்...',
   'voice.thinkingTitle': 'தகுதியை சரிபார்க்கிறோம்...',
-  'voice.speakingTitle': 'அறிவோம் திட்டம் பேசுகிறது...',
+  'voice.speakingTitle': 'பேக்ஸ் சகாயக் பேசுகிறது...',
   'voice.tapToSpeak': 'பேச தட்டவும்',
   'voice.stopListening': 'நிறுத்துக',
   'voice.typePlaceholder': 'உங்கள் விவரங்களை தட்டச்சு செய்க...',

@@ -16,7 +16,7 @@ export const SmsSimulator: React.FC = () => {
     {
       id: 'm1',
       sender: 'system',
-      text: 'ARIVOM THITTAM SMS HELPLINE: Send "SCHEME <SECTOR> <STATE>" (e.g. "SCHEME FARMER TN" or "SCHEME EDUCATION KL") to 51969 to query verified government schemes.',
+      text: 'PACS SAHAYAK SMS HELPLINE: Send "SCHEME <SECTOR> <STATE>" (e.g. "SCHEME FARMER TN" or "SCHEME EDUCATION KL") to 51969 to query verified government schemes.',
       time: 'Ready',
     },
   ]);
@@ -41,7 +41,7 @@ export const SmsSimulator: React.FC = () => {
     let reply = '';
 
     if (schemesStatus === 'NO_DATA' || schemes.length === 0) {
-      reply = 'ARIVOM:\nService unavailable.\nPlease try again later.';
+      reply = 'PACS SAHAYAK:\nService unavailable.\nPlease try again later.';
     } else {
       // Find matching schemes
       const matched = schemes.filter((s) => {
@@ -56,9 +56,9 @@ export const SmsSimulator: React.FC = () => {
           .slice(0, 3)
           .map((s, idx) => `${idx + 1}. ${s.name}: ${s.benefits?.amount || s.benefits?.shortSummary || ''}`)
           .join('\n');
-        reply = `ARIVOM THITTAM MATCHES:\n${list}\nApply with Aadhaar at nearest e-Seva center.`;
+        reply = `PACS SAHAYAK MATCHES:\n${list}\nApply with Aadhaar at nearest e-Seva center.`;
       } else {
-        reply = `ARIVOM:\nNo matching schemes found for query "${text}". Send "HELP" or visit your nearest Gram Panchayat e-Seva office.`;
+        reply = `PACS SAHAYAK:\nNo matching schemes found for query "${text}". Send "HELP" or visit your nearest Gram Panchayat e-Seva office.`;
       }
     }
 

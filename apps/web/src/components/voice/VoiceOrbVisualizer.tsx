@@ -35,7 +35,7 @@ export const VoiceOrbVisualizer: React.FC<VoiceOrbVisualizerProps> = ({
           coreGrad: 'radial-gradient(circle at 35% 35%, #c8a96b 0%, #6b3548 70%, #310a18 100%)',
           ringColor: 'rgba(200, 169, 107, 0.6)',
           rippleColor: 'rgba(200, 169, 107, 0.2)',
-          label: 'Arivom is thinking...',
+          label: 'PACS Sahayak is thinking...',
           statusBadge: 'bg-[#faf5ff] text-[#7e22ce] border-[#e9d5ff]',
         };
       case 'SPEAKING':
@@ -44,7 +44,7 @@ export const VoiceOrbVisualizer: React.FC<VoiceOrbVisualizerProps> = ({
           coreGrad: 'radial-gradient(circle at 35% 35%, #874d60 0%, #4a1f2d 70%, #241c20 100%)',
           ringColor: 'rgba(255, 181, 203, 0.7)',
           rippleColor: 'rgba(135, 77, 96, 0.25)',
-          label: 'Arivom speaking — tap to interrupt',
+          label: 'PACS Sahayak speaking — tap to interrupt',
           statusBadge: 'bg-[#fdf2f8] text-[#9d174d] border-[#fbcfe8]',
         };
       case 'PAUSED':
@@ -90,9 +90,9 @@ export const VoiceOrbVisualizer: React.FC<VoiceOrbVisualizerProps> = ({
         onClick={onClick}
         title={
           state === 'SPEAKING'
-            ? 'Arivom is speaking — Click to interrupt immediately and start speaking'
+            ? 'PACS Sahayak is speaking — Click to interrupt immediately and start speaking'
             : state === 'THINKING'
-            ? 'Arivom is thinking — Click to cancel and speak'
+            ? 'PACS Sahayak is thinking — Click to cancel and speak'
             : 'Tap orb to toggle voice interaction'
         }
       >
@@ -162,8 +162,20 @@ export const VoiceOrbVisualizer: React.FC<VoiceOrbVisualizerProps> = ({
             )}
 
             {state === 'READY' && (
-              <div className="text-white/90 font-bold text-lg tracking-wider flex items-center gap-1">
-                <span>{langInitial}</span>
+              <div className="flex items-center justify-center text-[#ffd9e1]">
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-7 h-7 drop-shadow-md animate-pulse text-[#ffd9e1]"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" fill="currentColor" fillOpacity="0.2" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" x2="12" y1="19" y2="22" />
+                </svg>
               </div>
             )}
 

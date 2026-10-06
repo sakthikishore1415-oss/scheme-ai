@@ -26,6 +26,8 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
     isSchemeSaved,
     easyMode,
     userProfile,
+    t,
+    uiStrings,
   } = useApp();
 
   const { scheme, score, matchLevel, criteriaBreakdown } = matchResult;
@@ -67,12 +69,12 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
                 )}`}
               >
                 <Sparkles className="w-3 h-3" />
-                {score}% PROFILE MATCH
+                {score}% {matchLevel === 'STRONG' ? uiStrings.strongMatchesBadge : uiStrings.potentialMatchesBadge}
               </span>
             ) : (
               <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-lg border flex items-center gap-1 bg-[#faf8f3] text-[#4a1f2d] border-[#e8e1dc]">
                 <Sparkles className="w-3 h-3 text-[#c8a96b]" />
-                OFFICIAL SCHEME
+                {t('scheme.verifiedBadge')}
               </span>
             )}
 
@@ -128,7 +130,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
         {/* Benefit Box */}
         <div className="mt-3.5 p-3 rounded-xl bg-[#faf8f3] border border-[#e8e1dc]">
           <span className="text-[10px] font-bold text-[#6b3548] uppercase tracking-wider block mb-0.5">
-            Potential Benefit
+            {t('scheme.benefits')}
           </span>
           <p className={`font-bold text-[#241c20] ${easyMode ? 'text-base' : 'text-sm'}`}>
             {scheme.benefits?.amount || scheme.benefits?.shortSummary || 'Welfare Entitlement'}
@@ -149,7 +151,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
               ) : (
                 <AlertTriangle className="w-3.5 h-3.5 text-[#c8a96b] shrink-0" />
               )}
-              Age
+              {t('profile.age')}
             </span>
             <span className="text-[#e8e1dc]">•</span>
             <span className="inline-flex items-center gap-1 text-[#514346] font-medium">
@@ -158,7 +160,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
               ) : (
                 <AlertTriangle className="w-3.5 h-3.5 text-[#c8a96b] shrink-0" />
               )}
-              Income
+              {t('profile.annualIncome')?.split(' ')[0] || 'Income'}
             </span>
             <span className="text-[#e8e1dc]">•</span>
             <span className="inline-flex items-center gap-1 text-[#514346] font-medium">
@@ -167,7 +169,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
               ) : (
                 <AlertTriangle className="w-3.5 h-3.5 text-[#c8a96b] shrink-0" />
               )}
-              Occupation
+              {t('profile.occupation')?.split(' ')[0] || 'Occupation'}
             </span>
             <span className="text-[#e8e1dc]">•</span>
             <span className="inline-flex items-center gap-1 text-[#514346] font-medium">
@@ -176,17 +178,17 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
               ) : (
                 <AlertTriangle className="w-3.5 h-3.5 text-[#c8a96b] shrink-0" />
               )}
-              State
+              {t('profile.state')}
             </span>
           </div>
         ) : (
           <div className="mt-3 flex items-center gap-2 flex-wrap text-[11px]">
             <span className="text-[#756a6f] font-medium">
-              Category: <strong className="text-[#4a1f2d] capitalize">{scheme.category || 'General'}</strong>
+              {scheme.category ? `${scheme.category.toUpperCase()}` : 'General'}
             </span>
             <span className="text-[#e8e1dc]">•</span>
             <span className="text-[#756a6f]">
-              {scheme.documents?.length || 0} Required Docs
+              {scheme.documents?.length || 0} {t('scheme.documents')}
             </span>
           </div>
         )}
@@ -200,20 +202,20 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
               id={`why-me-btn-${scheme.id}`}
               onClick={() => setSelectedWhyMeScheme(matchResult)}
               className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#faf8f3] text-[#4a1f2d] font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-[#e8e1dc]"
-              title="Explain why this scheme matches your profile"
+              title={uiStrings.whyThisMatchesBtn}
             >
               <HelpCircle className="w-3.5 h-3.5 text-[#4a1f2d]" />
-              <span>WHY ME?</span>
+              <span>{uiStrings.whyThisMatchesBtn || t('matches.whyMatches')}</span>
             </button>
           ) : (
             <button
               id={`criteria-btn-${scheme.id}`}
               onClick={() => setSelectedSchemeDetail(scheme)}
               className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#faf8f3] text-[#4a1f2d] font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer border border-[#e8e1dc]"
-              title="View eligibility criteria for this scheme"
+              title={uiStrings.checkEligibilityBtn}
             >
               <HelpCircle className="w-3.5 h-3.5 text-[#4a1f2d]" />
-              <span>CRITERIA</span>
+              <span>{uiStrings.checkEligibilityBtn || t('home.checkEligibility')}</span>
             </button>
           )}
 
@@ -222,10 +224,10 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
             id={`hear-scheme-voice-btn-${scheme.id}`}
             onClick={handlePlayVoice}
             className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#eedfe4] text-[#4a1f2d] font-bold text-xs flex items-center gap-1 border border-[#e8e1dc] transition-all cursor-pointer shadow-2xs"
-            title="Open Voice Assistant to hear and discuss this scheme"
+            title={t('home.startVoiceBtn')}
           >
             <Volume2 className="w-3.5 h-3.5 text-[#4a1f2d]" />
-            <span>HEAR</span>
+            <span>{t('home.startVoiceBtn')?.split(' ')[0] || 'VOICE'}</span>
           </button>
         </div>
 
@@ -235,7 +237,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ matchResult }) => {
           onClick={() => setSelectedSchemeDetail(scheme)}
           className="px-4 py-2 rounded-xl bg-[#4a1f2d] hover:bg-[#6b3548] text-white font-bold text-xs shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
         >
-          <span>DETAILS</span>
+          <span>{uiStrings.viewDetailsBtn || t('matches.viewDetails')}</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>

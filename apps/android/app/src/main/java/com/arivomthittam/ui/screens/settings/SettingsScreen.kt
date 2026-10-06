@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.arivomthittam.domain.language.AndroidTranslations
 import com.arivomthittam.ui.components.ArivomBottomBar
 import com.arivomthittam.ui.components.ArivomTopAppBar
 import com.arivomthittam.ui.navigation.Screen
@@ -42,18 +43,22 @@ import com.arivomthittam.ui.theme.SurfaceContainerLowest
 
 @Composable
 fun SettingsScreen(
+    language: String = "ta",
     onNavigate: (String) -> Unit
 ) {
     Scaffold(
         topBar = {
             ArivomTopAppBar(
-                title = "Arivom Thittam",
-                tamilTitle = "அமைப்புகள்"
+                title = "PACS Sahayak",
+                tamilTitle = AndroidTranslations.getString(language, "nav.support"),
+                currentLanguageName = AndroidTranslations.getLanguageDisplayName(language),
+                logoLetter = AndroidTranslations.getLogoLetter(language)
             )
         },
         bottomBar = {
             ArivomBottomBar(
                 currentRoute = Screen.Settings.route,
+                selectedLanguage = language,
                 onNavigate = onNavigate
             )
         }
@@ -134,7 +139,7 @@ fun SettingsScreen(
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Info, contentDescription = null, tint = PrimaryIndigo)
-                            Text("About Arivom Thittam (அறிவோம் திட்டம்)", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = OnSurface, modifier = Modifier.padding(start = 12.dp))
+                            Text("About PACS Sahayak", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = OnSurface, modifier = Modifier.padding(start = 12.dp))
                         }
                         Text(
                             text = "Premium Civic-Tech Architecture.\nNative Android application built in Kotlin + Jetpack Compose.\nAuthoritative deterministic rules engine with zero hallucination.",
